@@ -1,8 +1,10 @@
 """CLI interface for Full-Stack AI Agent Template Generator."""
 
+import subprocess
 from pathlib import Path
 
 import click
+from click.core import ParameterSource
 from rich.console import Console
 
 from . import __version__
@@ -1469,6 +1471,138 @@ def templates() -> None:
     console.print("  --no-env           Skip .env file generation")
     console.print("  --backend-port N   Backend port (default: 8000)")
     console.print("  --frontend-port N  Frontend port (default: 3000)")
+
+
+_PATH_OPTION = click.option(
+    "--path",
+    "project_path",
+    default=".",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, resolve_path=True, path_type=Path),
+    help="Project directory (default: current directory).",
+)
+
+
+def _git_error_message(exc: subprocess.CalledProcessError) -> str:
+    """Turn a failed git call into a message that keeps its stderr.
+
+    Every git call in the upgrade runs with ``check=True`` and captured output, so a
+    raw ``CalledProcessError`` would surface only the exit status and bury the actual
+    reason (bad git version, unicode pathspec, …) in the swallowed stderr.
+    """
+    cmd = exc.cmd
+    printable = " ".join(map(str, cmd)) if isinstance(cmd, (list, tuple)) else str(cmd)
+    detail = exc.stderr
+    if isinstance(detail, bytes):
+        detail = detail.decode("utf-8", "replace")
+    message = f"git command failed: {printable}"
+    if detail and detail.strip():
+        message += f"\n{detail.strip()}"
+    return message
+
+
+@cli.group(invoke_without_command=True)
+@_PATH_OPTION
+@click.option("--to", "to_version", default=None, help="Target version (default: latest).")
+@click.option("--dry-run", is_flag=True, help="Preview the upgrade without changing anything.")
+@click.option(
+    "--with-new-features",
+    is_flag=True,
+    help="Prompt to adopt optional features introduced since your version.",
+)
+@click.option(
+    "--force",
+    is_flag=True,
+    help="Recreate the upgrade branch if it exists, and overwrite colliding untracked files.",
+)
+@click.pass_context
+def upgrade(
+    ctx: click.Context,
+    project_path: Path,
+    to_version: str | None,
+    dry_run: bool,
+    with_new_features: bool,
+    force: bool,
+) -> None:
+    """Pull the latest template improvements into an existing project.
+
+    Run from inside a generated project. With no subcommand this performs the
+    upgrade; ``upgrade finalize`` bumps the manifest once conflicts are resolved.
+    """
+    if ctx.invoked_subcommand is not None:
+        # --path has a default, so "was it typed?" needs click's parameter source
+        # rather than a None check — otherwise `upgrade --path X finalize` silently
+        # finalizes the current directory instead of X.
+        path_given = ctx.get_parameter_source("project_path") is not ParameterSource.DEFAULT
+        misplaced = [
+            name
+            for name, given in (
+                ("--path", path_given),
+                ("--to", to_version is not None),
+                ("--dry-run", dry_run),
+                ("--with-new-features", with_new_features),
+                ("--force", force),
+            )
+            if given
+        ]
+        if misplaced:
+            # --path needs the opposite advice to the rest: the subcommands carry their
+            # own --path, so it moves *after* the subcommand. Telling the user to put it
+            # before (where they already had it, since that is what lands here) sends
+            # them in a circle, and dropping it would finalize the wrong directory.
+            fix = (
+                f"Use `upgrade {ctx.invoked_subcommand} --path ...` — the subcommand has "
+                "its own --path."
+                if misplaced == ["--path"]
+                else "Drop it, or run `upgrade` without a subcommand."
+            )
+            raise click.UsageError(
+                f"{', '.join(misplaced)} applies to `upgrade`, not "
+                f"`upgrade {ctx.invoked_subcommand}`. {fix}"
+            )
+        return
+
+    from .upgrade.runner import UpgradeError, run_upgrade
+
+    try:
+        run_upgrade(
+            project_path,
+            to_version=to_version,
+            dry_run=dry_run,
+            with_new_features=with_new_features,
+            force=force,
+        )
+    except subprocess.CalledProcessError as exc:
+        raise click.ClickException(_git_error_message(exc)) from exc
+    except (UpgradeError, FileNotFoundError, RuntimeError, ValueError) as exc:
+        raise click.ClickException(str(exc)) from exc
+
+
+@upgrade.command("finalize")
+@_PATH_OPTION
+def upgrade_finalize(project_path: Path) -> None:
+    """Bump the manifest to the new version after resolving conflicts."""
+    from .upgrade.runner import UpgradeError, run_finalize
+
+    try:
+        run_finalize(project_path)
+    except subprocess.CalledProcessError as exc:
+        raise click.ClickException(_git_error_message(exc)) from exc
+    except (UpgradeError, FileNotFoundError, RuntimeError, ValueError) as exc:
+        raise click.ClickException(str(exc)) from exc
+
+
+@upgrade.command("recover")
+@_PATH_OPTION
+def upgrade_recover(project_path: Path) -> None:
+    """Reconstruct a candidate manifest for a project generated before manifests."""
+    from .upgrade.runner import run_recover
+
+    try:
+        run_recover(project_path)
+    except subprocess.CalledProcessError as exc:  # pragma: no cover
+        raise click.ClickException(_git_error_message(exc)) from exc
+    except (FileNotFoundError, RuntimeError) as exc:  # pragma: no cover
+        raise click.ClickException(str(exc)) from exc
 
 
 def main() -> None:

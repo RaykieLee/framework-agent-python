@@ -8,6 +8,7 @@ from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from .config import DatabaseType, FrontendType, ProjectConfig
+from .upgrade import write_manifest
 
 console = Console()
 
@@ -97,6 +98,7 @@ def generate_project(config: ProjectConfig, output_dir: Path | None = None) -> P
                 output_dir=str(output_dir),
                 no_input=True,
             )
+            write_manifest(Path(project_path), context)
         except Exception:
             # Cleanup partial files on failure
             if target_dir.exists():
