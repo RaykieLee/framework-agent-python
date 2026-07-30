@@ -68,6 +68,36 @@ theme:
     - announce.dismiss
 
 plugins:
+  - i18n:
+      docs_structure: suffix
+      reconfigure_material: true
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: zh
+          name: 中文
+          build: true
+          nav_translations:
+            Home: 首页
+            Installation: 安装
+            Screenshots: 界面展示
+            "Getting Help": 获取帮助
+            Concepts: 核心概念
+            Overview: 概览
+            Architecture: 架构
+            "AI Agents": AI 智能体
+            Frontend: 前端
+            Guides: 指南
+            "Quick Start": 快速开始
+            Configuration: 配置
+            "Version Upgrade": 版本升级
+            Deployment: 部署
+            Observability: 可观测性
+            Development: 开发
+            Changelog: 更新日志
+
   - search:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - social:

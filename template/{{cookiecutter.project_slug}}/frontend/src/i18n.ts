@@ -1,7 +1,7 @@
 import { getRequestConfig } from "next-intl/server";
 
 {%- if cookiecutter.enable_i18n %}
-export const locales = ["en", "pl"] as const;
+export const locales = ["en", "pl", "zh"] as const;
 {%- else %}
 // i18n disabled at generation time — locked to a single locale.
 // To re-enable multi-language: regenerate with --i18n, or extend this list and
@@ -31,6 +31,7 @@ export function getLocaleLabel(locale: Locale): string {
     en: "English",
 {%- if cookiecutter.enable_i18n %}
     pl: "Polski",
+    zh: "中文",
 {%- endif %}
   };
   return labels[locale];
@@ -41,6 +42,7 @@ export function getLocaleFlag(locale: Locale): string {
     en: "🇬🇧",
 {%- if cookiecutter.enable_i18n %}
     pl: "🇵🇱",
+    zh: "🇨🇳",
 {%- endif %}
   };
   return flags[locale];
