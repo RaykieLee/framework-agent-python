@@ -206,7 +206,14 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      # qdrant's slim image ships no curl/wget; use bash's TCP client.
+      test:
+        - CMD-SHELL
+        - >-
+          bash -c 'exec 3<>/dev/tcp/127.0.0.1/6333 || exit 1;
+          printf "GET /healthz HTTP/1.0\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3;
+          IFS= read -r line <&3;
+          case "$$line" in *200*) exit 0;; *) exit 1;; esac'
       interval: 10s
       timeout: 5s
       retries: 5
