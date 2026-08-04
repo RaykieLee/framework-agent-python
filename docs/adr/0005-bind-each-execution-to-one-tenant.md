@@ -1,0 +1,3 @@
+# Bind every execution to exactly one tenant
+
+A conversation and every agent, team, knowledge, memory, workspace, and external connection operation it starts are bound to one Active Tenant. Personal knowledge, memory, and workspace resources are available only in the User's Personal Tenant; organization executions may use only that Tenant's resources plus deliberately published read-only Platform Resources and Personal Connections explicitly bound to that Tenant. This removes the convenience of carrying personal context into organization work, but prevents a User who belongs to multiple mutually untrusted Tenants from becoming a data bridge between them.

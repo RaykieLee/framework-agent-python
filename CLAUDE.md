@@ -116,3 +116,17 @@ template/
 - 模板变量：`template/cookiecutter.json`
 - 生成后逻辑：`template/hooks/post_gen_project.py`
 - 变量文档：`template/VARIABLES.md`
+
+## Agent skills
+
+### Issue tracker
+
+任务使用 `.scratch/<feature>/issues/` 下的本地 Markdown 文件。详见 `docs/agents/issue-tracker.md`。
+
+### Triage labels
+
+使用默认五状态词汇。详见 `docs/agents/triage-labels.md`。
+
+### Domain docs
+
+使用根目录 `CONTEXT.md` 和 `docs/adr/` 的单上下文结构。详见 `docs/agents/domain.md`。

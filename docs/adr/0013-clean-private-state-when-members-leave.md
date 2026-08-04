@@ -1,0 +1,3 @@
+# Clean private state when members leave and purge deleted tenants
+
+When a User leaves a Tenant, access is revoked immediately and that User's Personal Connections, User Memory, sessions, Execution Teams, and workspaces in the Tenant are deleted. Tenant Conversations and messages remain owned by the Tenant, with the former member retained only as a non-login audit identity. Deleting the Tenant launches an asynchronous Tenant Purge across SQL, Redis, Qdrant, knowledge vectors, and workspaces and records the outcome. This favors organizational continuity and verifiable deletion while keeping a departed member's private execution state from lingering.
