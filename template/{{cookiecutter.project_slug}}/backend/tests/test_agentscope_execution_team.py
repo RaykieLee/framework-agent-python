@@ -2,6 +2,8 @@
 """Contract tests for the conversation-scoped Execution Team seam."""
 
 from collections.abc import Sequence
+from typing import TypedDict
+from urllib.parse import unquote, urlsplit
 from uuid import uuid4
 
 import pytest
@@ -34,6 +36,15 @@ class FakeDefinitionResolver:
         return self.definitions
 
 
+class RedisMessageBusConfig(TypedDict):
+    """Typed kwargs accepted by AgentScope's RedisMessageBus constructor."""
+
+    host: str
+    port: int
+    db: int
+    password: str | None
+
+
 def _definition(slug: str, *, version: int = 1) -> AgentDefinitionRuntime:
     return AgentDefinitionRuntime(
         slug=slug,
@@ -62,6 +73,36 @@ def _coordinator(*slugs: str) -> AgentScopeExecutionTeamCoordinator:
         InMemoryMessageBus(),
         FakeDefinitionResolver([_definition(slug) for slug in slugs]),
     )
+
+
+def _redis_message_bus_kwargs(redis_url: str) -> RedisMessageBusConfig:
+    """Translate a Redis URI into AgentScope 2.x constructor arguments."""
+
+    parsed = urlsplit(redis_url)
+    if parsed.scheme not in {"redis", "rediss"} or parsed.hostname is None:
+        raise ValueError("AGENTSCOPE_INTEGRATION_REDIS_URL must be a redis:// URI")
+    try:
+        port = parsed.port or 6379
+    except ValueError as exc:
+        raise ValueError("AGENTSCOPE_INTEGRATION_REDIS_URL has an invalid port") from exc
+    db_path = parsed.path.strip("/")
+    if db_path and (not db_path.isdigit() or "/" in db_path):
+        raise ValueError("AGENTSCOPE_INTEGRATION_REDIS_URL database must be an integer path")
+    return {
+        "host": parsed.hostname,
+        "port": port,
+        "db": int(db_path or 0),
+        "password": unquote(parsed.password) if parsed.password else None,
+    }
+
+
+def test_redis_url_is_translated_to_native_message_bus_arguments() -> None:
+    assert _redis_message_bus_kwargs("redis://:p%40ss@redis.example:6381/4") == {
+        "host": "redis.example",
+        "port": 6381,
+        "db": 4,
+        "password": "p@ss",
+    }
 
 
 @pytest.mark.anyio
@@ -212,7 +253,7 @@ async def test_redis_message_bus_boundary_is_explicit() -> None:
         pytest.skip("set AGENTSCOPE_INTEGRATION_REDIS_URL for Redis MessageBus integration")
     from agentscope.app.message_bus import RedisMessageBus
 
-    async with RedisMessageBus(url=redis_url) as bus:
+    async with RedisMessageBus(**_redis_message_bus_kwargs(redis_url)) as bus:
         coordinator = AgentScopeExecutionTeamCoordinator(
             bus, FakeDefinitionResolver([_definition("writer")])
         )

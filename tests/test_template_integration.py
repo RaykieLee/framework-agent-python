@@ -516,6 +516,10 @@ class TestGeneratedAgentScopeExecutionTeam:
         assert "MessageBus" in content
         assert "NestedTeamNotAllowed" in content
         assert "def reconnect" in content
+        contract = (root / "tests" / "test_agentscope_execution_team.py").read_text()
+        assert "urlsplit" in contract
+        assert "RedisMessageBus(**_redis_message_bus_kwargs(redis_url))" in contract
+        assert '"db": int(db_path or 0)' in contract
 
 
 @pytest.fixture(scope="module")
