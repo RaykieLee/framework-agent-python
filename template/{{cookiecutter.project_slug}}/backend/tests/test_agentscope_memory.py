@@ -126,6 +126,17 @@ async def test_memory_is_available_to_a_fresh_context_for_same_scope() -> None:
 
 
 @pytest.mark.anyio
+async def test_memory_without_complete_namespace_metadata_is_rejected() -> None:
+    backend = FakeMem0()
+    scope = _context().scope
+    backend.records[backend._key(scope.mem0_user_id, scope.mem0_agent_id)] = [
+        {"id": "unscoped", "memory": "must not leak", "metadata": {"tenant_id": scope.tenant_id}}
+    ]
+
+    assert await AgentScopeUserMemoryAdapter(backend).search(_context(), "leak") == []
+
+
+@pytest.mark.anyio
 async def test_consent_is_required_for_runtime_read_write_and_middleware() -> None:
     adapter = AgentScopeUserMemoryAdapter(FakeMem0())
     context = _context(consent_granted=False)

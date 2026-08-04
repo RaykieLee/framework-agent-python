@@ -312,7 +312,9 @@ class AgentScopeUserMemoryAdapter:
         records: list[UserMemoryRecord] = []
         for item in raw_items:
             if isinstance(item, str):
-                records.append(UserMemoryRecord(memory_id=None, text=item))
+                # A bare text result carries no proof of its tenant/user/
+                # agent namespace.  Reject it rather than risk a leak from a
+                # misconfigured or legacy Mem0 collection.
                 continue
             if not isinstance(item, Mapping):
                 continue
@@ -338,7 +340,7 @@ class AgentScopeUserMemoryAdapter:
     @staticmethod
     def _metadata_matches_scope(metadata: Mapping[str, Any], scope: UserMemoryScope) -> bool:
         expected = scope.metadata
-        return all(key not in metadata or str(metadata[key]) == value for key, value in expected.items())
+        return all(key in metadata and str(metadata[key]) == value for key, value in expected.items())
 
     @staticmethod
     def _parse_datetime(value: Any) -> datetime | None:
