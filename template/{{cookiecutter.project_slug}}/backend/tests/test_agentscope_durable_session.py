@@ -32,7 +32,7 @@ async def test_mapping_survives_new_process_and_is_tenant_prefixed() -> None:
     second_ref = await second.open()
 
     assert first_ref == second_ref
-    assert mapping_key("tenant-a", "conv-1").startswith("agentscope:")
+    assert mapping_key("tenant-a", "conv-1").startswith("agentscope:tenant:tenant-a-")
     assert request_key(first_ref) != request_key(first_ref.__class__("tenant-b", "conv-1", first_ref.agent_session_id))
     assert event_key(first_ref).startswith("agentscope:")
 

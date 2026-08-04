@@ -259,16 +259,18 @@ class RedisPostgresDurableSessionStore:
 
 
 def _safe_component(value: str) -> str:
-    """Avoid key-prefix collisions and untrusted Redis key characters."""
-    return hashlib.sha256(str(value).encode("utf-8")).hexdigest()[:32]
+    """Keep a readable tenant prefix while preventing key collisions."""
+    raw = "".join(char if char.isalnum() or char in "._-" else "_" for char in str(value))
+    digest = hashlib.sha256(str(value).encode("utf-8")).hexdigest()[:16]
+    return f"{raw[:48] or 'empty'}-{digest}"
 
 
 def mapping_key(tenant_id: str, conversation_id: str) -> str:
-    return f"agentscope:{_safe_component(tenant_id)}:conversation:{_safe_component(conversation_id)}:mapping"
+    return f"agentscope:tenant:{_safe_component(tenant_id)}:conversation:{_safe_component(conversation_id)}:mapping"
 
 
 def session_key(ref: AgentScopeSessionRef) -> str:
-    return f"agentscope:{_safe_component(ref.tenant_id)}:conversation:{_safe_component(ref.conversation_id)}:session"
+    return f"agentscope:tenant:{_safe_component(ref.tenant_id)}:conversation:{_safe_component(ref.conversation_id)}:session"
 
 
 def request_key(ref: AgentScopeSessionRef) -> str:
