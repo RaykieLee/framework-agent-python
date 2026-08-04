@@ -23,13 +23,15 @@
 - Worker failures emit a leader-visible event and do not cancel siblings. Usage
   event IDs and terminal-state guards make charging and finalization idempotent.
 - `RedisPostgresTeamRunStore` defines the production PostgreSQL source-of-truth
-  and Redis-lock seam; no AgentScope source is modified.
+  and Redis-lock seam. `RedisTeamRunCancellation` adds tenant-prefixed
+  cancellation flags for workers in other processes; no AgentScope source is
+  modified.
 
 ## Verification
 
 - Generated AgentScope + PostgreSQL + Redis + Qdrant + Billing + Credits
   project: targeted Ruff and Ty checks pass.
-- Team Run contract suite: `11 passed`; the marked PostgreSQL/Redis boundary is
+- Team Run contract suite: `12 passed`; the marked PostgreSQL/Redis boundary is
   skipped unless the generated app injects live infrastructure fixtures.
 - Root generation assertion: `1 passed`.
 - Normal generated pytest collection remains environment-blocked by the
