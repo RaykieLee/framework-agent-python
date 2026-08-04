@@ -267,13 +267,14 @@
 
 | 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
-| `ai_framework` | enum | `"pydantic_ai"` | AI framework. Values: `pydantic_ai`, `langchain`, `langgraph`, `deepagents`, `pydantic_deep`, `none` | - |
+| `ai_framework` | enum | `"pydantic_ai"` | AI framework. Values: `pydantic_ai`, `langchain`, `langgraph`, `deepagents`, `pydantic_deep`, `agentscope`, `none` | - |
 | `use_ai` | bool | `true` | Any AI framework is selected (false when `ai_framework=none`) | Computed from `ai_framework` |
 | `use_pydantic_ai` | bool | `true` | PydanticAI is selected | Computed from `ai_framework` |
 | `use_langchain` | bool | `false` | LangChain is selected | Computed from `ai_framework` |
 | `use_langgraph` | bool | `false` | LangGraph (ReAct agent) is selected | Computed from `ai_framework` |
 | `use_deepagents` | bool | `false` | DeepAgents (agentic coding, LangChain) is selected | Computed from `ai_framework` |
 | `use_pydantic_deep` | bool | `false` | PydanticDeep (deep agentic coding, Docker sandbox) is selected | Computed from `ai_framework` |
+| `use_agentscope` | bool | `false` | AgentScope (multi-agent execution runtime) is selected | Computed from `ai_framework`; requires PostgreSQL, Redis, Docker, and Qdrant |
 | `sandbox_backend` | enum | `"state"` | Agent sandbox environment for DeepAgents/PydanticDeep. Values: `state`, `daytona` | Only used when `use_deepagents` or `use_pydantic_deep` is true |
 | `llm_provider` | enum | `"openai"` | LLM provider. Values: `openai`, `anthropic`, `google`, `openrouter` | - |
 | `use_openai` | bool | `true` | OpenAI is selected | Computed from `llm_provider` |

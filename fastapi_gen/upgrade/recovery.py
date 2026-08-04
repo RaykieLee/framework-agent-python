@@ -31,6 +31,7 @@ _PRESENCE_DETECTORS: tuple[tuple[str, str], ...] = (
     ("use_langgraph", "backend/app/agents/langgraph_assistant.py"),
     ("use_deepagents", "backend/app/agents/deepagents_assistant.py"),
     ("use_pydantic_deep", "backend/app/agents/pydantic_deep_assistant.py"),
+    ("use_agentscope", "backend/app/agents/agentscope_assistant.py"),
 )
 
 _UNRECOVERABLE = (

@@ -12,7 +12,8 @@
  {%- if cookiecutter.enable_redis %}, Redis{%- endif %}
  {%- if cookiecutter.use_pydantic_ai %}, PydanticAI{%- endif %}
  {%- if cookiecutter.use_langchain %}, LangChain{%- endif %}
- {%- if cookiecutter.use_langgraph %}, LangGraph{%- endif %}{%- if cookiecutter.use_deepagents %}, DeepAgents{%- endif %}
+{%- if cookiecutter.use_langgraph %}, LangGraph{%- endif %}{%- if cookiecutter.use_deepagents %}, DeepAgents{%- endif %}
+{%- if cookiecutter.use_agentscope %}, AgentScope{%- endif %}
  {%- if cookiecutter.enable_rag %}, RAG（{{ cookiecutter.vector_store }}）{%- endif %}
  {%- if cookiecutter.use_celery %}, Celery{%- endif %}
  {%- if cookiecutter.use_taskiq %}, Taskiq{%- endif %}

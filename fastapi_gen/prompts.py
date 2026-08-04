@@ -58,7 +58,7 @@ def _select_with_back(
     message: str,
     choices: list,
     *,
-    default: Any = 无,
+    default: Any = None,
     allow_back: bool = True,
 ) -> Any:
     """questionary.select wrapper that injects '← 返回' on top.
@@ -68,7 +68,7 @@ def _select_with_back(
     """
     full_choices = ([_back_choice()] if allow_back else []) + list(choices)
     answer = questionary.select(message, choices=full_choices, default=default).ask()
-    if answer is 无:
+    if answer is None:
         raise KeyboardInterrupt
     return answer
 
@@ -89,7 +89,7 @@ def _confirm_with_back(message: str, *, default: bool = False, allow_back: bool 
         choices=options,
         default=yes if default else no,
     ).ask()
-    if answer is 无:
+    if answer is None:
         raise KeyboardInterrupt
     return answer
 
@@ -106,7 +106,7 @@ def _section_gate(_section_name: str, *, can_go_back: bool) -> bool:  # noqa: AR
     return True
 
 
-def show_header() -> 无:
+def show_header() -> None:
     """Display the generator header."""
     header = Text()
     header.append("全栈 AI Agent 模板", style="bold cyan")
@@ -118,7 +118,7 @@ def show_header() -> 无:
 
 def _check_cancelled(value: Any) -> Any:
     """Check if the user cancelled the prompt and raise KeyboardInterrupt if so."""
-    if value is 无:
+    if value is None:
         raise KeyboardInterrupt
     return value
 
@@ -719,6 +719,10 @@ def prompt_ai_framework() -> AIFrameworkType:
         questionary.Choice(
             "PydanticDeep（深度编码 Agent，Docker 沙箱）",
             value=AIFrameworkType.PYDANTIC_DEEP,
+        ),
+        questionary.Choice(
+            "AgentScope（团队协作运行时，PostgreSQL + Redis + Qdrant）",
+            value=AIFrameworkType.AGENTSCOPE,
         ),
         questionary.Choice(
             "无 — plain SaaS (no AI/chat/agents generated)",
@@ -1531,20 +1535,20 @@ def run_interactive_prompts() -> ProjectConfig:
     # one snapshot per step so back navigation can roll back the merges that
     # this step contributed.
 
-    def step_basic_info() -> 无:
+    def step_basic_info() -> None:
         info = prompt_basic_info()
         state.update(info)
 
-    def step_database() -> 无:
+    def step_database() -> None:
         state["database"] = prompt_database()
 
-    def step_orm_type() -> 无:
+    def step_orm_type() -> None:
         state["orm_type"] = prompt_orm_type()
 
-    def step_oauth() -> 无:
+    def step_oauth() -> None:
         state["oauth_provider"] = prompt_oauth()
 
-    def step_session() -> 无:
+    def step_session() -> None:
         state["enable_session_management"] = _check_cancelled(
             questionary.confirm(
                 "启用会话管理？（追踪活跃会话，从设备登出）",
@@ -1552,7 +1556,7 @@ def run_interactive_prompts() -> ProjectConfig:
             ).ask()
         )
 
-    def step_auth_mode() -> 无:
+    def step_auth_mode() -> None:
         auth_mode, use_shared_secret, external_user_id = prompt_auth_mode(
             oauth_provider=state.get("oauth_provider", OAuthProvider.NONE),
             enable_session_management=state.get("enable_session_management", False),
@@ -1564,10 +1568,10 @@ def run_interactive_prompts() -> ProjectConfig:
             state["oauth_provider"] = OAuthProvider.NONE
             state["enable_session_management"] = False
 
-    def step_background_tasks() -> 无:
+    def step_background_tasks() -> None:
         state["background_tasks"] = prompt_background_tasks()
 
-    def step_integrations() -> 无:
+    def step_integrations() -> None:
         state["integrations"] = prompt_integrations(
             database=state["database"], orm_type=state["orm_type"]
         )
@@ -1579,16 +1583,16 @@ def run_interactive_prompts() -> ProjectConfig:
         ):
             state["integrations"]["enable_redis"] = True
 
-    def step_dev_tools() -> 无:
+    def step_dev_tools() -> None:
         state["dev_tools"] = prompt_dev_tools()
 
-    def step_reverse_proxy() -> 无:
+    def step_reverse_proxy() -> None:
         if state["dev_tools"].get("enable_docker"):
             state["reverse_proxy"] = prompt_reverse_proxy()
         else:
             state["reverse_proxy"] = ReverseProxyType.NONE
 
-    def step_frontend() -> 无:
+    def step_frontend() -> None:
         state["frontend"] = prompt_frontend()
         if (
             state["frontend"] == FrontendType.NONE
@@ -1602,16 +1606,16 @@ def run_interactive_prompts() -> ProjectConfig:
         if state["frontend"] != FrontendType.NONE:
             state["brand_color"] = prompt_brand_color()
 
-    def step_python_version() -> 无:
+    def step_python_version() -> None:
         state["python_version"] = prompt_python_version()
 
-    def step_ports() -> 无:
+    def step_ports() -> None:
         state["ports"] = prompt_ports(has_frontend=state["frontend"] != FrontendType.NONE)
 
-    def step_ai_framework() -> 无:
+    def step_ai_framework() -> None:
         state["ai_framework"] = prompt_ai_framework()
 
-    def step_logfire() -> 无:
+    def step_logfire() -> None:
         # Skip Logfire prompt entirely when no AI framework is selected.
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["enable_logfire"] = True
@@ -1623,7 +1627,7 @@ def run_interactive_prompts() -> ProjectConfig:
                 state["background_tasks"], state["ai_framework"]
             )
 
-    def step_sandbox_backend() -> 无:
+    def step_sandbox_backend() -> None:
         if state["ai_framework"] in (
             AIFrameworkType.DEEPAGENTS,
             AIFrameworkType.PYDANTIC_DEEP,
@@ -1632,13 +1636,13 @@ def run_interactive_prompts() -> ProjectConfig:
         else:
             state["sandbox_backend"] = "state"
 
-    def step_llm_provider() -> 无:
+    def step_llm_provider() -> None:
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["llm_provider"] = LLMProviderType.OPENAI  # irrelevant, but must be valid
         else:
             state["llm_provider"] = prompt_llm_provider(state["ai_framework"])
 
-    def step_web_capabilities() -> 无:
+    def step_web_capabilities() -> None:
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["enable_web_search"] = False
             state["enable_web_fetch"] = False
@@ -1648,7 +1652,7 @@ def run_interactive_prompts() -> ProjectConfig:
                 state["enable_web_fetch"],
             ) = prompt_web_capabilities(state["ai_framework"])
 
-    def step_rag_config() -> 无:
+    def step_rag_config() -> None:
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["rag_features"] = RAGFeatures()  # RAG 已禁用 when no AI
         else:
@@ -1667,25 +1671,25 @@ def run_interactive_prompts() -> ProjectConfig:
                 )
                 state["dev_tools"]["enable_docker"] = True
 
-    def step_charts() -> 无:
+    def step_charts() -> None:
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["enable_charts"] = False
         else:
             state["enable_charts"] = prompt_charts()
 
-    def step_code_execution() -> 无:
+    def step_code_execution() -> None:
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["enable_code_execution"] = False
         else:
             state["enable_code_execution"] = prompt_code_execution()
 
-    def step_skills() -> 无:
+    def step_skills() -> None:
         if state["ai_framework"] == AIFrameworkType.PYDANTIC_AI:
             state["enable_skills"] = prompt_skills()
         else:
             state["enable_skills"] = False
 
-    def step_deep_research() -> 无:
+    def step_deep_research() -> None:
         if state.get("ai_framework") == AIFrameworkType.PYDANTIC_AI.value:
             result = prompt_deep_research()
             state["enable_deep_research"] = result["enable_deep_research"]
@@ -1696,13 +1700,13 @@ def run_interactive_prompts() -> ProjectConfig:
             state["enable_todo"] = False
             state["enable_subagents"] = False
 
-    def step_mcp_client() -> 无:
+    def step_mcp_client() -> None:
         if state.get("ai_framework") == AIFrameworkType.PYDANTIC_AI.value:
             state["enable_mcp_client"] = prompt_mcp_client()
         else:
             state["enable_mcp_client"] = False
 
-    def step_langsmith() -> 无:
+    def step_langsmith() -> None:
         if state["ai_framework"] in (
             AIFrameworkType.LANGCHAIN,
             AIFrameworkType.LANGGRAPH,
@@ -1712,24 +1716,24 @@ def run_interactive_prompts() -> ProjectConfig:
         else:
             state["enable_langsmith"] = False
 
-    def step_channels() -> 无:
+    def step_channels() -> None:
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["use_telegram"] = False
             state["use_slack"] = False
         else:
             state["use_telegram"], state["use_slack"] = prompt_channels()
 
-    def step_teams_billing() -> 无:
+    def step_teams_billing() -> None:
         state["teams_billing"] = prompt_teams_billing(database=state["database"])
 
-    def step_email() -> 无:
+    def step_email() -> None:
         (
             state["enable_email"],
             state["email_provider"],
             state["enable_newsletter_signup"],
         ) = prompt_email_config()
 
-    def step_rate_limit_config() -> 无:
+    def step_rate_limit_config() -> None:
         if state["integrations"].get("enable_rate_limiting"):
             (
                 state["rate_limit_requests"],
@@ -1739,7 +1743,7 @@ def run_interactive_prompts() -> ProjectConfig:
                 redis_已启用=state["integrations"].get("enable_redis", False)
             )
 
-    def step_marketing() -> 无:
+    def step_marketing() -> None:
         if state["frontend"] != FrontendType.NONE:
             state["marketing_features"] = prompt_marketing_features()
         else:
@@ -1904,7 +1908,7 @@ def run_interactive_prompts() -> ProjectConfig:
     return config
 
 
-def show_summary(config: ProjectConfig) -> 无:
+def show_summary(config: ProjectConfig) -> None:
     """Display configuration summary."""
     console.print()
     console.print("[bold green]配置摘要[/]")

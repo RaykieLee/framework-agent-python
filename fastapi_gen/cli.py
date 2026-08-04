@@ -388,7 +388,15 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
 @click.option(
     "--ai-framework",
     type=click.Choice(
-        ["none", "pydantic_ai", "langchain", "langgraph", "deepagents", "pydantic_deep"]
+        [
+            "none",
+            "pydantic_ai",
+            "langchain",
+            "langgraph",
+            "deepagents",
+            "pydantic_deep",
+            "agentscope",
+        ]
     ),
     default="pydantic_ai",
     help="AI ??????pydantic_ai???? none ??? SaaS?? AI/???",
@@ -1357,6 +1365,9 @@ def templates() -> None:
     console.print("  --ai-framework deepagents       DeepAgents??? Agent??????")
     console.print(
         "  --ai-framework pydantic_deep    PydanticDeep????? Agent?Docker ???"
+    )
+    console.print(
+        "  --ai-framework agentscope       AgentScope（需 PostgreSQL + Redis + Docker + Qdrant）"
     )
     console.print("  --llm-provider openai           OpenAI")
     console.print("  --llm-provider anthropic        Anthropic")

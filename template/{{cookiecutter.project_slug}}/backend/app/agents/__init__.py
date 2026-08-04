@@ -50,6 +50,12 @@ task management, subagent delegation, skills, memory, and Docker sandbox support
 from app.agents.pydantic_deep_assistant import PydanticDeepAssistant, PydanticDeepContext
 
 __all__ = ["PydanticDeepAssistant", "PydanticDeepContext"]
+{%- elif cookiecutter.use_agentscope %}
+"""AI Agents module using AgentScope."""
+
+from app.agents.agentscope_assistant import AgentScopeAssistant, get_agent
+
+__all__ = ["AgentScopeAssistant", "get_agent"]
 {%- else %}
 """AI Agents - not configured."""
 {%- endif %}

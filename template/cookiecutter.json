@@ -74,6 +74,7 @@
   "use_langgraph": false,
   "use_deepagents": false,
   "use_pydantic_deep": false,
+  "use_agentscope": false,
   "sandbox_backend": "state",
   "use_slack": false,
   "llm_provider": "openai",

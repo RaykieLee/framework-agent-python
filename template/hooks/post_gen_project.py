@@ -52,6 +52,7 @@ enable_todo = "{{ cookiecutter.enable_todo }}" == "True"
 enable_subagents = "{{ cookiecutter.enable_subagents }}" == "True"
 enable_mcp_client = "{{ cookiecutter.enable_mcp_client }}" == "True"
 use_pydantic_deep = "{{ cookiecutter.use_pydantic_deep }}" == "True"
+use_agentscope = "{{ cookiecutter.use_agentscope }}" == "True"
 use_telegram = "{{ cookiecutter.use_telegram }}" == "True"
 use_slack = "{{ cookiecutter.use_slack }}" == "True"
 enable_docker = "{{ cookiecutter.enable_docker }}" == "True"
@@ -138,6 +139,8 @@ if not use_deepagents:
     remove_file(os.path.join(backend_app, "agents", "deepagents_assistant.py"))
 if not use_pydantic_deep:
     remove_file(os.path.join(backend_app, "agents", "pydantic_deep_assistant.py"))
+if not use_agentscope:
+    remove_file(os.path.join(backend_app, "agents", "agentscope_assistant.py"))
 if not enable_web_search:
     remove_file(os.path.join(backend_app, "agents", "tools", "web_search.py"))
     remove_file(os.path.join(os.getcwd(), "backend", "tests", "test_web_search.py"))

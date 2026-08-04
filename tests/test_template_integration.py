@@ -231,6 +231,14 @@ MATRIX_CONFIGS: dict[str, dict] = {
         enable_redis=True,
         background_tasks=BackgroundTaskType.NONE,
     ),
+    "agentscope_pg_redis_qdrant": dict(
+        database=DatabaseType.POSTGRESQL,
+        ai_framework=AIFrameworkType.AGENTSCOPE,
+        enable_redis=True,
+        enable_docker=True,
+        background_tasks=BackgroundTaskType.NONE,
+        rag_features=RAGFeatures(enable_rag=True, vector_store=VectorStoreType.QDRANT),
+    ),
     # --- LLM providers ----------------------------------------------------
     "openrouter": dict(
         database=DatabaseType.POSTGRESQL,
@@ -373,6 +381,44 @@ class TestGeneratedTemplateMatrix:
             cwd=backend_path,
         )
         assert result.returncode == 0, f"ty failed:\n{result.stdout}\n{result.stderr}"
+
+
+@pytest.fixture(scope="module")
+def generated_agentscope_project(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Generate the production-baseline AgentScope configuration."""
+    config = ProjectConfig(
+        project_name="test_agentscope_baseline",
+        database=DatabaseType.POSTGRESQL,
+        ai_framework=AIFrameworkType.AGENTSCOPE,
+        enable_redis=True,
+        enable_docker=True,
+        background_tasks=BackgroundTaskType.NONE,
+        rag_features=RAGFeatures(enable_rag=True, vector_store=VectorStoreType.QDRANT),
+    )
+    return generate_project(config, tmp_path_factory.mktemp("agentscope_baseline"))
+
+
+class TestGeneratedAgentScopeBaseline:
+    """Verify generated AgentScope projects contain the production baseline."""
+
+    @pytest.mark.slow
+    def test_dependencies_and_services_are_persistent(self, generated_agentscope_project: Path) -> None:
+        backend_pyproject = (
+            generated_agentscope_project / "backend" / "pyproject.toml"
+        ).read_text()
+        compose = (generated_agentscope_project / "docker-compose.yml").read_text()
+
+        assert "agentscope[storage-redis,storage-sql,vdb-qdrant,memory-mem0]" in backend_pyproject
+        assert "qdrant/qdrant" in compose
+        assert "qdrant_data:/qdrant/storage" in compose
+        assert "redis:7-alpine" in compose
+
+    @pytest.mark.slow
+    def test_runtime_scaffold_is_generated(self, generated_agentscope_project: Path) -> None:
+        root = generated_agentscope_project / "backend" / "app"
+        assert (root / "agents" / "agentscope_assistant.py").exists()
+        assert (root / "services" / "agent_session.py").exists()
+        assert "AgentScope" in (root / "agents" / "agentscope_assistant.py").read_text()
 
 
 # ---------------------------------------------------------------------------

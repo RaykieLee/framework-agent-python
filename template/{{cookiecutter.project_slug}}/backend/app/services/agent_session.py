@@ -2735,6 +2735,38 @@ class AgentSession:
                         "content": str(tool_event.result.content),
                     },
                 )
+{%- elif cookiecutter.use_agentscope %}
+"""AgentScope WebSocket session seam.
+
+The full event adapter is implemented in the next ticket. This baseline keeps
+the generated application importable while making AgentScope an explicit,
+mutually-exclusive runtime choice.
+"""
+
+from typing import Any
+
+from fastapi import WebSocket
+
+
+class AgentSession:
+    """Minimal session boundary reserved for the AgentScope adapter."""
+
+    def __init__(self, websocket: WebSocket, user: Any = None) -> None:
+        self.websocket = websocket
+        self.user = user
+
+    async def handle_frame(self, _data: dict[str, Any]) -> None:
+        """Reject execution until the streaming adapter is installed."""
+        await self.websocket.send_json(
+            {
+                "type": "error",
+                "data": {"message": "AgentScope execution adapter is not enabled yet"},
+            }
+        )
+
+    async def shutdown(self) -> None:
+        """Release any resources held by the session."""
+        return None
 {%- else %}
 """AI Agent session - not configured."""
 {%- endif %}

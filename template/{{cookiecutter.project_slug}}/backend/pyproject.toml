@@ -173,6 +173,11 @@ dependencies = [
     # pydantic-ai with web search and fetch support (WebSearch, WebFetch capabilities)
     "pydantic-ai-slim[duckduckgo,web-fetch]>=1.80.0",
 {%- endif %}
+{%- if cookiecutter.use_agentscope %}
+    # AgentScope production runtime: durable SQL/Redis services, Qdrant
+    # vector backend, and Mem0 user-memory support.
+    "agentscope[storage-redis,storage-sql,vdb-qdrant,memory-mem0]>=2.0.5",
+{%- endif %}
 {%- if cookiecutter.enable_rag %}
     # Vector store
 {%- if cookiecutter.use_milvus %}

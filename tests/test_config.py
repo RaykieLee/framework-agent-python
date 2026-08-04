@@ -71,6 +71,10 @@ class TestEnums:
         assert OrmType.SQLALCHEMY.value == "sqlalchemy"
         assert OrmType.SQLMODEL.value == "sqlmodel"
 
+    def test_agentscope_framework_value(self) -> None:
+        """AgentScope is exposed as a distinct sixth runtime selection."""
+        assert AIFrameworkType.AGENTSCOPE.value == "agentscope"
+
 
 class TestLogfireFeatures:
     """Tests for LogfireFeatures model."""
@@ -108,6 +112,52 @@ class TestProjectConfig:
         config = ProjectConfig(project_name="myproject", background_tasks=BackgroundTaskType.NONE)
         assert config.project_name == "myproject"
         assert config.database == DatabaseType.POSTGRESQL
+
+    def test_agentscope_requires_production_infrastructure(self) -> None:
+        """AgentScope rejects missing durable runtime dependencies."""
+        with pytest.raises(ValidationError, match="AgentScope requires Redis"):
+            ProjectConfig(
+                project_name="agentscope_app",
+                ai_framework=AIFrameworkType.AGENTSCOPE,
+                background_tasks=BackgroundTaskType.NONE,
+            )
+
+        with pytest.raises(ValidationError, match="requires Docker"):
+            ProjectConfig(
+                project_name="agentscope_app",
+                ai_framework=AIFrameworkType.AGENTSCOPE,
+                enable_redis=True,
+                enable_docker=False,
+                rag_features=RAGFeatures(enable_rag=True, vector_store=VectorStoreType.QDRANT),
+                background_tasks=BackgroundTaskType.NONE,
+            )
+
+        with pytest.raises(ValidationError, match="requires Qdrant"):
+            ProjectConfig(
+                project_name="agentscope_app",
+                ai_framework=AIFrameworkType.AGENTSCOPE,
+                enable_redis=True,
+                rag_features=RAGFeatures(enable_rag=True, vector_store=VectorStoreType.MILVUS),
+                background_tasks=BackgroundTaskType.NONE,
+            )
+
+    def test_agentscope_context_enables_only_agentscope_runtime(self) -> None:
+        """Generated context has mutually-exclusive runtime flags."""
+        config = ProjectConfig(
+            project_name="agentscope_app",
+            ai_framework=AIFrameworkType.AGENTSCOPE,
+            enable_redis=True,
+            rag_features=RAGFeatures(enable_rag=True, vector_store=VectorStoreType.QDRANT),
+            background_tasks=BackgroundTaskType.NONE,
+        )
+        context = config.to_cookiecutter_context()
+
+        assert context["use_agentscope"] is True
+        assert context["use_pydantic_ai"] is False
+        assert context["use_langchain"] is False
+        assert context["use_langgraph"] is False
+        assert context["use_deepagents"] is False
+        assert context["use_pydantic_deep"] is False
 
     def test_valid_project_names(self) -> None:
         """Test valid project name patterns."""

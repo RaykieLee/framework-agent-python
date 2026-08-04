@@ -1,4 +1,4 @@
-{%- if cookiecutter.use_pydantic_ai or cookiecutter.use_langchain or cookiecutter.use_langgraph or cookiecutter.use_deepagents or cookiecutter.use_pydantic_deep %}
+{%- if cookiecutter.use_pydantic_ai or cookiecutter.use_langchain or cookiecutter.use_langgraph or cookiecutter.use_deepagents or cookiecutter.use_pydantic_deep or cookiecutter.use_agentscope %}
 # Route is lifecycle plumbing only — auth, accept, dispatch loop, disconnect.
 # Per-turn orchestration lives in app.services.agent_session.AgentSession.
 import logging

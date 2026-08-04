@@ -82,6 +82,7 @@ class AIFrameworkType(StrEnum):
     LANGGRAPH = "langgraph"
     DEEPAGENTS = "deepagents"
     PYDANTIC_DEEP = "pydantic_deep"
+    AGENTSCOPE = "agentscope"
 
 
 class LLMProviderType(StrEnum):
@@ -476,6 +477,39 @@ class ProjectConfig(BaseModel):
         ):
             raise ValueError("pgvector ?? PostgreSQL ???")
 
+        # AgentScope is the production execution runtime.  Its generated
+        # application relies on durable product/execution state in
+        # PostgreSQL, Redis for the MessageBus/replay/locks, and persistent
+        # Qdrant for the Mem0 user-memory store.  Keep these requirements in
+        # the configuration model so every entry point (CLI, prompts, and
+        # programmatic generation) gets the same actionable validation.
+        if self.ai_framework == AIFrameworkType.AGENTSCOPE:
+            if self.database != DatabaseType.POSTGRESQL:
+                raise ValueError(
+                    "AgentScope requires PostgreSQL for durable product and execution state. "
+                    "Quick fix: use --database postgresql."
+                )
+            if not self.enable_redis:
+                raise ValueError(
+                    "AgentScope requires Redis for its MessageBus, event replay, and distributed locks. "
+                    "Quick fix: add --redis."
+                )
+            if not self.enable_docker:
+                raise ValueError(
+                    "AgentScope requires Docker so the generated project can run persistent Qdrant. "
+                    "Quick fix: remove --no-docker."
+                )
+            if not self.rag_features.enable_rag:
+                raise ValueError(
+                    "AgentScope requires RAG to provision its persistent Qdrant memory store. "
+                    "Quick fix: add --rag --vector-store qdrant."
+                )
+            if self.rag_features.vector_store != VectorStoreType.QDRANT:
+                raise ValueError(
+                    "AgentScope requires Qdrant as the persistent memory store. "
+                    "Quick fix: use --vector-store qdrant."
+                )
+
         # LangSmith requires LangChain-ecosystem framework
         if self.enable_langsmith and self.ai_framework not in (
             AIFrameworkType.LANGCHAIN,
@@ -801,6 +835,7 @@ class ProjectConfig(BaseModel):
             "use_langgraph": self.ai_framework == AIFrameworkType.LANGGRAPH,
             "use_deepagents": self.ai_framework == AIFrameworkType.DEEPAGENTS,
             "use_pydantic_deep": self.ai_framework == AIFrameworkType.PYDANTIC_DEEP,
+            "use_agentscope": self.ai_framework == AIFrameworkType.AGENTSCOPE,
             "sandbox_backend": self.sandbox_backend,
             "llm_provider": self.llm_provider.value,
             # ALL turns on every provider so users can pick the model at runtime.
