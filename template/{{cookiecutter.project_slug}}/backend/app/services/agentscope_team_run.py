@@ -404,7 +404,41 @@ class RedisPostgresTeamRunStore:
 
 
 class WorkerCancellation(Protocol):
-    async def cancel(self, *, session_id: str, reason: TeamRunStopReason) -> None: ...
+    async def cancel(
+        self, *, session_id: str, reason: TeamRunStopReason, tenant_id: str
+    ) -> None: ...
+
+
+class RedisTeamRunCancellation:
+    """Redis cancellation flags polled by workers in other processes."""
+
+    def __init__(self, redis: Any, *, ttl_seconds: int = 3_600) -> None:
+        if ttl_seconds < 1:
+            raise ValueError("ttl_seconds must be positive")
+        self.redis = redis
+        self.ttl_seconds = ttl_seconds
+
+    async def cancel(
+        self, *, session_id: str, reason: TeamRunStopReason, tenant_id: str
+    ) -> None:
+        await self.redis.set(
+            f"agentscope:team-run-cancel:{_safe(tenant_id)}:{_safe(session_id)}",
+            reason.value,
+            ex=self.ttl_seconds,
+        )
+
+    async def is_cancelled(self, *, session_id: str, tenant_id: str) -> TeamRunStopReason | None:
+        value = await self.redis.get(
+            f"agentscope:team-run-cancel:{_safe(tenant_id)}:{_safe(session_id)}"
+        )
+        if value is None:
+            return None
+        if isinstance(value, bytes):
+            value = value.decode("utf-8")
+        try:
+            return TeamRunStopReason(str(value))
+        except ValueError:
+            return TeamRunStopReason.SECURITY
 
 
 class TenantBudgetResolver(Protocol):
@@ -629,7 +663,7 @@ class AgentScopeTeamRunService:
         for member in state.members.values():
             if member.status == TeamMemberStatus.RUNNING:
                 try:
-                    await self._cancel(member.session_id, reason)
+                    await self._cancel(member.session_id, reason, state.context.tenant_id)
                 except Exception as exc:
                     # A crashed cancellation transport must not leave the
                     # authoritative run in ``stopping`` forever.  The member
@@ -652,10 +686,10 @@ class AgentScopeTeamRunService:
         )
         return state
 
-    async def _cancel(self, session_id: str, reason: TeamRunStopReason) -> None:
+    async def _cancel(self, session_id: str, reason: TeamRunStopReason, tenant_id: str) -> None:
         if self.cancellation is None:
             return
-        await self.cancellation.cancel(session_id=session_id, reason=reason)
+        await self.cancellation.cancel(session_id=session_id, reason=reason, tenant_id=tenant_id)
 
     async def _emit(self, state: TeamRunState, event_type: str, data: Mapping[str, Any]) -> None:
         await self.store.append_event(
@@ -715,6 +749,7 @@ __all__ = [
     "MemberUsage",
     "PostgresTeamRunRepository",
     "RedisPostgresTeamRunStore",
+    "RedisTeamRunCancellation",
     "TeamMemberStatus",
     "TeamRunContext",
     "TeamRunError",

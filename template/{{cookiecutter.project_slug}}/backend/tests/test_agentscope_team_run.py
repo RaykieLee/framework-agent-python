@@ -17,6 +17,7 @@ from app.services.agentscope_team_run import (
     TeamRunStopReason,
     TeamRunTerminalError,
     TeamRunOwnershipError,
+    RedisTeamRunCancellation,
     UsageDelta,
 )
 
@@ -37,10 +38,10 @@ def _context(**overrides: str) -> TeamRunContext:
 
 class CancellationRecorder:
     def __init__(self) -> None:
-        self.calls: list[tuple[str, TeamRunStopReason]] = []
+        self.calls: list[tuple[str, TeamRunStopReason, str]] = []
 
-    async def cancel(self, *, session_id: str, reason: TeamRunStopReason) -> None:
-        self.calls.append((session_id, reason))
+    async def cancel(self, *, session_id: str, reason: TeamRunStopReason, tenant_id: str) -> None:
+        self.calls.append((session_id, reason, tenant_id))
 
 
 async def _started(
@@ -141,8 +142,9 @@ async def test_budget_exhaustion_stops_every_member_and_keeps_partial_results(
     assert state.members["worker-1"].result == {"text": "partial"}
     assert state.members["leader"].status == TeamMemberStatus.CANCELLED
     assert state.members["worker-2"].status == TeamMemberStatus.CANCELLED
-    assert {session for session, _ in recorder.calls} == {"leader", "worker-2"}
-    assert all(stop_reason == reason for _, stop_reason in recorder.calls)
+    assert {session for session, _, _ in recorder.calls} == {"leader", "worker-2"}
+    assert all(stop_reason == reason for _, stop_reason, _ in recorder.calls)
+    assert all(tenant_id == "tenant-a" for _, _, tenant_id in recorder.calls)
 
 
 @pytest.mark.anyio
@@ -184,6 +186,31 @@ async def test_tenant_context_and_usage_validation_are_enforced() -> None:
         await service.snapshot(_context(tenant_id="tenant-b"), "run-a")
     with pytest.raises(TeamRunOwnershipError):
         await service.record_usage(context, "run-a", UsageDelta("unknown", "model", credits=1))
+
+
+@pytest.mark.anyio
+async def test_redis_cancellation_flags_are_tenant_process_boundary() -> None:
+    class FakeRedis:
+        def __init__(self) -> None:
+            self.values: dict[str, str] = {}
+
+        async def set(self, key: str, value: str, *, ex: int) -> None:
+            assert ex > 0
+            self.values[key] = value
+
+        async def get(self, key: str) -> str | None:
+            return self.values.get(key)
+
+    cancellation = RedisTeamRunCancellation(FakeRedis())
+    assert await cancellation.is_cancelled(session_id="worker-1", tenant_id="tenant-a") is None
+    await cancellation.cancel(
+        session_id="worker-1", tenant_id="tenant-a", reason=TeamRunStopReason.SECURITY
+    )
+    assert (
+        await cancellation.is_cancelled(session_id="worker-1", tenant_id="tenant-a")
+        == TeamRunStopReason.SECURITY
+    )
+    assert await cancellation.is_cancelled(session_id="worker-1", tenant_id="tenant-b") is None
 
 
 @pytest.mark.integration
