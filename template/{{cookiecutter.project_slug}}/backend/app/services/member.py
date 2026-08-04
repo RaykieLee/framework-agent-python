@@ -9,6 +9,9 @@ from app.core.exceptions import AuthorizationError, BadRequestError, NotFoundErr
 from app.db.models.organization import OrgRole, OrganizationMember
 from app.repositories import member_repo, user_repo
 from app.schemas.organization import OrganizationMemberList, OrganizationMemberRead, OrganizationMemberUpdate
+{%- if cookiecutter.use_agentscope %}
+from app.services.agentscope_member_exit import MemberExitCleanupService, MemberExitRequest
+{%- endif %}
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +20,18 @@ _ADMIN_ASSIGNABLE_ROLES = {OrgRole.MEMBER.value, OrgRole.VIEWER.value}
 
 
 class MemberService:
-    def __init__(self, db: AsyncSession):
+    def __init__(
+        self,
+        db: AsyncSession,
+{%- if cookiecutter.use_agentscope %}
+        *,
+        member_exit_cleanup: MemberExitCleanupService | None = None,
+{%- endif %}
+    ):
         self.db = db
+{%- if cookiecutter.use_agentscope %}
+        self.member_exit_cleanup = member_exit_cleanup
+{%- endif %}
 
     async def list_for_org(
         self,
@@ -104,6 +117,17 @@ class MemberService:
             raise AuthorizationError(message="Admin cannot remove another Admin")
 
         await member_repo.delete(self.db, target)
+{%- if cookiecutter.use_agentscope %}
+        if self.member_exit_cleanup is not None:
+            await self.member_exit_cleanup.run(
+                MemberExitRequest(
+                    tenant_id=str(organization_id),
+                    user_id=str(target_user_id),
+                    actor_user_id=str(requester_id),
+                    request_id=f"remove:{organization_id}:{target_user_id}",
+                )
+            )
+{%- endif %}
 
     async def leave(self, organization_id: UUID, requester_id: UUID) -> None:
         """Current user leaves the org.
@@ -120,6 +144,17 @@ class MemberService:
                 raise BadRequestError(message="Transfer ownership before leaving the organization")
 
         await member_repo.delete(self.db, membership)
+{%- if cookiecutter.use_agentscope %}
+        if self.member_exit_cleanup is not None:
+            await self.member_exit_cleanup.run(
+                MemberExitRequest(
+                    tenant_id=str(organization_id),
+                    user_id=str(requester_id),
+                    actor_user_id=str(requester_id),
+                    request_id=f"leave:{organization_id}:{requester_id}",
+                )
+            )
+{%- endif %}
 
     async def transfer_ownership(
         self,

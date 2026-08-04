@@ -142,8 +142,10 @@ if not use_pydantic_deep:
 if not use_agentscope:
     remove_file(os.path.join(backend_app, "agents", "agentscope_assistant.py"))
     remove_file(os.path.join(backend_app, "services", "agentscope_durable_session.py"))
+    remove_file(os.path.join(backend_app, "services", "agentscope_member_exit.py"))
     remove_file(os.path.join(backend_app, "services", "agentscope_knowledge.py"))
     remove_file(os.path.join(os.getcwd(), "backend", "tests", "test_agentscope_durable_session.py"))
+    remove_file(os.path.join(os.getcwd(), "backend", "tests", "test_agentscope_member_exit.py"))
     remove_file(os.path.join(os.getcwd(), "backend", "tests", "test_agentscope_knowledge.py"))
 if not enable_web_search:
     remove_file(os.path.join(backend_app, "agents", "tools", "web_search.py"))

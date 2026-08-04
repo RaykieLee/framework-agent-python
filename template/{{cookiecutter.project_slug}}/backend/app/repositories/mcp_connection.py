@@ -50,8 +50,6 @@ async def get_by_name(
     predicates = [McpConnection.user_id == user_id, McpConnection.name == name]
 {%- if cookiecutter.enable_teams %}
     predicates.append(McpConnection.organization_id == organization_id)
-{%- elif organization_id is not None %}
-    del organization_id
 {%- endif %}
     result = await db.execute(
         select(McpConnection).where(*predicates)
@@ -83,8 +81,6 @@ async def list_for_user(
     )
 {%- if cookiecutter.enable_teams %}
     stmt = stmt.where(McpConnection.organization_id == organization_id)
-{%- elif organization_id is not None %}
-    del organization_id
 {%- endif %}
     if enabled_only:
         stmt = stmt.where(McpConnection.is_enabled.is_(True))

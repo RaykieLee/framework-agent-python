@@ -154,6 +154,34 @@ class TestMemberService:
         ):
             await service.transfer_ownership(uuid.uuid4(), uid, requester_id=uid)
 
+{%- if cookiecutter.use_agentscope %}
+    @pytest.mark.anyio
+    async def test_leave_runs_private_state_cleanup_after_membership_revocation(self, mock_db):
+        class Cleanup:
+            def __init__(self):
+                self.requests = []
+
+            async def run(self, request):
+                self.requests.append(request)
+
+        cleanup = Cleanup()
+        service = MemberService(mock_db, member_exit_cleanup=cleanup)
+        organization_id = uuid.uuid4()
+        user_id = uuid.uuid4()
+        membership = MagicMock()
+        membership.role = "member"
+
+        with (
+            patch("app.services.member.member_repo.get", new=AsyncMock(return_value=membership)),
+            patch("app.services.member.member_repo.delete", new=AsyncMock()),
+        ):
+            await service.leave(organization_id, requester_id=user_id)
+
+        assert len(cleanup.requests) == 1
+        assert cleanup.requests[0].tenant_id == str(organization_id)
+        assert cleanup.requests[0].user_id == str(user_id)
+{%- endif %}
+
 
 class TestInvitationService:
     """Tests for InvitationService (PostgreSQL async)."""
