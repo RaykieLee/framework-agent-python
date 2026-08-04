@@ -18,10 +18,10 @@ This guide covers setting up a local development environment for your generated 
 
 ```bash
 # Interactive mode
-fastapi-fullstack new
+framework-agent-python new
 
 # Or quick mode
-fastapi-fullstack create my_project --database postgresql --auth jwt
+framework-agent-python create my_project --database postgresql --auth jwt
 ```
 
 ### 2. Backend Setup

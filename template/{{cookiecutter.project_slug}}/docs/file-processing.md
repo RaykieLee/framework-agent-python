@@ -1,15 +1,14 @@
-# File Processing
+# 文件处理
 
-This document covers how files are handled in two contexts: chat file uploads
-(user-facing) and RAG document ingestion (admin/CLI).
+本文档介绍文件在两种场景下的处理方式：聊天文件上传（面向用户）和 RAG 文档摄取（管理员/CLI）。
 
 {%- if cookiecutter.use_jwt %}
 
-## Chat File Uploads
+## 聊天文件上传
 
-When a user uploads a file in the chat interface, the following pipeline runs:
+当用户在聊天界面上传文件时，执行以下流水线：
 
-### Flow
+### 流程
 
 ```
 1. Upload     POST /api/v1/files/upload
@@ -29,27 +28,27 @@ When a user uploads a file in the chat interface, the following pipeline runs:
 8. Display     Frontend shows images as thumbnails, documents as badges
 ```
 
-### Supported File Types
+### 支持的文件类型
 
-| Category | MIME Types | Extensions | Processing |
+| Category | MIME 类型 | 扩展名 | 处理方式 |
 |----------|-----------|------------|------------|
 | **Images** | image/jpeg, image/png, image/webp, image/gif | .jpg, .png, .webp, .gif | Stored as-is. Sent to LLM as `BinaryContent` for vision analysis. |
 | **PDF** | application/pdf | .pdf | Text extracted via configured PDF parser. Appended to prompt as context. |
 | **DOCX** | application/vnd.openxmlformats-officedocument.wordprocessingml.document | .docx | Paragraphs extracted via `python-docx`. Appended to prompt as context. |
 | **Text** | text/plain, text/markdown | .txt, .md | UTF-8 decoded directly. Appended to prompt as context. |
 
-### PDF Parser Selection (Chat)
+### PDF 解析器选择（聊天）
 
 {%- if cookiecutter.use_all_pdf_parsers %}
 
 The `CHAT_PDF_PARSER` environment variable controls which parser processes PDFs
 uploaded in chat. This is separate from the RAG ingestion parser (`PDF_PARSER`).
 
-| Parser | `CHAT_PDF_PARSER=` | Requirements | Speed | Quality |
+| 解析器 | `CHAT_PDF_PARSER=` | 要求 | 速度 | 质量 |
 |--------|-------------------|--------------|-------|---------|
-| PyMuPDF | `pymupdf` (default) | None (bundled) | Fast | Good for text-heavy PDFs |
-| LlamaParse | `llamaparse` | `LLAMAPARSE_API_KEY` | Slow (API call) | Best for complex layouts |
-| LiteParse | `liteparse` | None | Medium | Good balance |
+| PyMuPDF | `pymupdf`（默认）| 无需（已内置）| 快速 | 适合文本密集型 PDF |
+| LlamaParse | `llamaparse` | `LLAMAPARSE_API_KEY` | 慢（API 调用）| 最适合复杂布局 |
+| LiteParse | `liteparse` | 无需 | 中等 | 良好的平衡 |
 
 If the selected parser fails, it automatically falls back to PyMuPDF.
 
@@ -66,12 +65,12 @@ key and handles text extraction, table detection, and block-level parsing.
 
 {%- endif %}
 
-### Size Limits
+### 大小限制
 
 - Maximum file size: `MAX_UPLOAD_SIZE_MB` environment variable (default: **50 MB**)
 - The limit is enforced server-side after reading the file content.
 
-### Storage
+### 存储
 
 Files are saved by `FileStorageService` to the `media/` directory:
 
@@ -88,24 +87,24 @@ If S3/MinIO storage is configured (`S3_ENDPOINT`), files are uploaded to the
 configured bucket instead of local disk.
 {%- endif %}
 
-### ChatFile Model
+### ChatFile 模型
 
 The `ChatFile` database model tracks uploaded files:
 
-| Field | Type | Description |
+| 字段 | 类型 | 说明 |
 |-------|------|-------------|
-| `id` | UUID | Primary key |
-| `user_id` | UUID/FK | Owner (used for access control) |
-| `filename` | String | Original filename |
-| `mime_type` | String | MIME type (e.g. `application/pdf`) |
-| `size` | Integer | File size in bytes |
-| `storage_path` | String | Relative path in storage |
-| `file_type` | String | Classified type: `image`, `pdf`, `docx`, `text` |
-| `parsed_content` | Text | Extracted text content (NULL for images) |
-| `message_id` | UUID/FK | Linked message (set when message is sent) |
-| `created_at` | DateTime | Upload timestamp |
+| `id` | UUID | 主键 |
+| `user_id` | UUID/FK | 所有者（用于访问控制）|
+| `filename` | String | 原始文件名 |
+| `mime_type` | String | MIME 类型（例如 `application/pdf`）|
+| `size` | Integer | 文件大小（字节）|
+| `storage_path` | String | 存储中的相对路径 |
+| `file_type` | String | 分类类型：`image`、`pdf`、`docx`、`text` |
+| `parsed_content` | Text | 提取的文本内容（图片为 NULL）|
+| `message_id` | UUID/FK | 关联的消息（发送消息时设置）|
+| `created_at` | DateTime | 上传时间戳 |
 
-### Ownership & Access
+### 所有权与访问
 
 - Only the file owner can download their files (`GET /files/{id}`).
 - The `FileUploadService.get_user_file()` method compares `chat_file.user_id`
@@ -117,12 +116,11 @@ The `ChatFile` database model tracks uploaded files:
 
 {%- if cookiecutter.enable_rag %}
 
-## RAG Document Ingestion
+## RAG 文档摄取
 
-When documents are ingested into the RAG knowledge base (via CLI or API), a
-different pipeline handles parsing, chunking, and embedding.
+当文档被摄取到 RAG 知识库（通过 CLI 或 API）时，另一个流水线处理解析、分块和嵌入。
 
-### Ingestion Flow
+### 摄取流程
 
 ```
 1. Input       File path (CLI) or uploaded file (API)
@@ -138,7 +136,7 @@ different pipeline handles parsing, chunking, and embedding.
 6. Track       RAGDocument record created in SQL (status tracking)
 ```
 
-### Supported Formats
+### 支持的格式
 
 The set of supported formats depends on the configured PDF parser:
 
@@ -165,18 +163,18 @@ Supported file types with the default PyMuPDF parser:
 
 {%- endif %}
 
-### PDF Parser Selection (RAG)
+### PDF 解析器选择（RAG）
 
 {%- if cookiecutter.use_all_pdf_parsers %}
 
 The `PDF_PARSER` environment variable controls which parser processes PDFs
 during RAG ingestion:
 
-| Parser | `PDF_PARSER=` | Best For |
+| 解析器 | `PDF_PARSER=` | 适用场景 |
 |--------|--------------|----------|
-| PyMuPDF | `pymupdf` (default) | Fast local processing, text-heavy documents |
-| LlamaParse | `llamaparse` | Complex layouts, scanned PDFs, 130+ formats |
-| LiteParse | `liteparse` | Balance of speed and quality |
+| PyMuPDF | `pymupdf`（默认）| 快速本地处理，文本密集型文档 |
+| LlamaParse | `llamaparse` | 复杂布局、扫描 PDF、130+ 格式 |
+| LiteParse | `liteparse` | 速度与质量的平衡 |
 
 Note: `PDF_PARSER` controls RAG ingestion. `CHAT_PDF_PARSER` controls chat
 file uploads. They can be set independently.
@@ -193,11 +191,11 @@ RAG ingestion uses PyMuPDF for document parsing (local, no API key required).
 
 {%- endif %}
 
-### Chunking Configuration
+### 分块配置
 
 Text is split into chunks before embedding. Configure via environment variables:
 
-| Variable | Default | Description |
+| 变量 | 默认值 | 说明 |
 |----------|---------|-------------|
 | `RAG_CHUNK_SIZE` | `512` | Maximum characters per chunk |
 | `RAG_CHUNK_OVERLAP` | `50` | Characters of overlap between chunks |
@@ -205,13 +203,13 @@ Text is split into chunks before embedding. Configure via environment variables:
 
 **Strategy comparison:**
 
-| Strategy | Best For |
+| 策略 | 适用场景 |
 |----------|----------|
-| `recursive` | General text; splits by paragraph, then sentence, then word |
-| `markdown` | Markdown/structured docs; splits at heading boundaries |
-| `fixed` | Uniform chunk sizes; simplest but may split mid-sentence |
+| `recursive` | 通用文本；按段落、句子、单词依次分割 |
+| `markdown` | Markdown/结构化文档；在标题边界处分割 |
+| `fixed` | 均匀的块大小；最简单但可能在句子中间分割 |
 
-### Embedding Providers
+### 嵌入提供商
 
 {%- if cookiecutter.use_openai_embeddings %}
 Embeddings are generated using **OpenAI** (`text-embedding-3-small` by default).
@@ -228,7 +226,7 @@ Embeddings are generated locally using **Sentence Transformers**
 `MODELS_CACHE_DIR`.
 {%- endif %}
 
-### Vector Storage
+### 向量存储
 
 {%- if cookiecutter.use_milvus %}
 Vectors are stored in **Milvus**. Configure with `MILVUS_HOST`, `MILVUS_PORT`,
@@ -244,7 +242,7 @@ Vectors are stored in **pgvector** using the existing PostgreSQL database.
 No additional services needed.
 {%- endif %}
 
-### RAG is Global
+### RAG 是全局的
 
 Collections are shared across **all users**:
 
@@ -254,29 +252,29 @@ Collections are shared across **all users**:
   and view ingestion logs.
 - There is no per-user document isolation.
 
-### Document Tracking
+### 文档跟踪
 
 
 Ingested documents are tracked in the SQL database via the `RAGDocument` model:
 
-| Field | Description |
+| 字段 | 说明 |
 |-------|-------------|
-| `collection_name` | Target collection |
-| `filename` | Original filename |
-| `filesize` | File size in bytes |
-| `filetype` | File extension (without dot) |
-| `status` | `processing`, `done`, or `error` |
-| `error_message` | Error details (if status is `error`) |
-| `vector_document_id` | ID in the vector store |
-| `chunk_count` | Number of chunks created |
-| `storage_path` | Path to original file (for re-ingestion/download) |
-| `created_at` | Ingestion start time |
-| `completed_at` | Ingestion completion time |
+| `collection_name` | 目标集合 |
+| `filename` | 原始文件名 |
+| `filesize` | 文件大小（字节）|
+| `filetype` | 文件扩展名（不含点）|
+| `status` | `processing`、`done` 或 `error` |
+| `error_message` | 错误详情（如果状态为 `error`）|
+| `vector_document_id` | 向量存储中的 ID |
+| `chunk_count` | 创建的块数 |
+| `storage_path` | 原始文件路径（用于重新摄取/下载）|
+| `created_at` | 摄取开始时间 |
+| `completed_at` | 摄取完成时间 |
 
 Failed ingestions can be retried via `POST /rag/documents/{id}/retry`.
 
 
-### Sync Operations
+### 同步操作
 
 Sync operations are tracked via the `SyncLog` model, recording source, mode,
 total files, ingested/updated/skipped/failed counts, and timing. View sync
@@ -284,7 +282,7 @@ history via `GET /rag/sync/logs`.
 
 {%- if cookiecutter.enable_rag_image_description %}
 
-### Image Description
+### 图片描述
 
 When processing documents that contain images, the system can optionally
 describe images using LLM vision capabilities. Set `RAG_IMAGE_DESCRIPTION_MODEL`
@@ -295,7 +293,7 @@ descriptions are included in the document text for better semantic search.
 
 {%- if cookiecutter.enable_reranker %}
 
-### Reranking
+### 重排
 
 Search results can optionally be reranked for better relevance. Enable
 reranking by passing `use_reranker=True` to the search API.

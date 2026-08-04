@@ -18,10 +18,10 @@
 
 ```bash
 # Interactive mode
-fastapi-fullstack new
+framework-agent-python new
 
 # Or quick mode
-fastapi-fullstack create my_project --database postgresql --auth jwt
+framework-agent-python create my_project --database postgresql --auth jwt
 ```
 
 ### 2. 后端搭建

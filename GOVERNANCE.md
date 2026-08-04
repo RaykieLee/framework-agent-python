@@ -1,71 +1,71 @@
-# Governance
+﻿# 治理说明
 
-## Overview
+## 概述
 
-Full-Stack AI Agent Template is maintained by [Vstorm](https://vstorm.co), a Poland-based AI engineering consultancy.
+全栈 AI 代理模板由 [Vstorm](https://vstorm.co) 维护，这是一家位于波兰的 AI 工程咨询公司。
 
-## Decision Making
+## 决策机制
 
-This project follows a **Benevolent Dictator** governance model:
+本项目采用**仁慈独裁者**治理模型：
 
-- **Project Lead**: Kacper Wlodarczyk ([@sebastiondev](https://github.com/sebastiondev)) makes final decisions on project direction, feature inclusion, and releases.
-- **Community Input**: Feature requests, bug reports, and discussions happen via [GitHub Issues](https://github.com/vstorm-co/full-stack-ai-agent-template/issues) and Pull Requests. All input is considered.
-- **Pull Requests**: Reviewed by the project lead or designated maintainers. All PRs require at least one approving review before merge.
+- **项目负责人**：Kacper Wlodarczyk（[@sebastiondev](https://github.com/sebastiondev)）对项目方向、功能包含和发布做出最终决定。
+- **社区意见**：功能请求、Bug 报告和讨论通过 [GitHub Issues](https://github.com/vstorm-co/framework-agent-python/issues) 和 Pull Request 进行。所有意见都会被考虑。
+- **Pull Request**：由项目负责人或指定的维护者审查。所有 PR 在合并前至少需要一人批准。
 
-## Roles and Responsibilities
+## 角色与职责
 
-### Project Lead
+### 项目负责人
 
-**Current**: Kacper Wlodarczyk ([@sebastiondev](https://github.com/sebastiondev))
+**现任**：Kacper Wlodarczyk（[@sebastiondev](https://github.com/sebastiondev)）
 
-- Set project roadmap and long-term direction
-- Approve or reject new features and architectural changes
-- Cut releases and publish to PyPI
-- Respond to security vulnerability reports (per [SECURITY.md](SECURITY.md))
-- Grant or revoke maintainer access
-- Final authority on all merge decisions
+- 制定项目路线图和长期方向
+- 批准或拒绝新功能和架构变更
+- 发布版本并发布到 PyPI
+- 响应安全漏洞报告（详见 [SECURITY.md](SECURITY.md)）
+- 授予或撤销维护者权限
+- 对合并决策拥有最终决定权
 
-### Maintainer
+### 维护者
 
-**Current**: Vstorm team
+**现任**：Vstorm 团队
 
-- Review and merge Pull Requests (at least one approval required)
-- Triage issues: label, assign, close duplicates
-- Ensure CI passes before merging
-- Maintain documentation accuracy
-- Monitor and respond to community discussions
+- 审查和合并 Pull Request（至少需要一人批准）
+- 分类问题：标记、分配、关闭重复项
+- 确保合并前 CI 通过
+- 保持文档准确性
+- 监控并回应社区讨论
 
-### Contributor
+### 贡献者
 
-**Current**: Anyone (with [DCO](DCO) sign-off)
+**现任**：任何人（需 [DCO](DCO) 签署）
 
-- Submit Pull Requests with bug fixes, features, or documentation improvements
-- Report bugs and request features via GitHub Issues
-- Participate in discussions and code reviews
-- Follow the project's coding standards and testing requirements
+- 提交包含 Bug 修复、功能或文档改进的 Pull Request
+- 通过 GitHub Issues 报告 Bug 和请求功能
+- 参与讨论和代码审查
+- 遵循项目的编码标准和测试要求
 
-## Contributions
+## 贡献
 
-All contributions require [Developer Certificate of Origin (DCO)](DCO) sign-off. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+所有贡献都需要[开发者原创证书（DCO）](DCO)签署。详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-## Releases
+## 发布
 
-Releases follow [Semantic Versioning](https://semver.org/). The project lead decides release timing and content.
+发布遵循[语义化版本控制](https://semver.org/)。项目负责人决定发布时间和内容。
 
-## Bus Factor and Continuity Plan
+## 人员风险与连续性计划
 
-The project maintains a **bus factor of 2**. At least two people have the access and knowledge required to manage every critical aspect of the project (GitHub org ownership, PyPI publishing, DNS, CI/CD secrets).
+项目保持**人员风险系数为 2**。至少有两人拥有管理项目每个关键方面（GitHub 组织所有权、PyPI 发布、DNS、CI/CD 密钥）所需的访问权限和知识。
 
-The project is designed to continue with minimal interruption if any single contributor becomes unavailable:
+如果任何单个贡献者无法继续工作，项目设计为能以最小的中断继续运行：
 
-- **GitHub Organization**: The repository is owned by the [vstorm-co](https://github.com/vstorm-co) GitHub organization. Multiple team members have **Owner** access, ensuring no single point of failure for repository management, issue triage, and PR merges.
-- **PyPI**: The `fastapi-fullstack` package on PyPI has multiple maintainers with publish rights, allowing releases to continue independently.
-- **DNS / Domain**: The `vstorm.co` domain is registered under the organization, not a personal account.
-- **CI/CD**: GitHub Actions secrets are managed at the organization level. Any organization Owner can update or rotate them.
-- **Forks**: As an MIT-licensed project, the community can fork and continue development at any time without legal barriers.
+- **GitHub 组织**：仓库归 [vstorm-co](https://github.com/vstorm-co) GitHub 组织所有。多名团队成员拥有**所有者**权限，确保仓库管理、问题分类和 PR 合并不存在单点故障。
+- **PyPI**：PyPI 上的 `framework-agent-python` 包有多名具有发布权限的维护者，可独立继续发布。
+- **DNS/域名**：`vstorm.co` 域名在组织下注册，而非个人账户。
+- **CI/CD**：GitHub Actions 密钥在组织级别管理。任何组织所有者均可更新或轮换它们。
+- **Fork**：作为 MIT 许可的项目，社区可随时 Fork 并继续开发，无法律障碍。
 
-In the event that the Project Lead becomes permanently unavailable, the remaining organization Owners will appoint a new lead within one week.
+如果项目负责人永久无法履职，剩余的组织所有者将在一周内任命新的负责人。
 
-## Security
+## 安全
 
-Security vulnerabilities should be reported per [SECURITY.md](SECURITY.md). Critical issues are prioritized above all other work.
+安全漏洞应按照 [SECURITY.md](SECURITY.md) 报告。关键问题优先于所有其他工作。

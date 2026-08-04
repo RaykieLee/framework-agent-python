@@ -3,9 +3,9 @@ description: Pydantic schema patterns and SQLAlchemy model conventions
 globs: ["backend/app/schemas/**/*.py", "backend/app/db/models/**/*.py", "backend/app/db/base.py"]
 ---
 
-# Schemas & Models
+# 模式与模型
 
-## Pydantic Schemas (`app/schemas/`)
+## Pydantic 模式 (`app/schemas/`)
 
 Base schema with shared config:
 
@@ -51,7 +51,7 @@ Rules:
 - `*List` — `items` list + `total` count
 - Use `@field_validator` for complex deserialization (e.g., JSON string → dict)
 
-## SQLAlchemy Models (`app/db/models/`)
+## SQLAlchemy 模型 (`app/db/models/`)
 
 ```python
 class User(Base, TimestampMixin):

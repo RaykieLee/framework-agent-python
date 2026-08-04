@@ -18,13 +18,13 @@ Enable RAG during project creation:
 
 ```bash
 # Interactive wizard
-fastapi-fullstack new
+framework-agent-python new
 
 # With RAG enabled
-fastapi-fullstack create my_project --enable-rag
+framework-agent-python create my_project --enable-rag
 
 # Full RAG with all features
-fastapi-fullstack create my_project --enable-rag --pdf-parser llamaparse --reranker cohere
+framework-agent-python create my_project --enable-rag --pdf-parser llamaparse --reranker cohere
 ```
 
 ---
@@ -158,7 +158,7 @@ Reranking improves search result quality by re-ordering initial vector search re
 Uses Cohere's rerank API. Requires `COHERE_API_KEY`.
 
 ```bash
-fastapi-fullstack create my_project --enable-rag --reranker cohere
+framework-agent-python create my_project --enable-rag --reranker cohere
 ```
 
 ### Cross-Encoder Reranker
@@ -166,7 +166,7 @@ fastapi-fullstack create my_project --enable-rag --reranker cohere
 Uses HuggingFace Cross-Encoder models locally. Requires `HF_TOKEN` for private models (optional for public models).
 
 ```bash
-fastapi-fullstack create my_project --enable-rag --reranker cross_encoder
+framework-agent-python create my_project --enable-rag --reranker cross_encoder
 ```
 
 Default model: `cross-encoder/ms-marco-MiniLM-L6-v2`. Override with `CROSS_ENCODER_MODEL` env var.
@@ -351,7 +351,7 @@ Improve search results with reranking:
 ### Cohere Reranker
 
 ```bash
-fastapi-fullstack create my_project --enable-rag --enable-reranker cohere
+framework-agent-python create my_project --enable-rag --enable-reranker cohere
 ```
 
 ### Cross-Encoder Reranker
@@ -359,7 +359,7 @@ fastapi-fullstack create my_project --enable-rag --enable-reranker cohere
 Uses Sentence Transformers locally:
 
 ```bash
-fastapi-fullstack create my_project --enable-rag --enable-reranker cross_encoder
+framework-agent-python create my_project --enable-rag --enable-reranker cross_encoder
 ```
 
 ---
@@ -369,7 +369,7 @@ fastapi-fullstack create my_project --enable-rag --enable-reranker cross_encoder
 Enable Google Drive as a document source:
 
 ```bash
-fastapi-fullstack create my_project --enable-rag --enable-google-drive-ingestion
+framework-agent-python create my_project --enable-rag --enable-google-drive-ingestion
 ```
 
 Requires OAuth2 configuration in Google Cloud Console.

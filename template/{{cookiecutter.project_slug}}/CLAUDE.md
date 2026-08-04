@@ -1,22 +1,22 @@
-# CLAUDE.md
-
-## Project Overview
-
-**{{ cookiecutter.project_name }}** - FastAPI application generated with [Full-Stack AI Agent Template](https://github.com/vstorm-co/full-stack-ai-agent-template).
-
-**Stack:** FastAPI + Pydantic v2
-{%- if True %}, PostgreSQL (async via asyncpg){%- endif %}
-{%- if False %}, MongoDB (async via Motor){%- endif %}
-{%- if False %}, SQLite (sync){%- endif %}
-, JWT + API Key auth
-{%- if cookiecutter.enable_redis %}, Redis{%- endif %}
-{%- if cookiecutter.use_pydantic_ai %}, PydanticAI{%- endif %}
-{%- if cookiecutter.use_langchain %}, LangChain{%- endif %}
-{%- if cookiecutter.use_langgraph %}, LangGraph{%- endif %}{%- if cookiecutter.use_deepagents %}, DeepAgents{%- endif %}
-{%- if cookiecutter.enable_rag %}, RAG ({{ cookiecutter.vector_store }}){%- endif %}
-{%- if cookiecutter.use_celery %}, Celery{%- endif %}
-{%- if cookiecutter.use_taskiq %}, Taskiq{%- endif %}
-{%- if cookiecutter.use_frontend %}, Next.js 15 (i18n){%- endif %}
+ # CLAUDE.md
+ 
+ ## 项目概览
+ 
+ **{{ cookiecutter.project_name }}** - 由 [全栈 AI Agent 模板](https://github.com/vstorm-co/framework-agent-python) 生成的 FastAPI 应用。
+ 
+ **技术栈：** FastAPI + Pydantic v2
+ {%- if True %}, PostgreSQL（asyncpg 异步）{%- endif %}
+ {%- if False %}, MongoDB（Motor 异步）{%- endif %}
+ {%- if False %}, SQLite（同步）{%- endif %}
+ , JWT + API 密钥认证
+ {%- if cookiecutter.enable_redis %}, Redis{%- endif %}
+ {%- if cookiecutter.use_pydantic_ai %}, PydanticAI{%- endif %}
+ {%- if cookiecutter.use_langchain %}, LangChain{%- endif %}
+ {%- if cookiecutter.use_langgraph %}, LangGraph{%- endif %}{%- if cookiecutter.use_deepagents %}, DeepAgents{%- endif %}
+ {%- if cookiecutter.enable_rag %}, RAG（{{ cookiecutter.vector_store }}）{%- endif %}
+ {%- if cookiecutter.use_celery %}, Celery{%- endif %}
+ {%- if cookiecutter.use_taskiq %}, Taskiq{%- endif %}
+ {%- if cookiecutter.use_frontend %}, Next.js 15（i18n）{%- endif %}
 
 ## Commands
 
@@ -65,17 +65,17 @@ uv run {{ cookiecutter.project_slug }} cmd rag-source-sync
 {%- endif %}
 ```
 
-## Hard Boundaries
+ ## 硬边界
+ 
+ 以下是不易察觉但容易违反的规则，涉及面广，需要提前说明：
+ 
+ - 仓库层使用 `db.flush()` + `db.refresh()`，**绝不能**使用 `db.commit()`——会话通过 `get_db_session` 自动提交。
+ - 路由层仅调用服务层——**绝不能**直接导入或调用仓库层。
+ - 路由处理器返回 `-> Any`；序列化由 `response_model` 处理（避免重复的 Pydantic 验证）。
+ - 使用 `datetime.now(UTC)`，绝不使用 `datetime.utcnow()`。
+ - API 密钥比较使用 `secrets.compare_digest()`，绝不使用 `==`。
 
-Non-obvious rules that are easy to violate and cross-cutting enough to state up front:
-
-- Repositories use `db.flush()` + `db.refresh()`, **never** `db.commit()` — the session auto-commits via `get_db_session`.
-- Routes call services only — **never** import or call repositories directly.
-- Route handlers return `-> Any`; serialization is handled by `response_model` (avoids double Pydantic validation).
-- `datetime.now(UTC)`, never `datetime.utcnow()`.
-- `secrets.compare_digest()` for API key comparison, never `==`.
-
-## Detailed Conventions
+ ## 详细约定
 
 Path-scoped guidance lives in `.claude/rules/*` and loads automatically when you edit matching files — it is intentionally NOT repeated here:
 
@@ -86,7 +86,7 @@ Path-scoped guidance lives in `.claude/rules/*` and loads automatically when you
 - `code-style.md` — formatting, naming, imports, type hints
 - `testing.md` — test structure, fixtures, async patterns
 {%- if cookiecutter.use_frontend %}
-- `frontend.md` — Next.js 15 conventions
+ - `frontend.md` — Next.js 15 约定
 {%- endif %}
 
-Longer-form docs: `docs/architecture.md`, `docs/adding_features.md`, `docs/testing.md`, `docs/patterns.md`.
+ 长文档：`docs/architecture.md`、`docs/adding_features.md`、`docs/testing.md`、`docs/patterns.md`。

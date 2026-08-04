@@ -1,262 +1,254 @@
-# 升级生成的项目
+﻿# 鍗囩骇鐢熸垚鐨勯」鐩?
 
-当你生成一个项目后，它就属于*你*了 —— 你会修改路由、添加业务逻辑、调整配置。与此同时，脚手架本身也在持续改进。`upgrade` 命令会把这些改进**在不丢失你定制内容的前提下**合并进你现有的项目，它执行的是真正的三方合并(three-way merge),并把冲突留给你用日常的 git 工具来处理。
+褰撲綘鐢熸垚涓€涓」鐩悗锛屽畠灏卞睘浜?浣?浜?鈥斺€?浣犱細淇敼璺敱銆佹坊鍔犱笟鍔￠€昏緫銆佽皟鏁撮厤缃€備笌姝ゅ悓鏃讹紝鑴氭墜鏋舵湰韬篃鍦ㄦ寔缁敼杩涖€俙upgrade` 鍛戒护浼氭妸杩欎簺鏀硅繘**鍦ㄤ笉涓㈠け浣犲畾鍒跺唴瀹圭殑鍓嶆彁涓?*鍚堝苟杩涗綘鐜版湁鐨勯」鐩紝瀹冩墽琛岀殑鏄湡姝ｇ殑涓夋柟鍚堝苟(three-way merge),骞舵妸鍐茬獊鐣欑粰浣犵敤鏃ュ父鐨?git 宸ュ叿鏉ュ鐞嗐€?
 
-- **在项目内部运行**(`make upgrade`)。
-- **不会静默覆盖任何内容。** 只有你改过的文件会被保留；只有脚手架改过的文件会被更新；双方都改过的文件要么自动合并，要么标记为冲突交给你解决。
-- **始终可撤销。** 升级落在一个专门的 git 分支上；你的提交历史原封不动，一条命令即可全部回退。
+- **鍦ㄩ」鐩唴閮ㄨ繍琛?*(`make upgrade`)銆?
+- **涓嶄細闈欓粯瑕嗙洊浠讳綍鍐呭銆?* 鍙湁浣犳敼杩囩殑鏂囦欢浼氳淇濈暀锛涘彧鏈夎剼鎵嬫灦鏀硅繃鐨勬枃浠朵細琚洿鏂帮紱鍙屾柟閮芥敼杩囩殑鏂囦欢瑕佷箞鑷姩鍚堝苟锛岃涔堟爣璁颁负鍐茬獊浜ょ粰浣犺В鍐炽€?
+- **濮嬬粓鍙挙閿€銆?* 鍗囩骇钀藉湪涓€涓笓闂ㄧ殑 git 鍒嗘敮涓婏紱浣犵殑鎻愪氦鍘嗗彶鍘熷皝涓嶅姩锛屼竴鏉″懡浠ゅ嵆鍙叏閮ㄥ洖閫€銆?
 
 ---
 
-## 工作原理(一张图说明)
+## 宸ヤ綔鍘熺悊(涓€寮犲浘璇存槑)
 
-一次升级会比较每个文件的三个版本：
+涓€娆″崌绾т細姣旇緝姣忎釜鏂囦欢鐨勪笁涓増鏈細
 
-| 角色   | 含义                                                              |
+| 瑙掕壊   | 鍚箟                                                              |
 | ------ | ----------------------------------------------------------------- |
-| BASE   | 你生成时所基于版本的脚手架，用你当初的答案渲染出来                |
-| OURS   | 你当前的项目(你正在使用、已定制的代码)                          |
-| THEIRS | 目标版本的脚手架，同样用你当初的答案渲染出来                      |
+| BASE   | 浣犵敓鎴愭椂鎵€鍩轰簬鐗堟湰鐨勮剼鎵嬫灦锛岀敤浣犲綋鍒濈殑绛旀娓叉煋鍑烘潵                |
+| OURS   | 浣犲綋鍓嶇殑椤圭洰(浣犳鍦ㄤ娇鐢ㄣ€佸凡瀹氬埗鐨勪唬鐮?                          |
+| THEIRS | 鐩爣鐗堟湰鐨勮剼鎵嬫灦锛屽悓鏍风敤浣犲綋鍒濈殑绛旀娓叉煋鍑烘潵                      |
 
-两份脚手架版本都用**你最初的答案**来渲染，正是这一点保证了合并的精确性：任何 BASE→OURS 的差异都确实是*你*的修改，任何 BASE→THEIRS 的差异都确实是*脚手架*的变更。工具从一个小清单文件 `.fastapi-fullstack.json` 中读取你的答案，该文件由生成器写入每个新项目。
+涓や唤鑴氭墜鏋剁増鏈兘鐢?*浣犳渶鍒濈殑绛旀**鏉ユ覆鏌擄紝姝ｆ槸杩欎竴鐐逛繚璇佷簡鍚堝苟鐨勭簿纭€э細浠讳綍 BASE鈫扥URS 鐨勫樊寮傞兘纭疄鏄?浣?鐨勪慨鏀癸紝浠讳綍 BASE鈫扵HEIRS 鐨勫樊寮傞兘纭疄鏄?鑴氭墜鏋?鐨勫彉鏇淬€傚伐鍏蜂粠涓€涓皬娓呭崟鏂囦欢 `.fastapi-fullstack.json` 涓鍙栦綘鐨勭瓟妗堬紝璇ユ枃浠剁敱鐢熸垚鍣ㄥ啓鍏ユ瘡涓柊椤圭洰銆?
 
-为保证这一点成立，三棵目录树在比较之前必须以*相同方式*格式化 —— 否则格式差异会被误读为修改。升级过程会在 BASE 和 THEIRS 上复现生成器当初创建你项目时所做的事(`ruff check --fix`,然后 `ruff format`,前端则用 Prettier),而从不对 OURS 执行自动修复，因此你自己的代码在这个过程中绝不会被改写。
+涓轰繚璇佽繖涓€鐐规垚绔嬶紝涓夋５鐩綍鏍戝湪姣旇緝涔嬪墠蹇呴』浠?鐩稿悓鏂瑰紡*鏍煎紡鍖?鈥斺€?鍚﹀垯鏍煎紡宸紓浼氳璇涓轰慨鏀广€傚崌绾ц繃绋嬩細鍦?BASE 鍜?THEIRS 涓婂鐜扮敓鎴愬櫒褰撳垵鍒涘缓浣犻」鐩椂鎵€鍋氱殑浜?`ruff check --fix`,鐒跺悗 `ruff format`,鍓嶇鍒欑敤 Prettier),鑰屼粠涓嶅 OURS 鎵ц鑷姩淇锛屽洜姝や綘鑷繁鐨勪唬鐮佸湪杩欎釜杩囩▼涓粷涓嶄細琚敼鍐欍€?
 
-结果会应用到一个新分支 `template-upgrade/v<version>` 上，你像审查任何其他变更一样去审查并合并它。
-
----
-
-## 前置条件
-
-- 项目必须是**其自身 git 仓库的根目录**(`git rev-parse --show-toplevel` 指向项目目录)。升级合并的是整棵目录树，如果一个项目处于更大仓库的某个子目录里，两边的路径含义就不一致，无法对齐。遇到这种情况，工具会拒绝运行，而不是产出错误的合并。
-- **干净的 git 工作区**(先把改动提交或暂存起来)。否则升级会拒绝运行，以此保证始终可撤销。`--dry-run` 是个例外：它可以在脏工作区上运行，但比较的是你已提交的 `HEAD`,所以未提交的改动不会出现在预览中(你会收到一条警告)。
-- 能访问 **PyPI**(工具会从已发布的发行版中拉取脚手架版本)。
-- 你的项目 **Makefile** 提供了 `make upgrade-dry-run` / `make upgrade` / `make upgrade-new-features` / `make upgrade-finalize`(用近期版本脚手架生成的项目都自带这些)。
-- **前端项目：** 先在 `frontend/` 里运行 `bun install`。升级会用你已安装的 Prettier 来归一化格式，这样脚手架对 `.ts/.tsx` 文件的改动才能干净地合并；如果没有它，前端文件会退化为仅空白符归一化，可能产生虚假差异。(依赖缺失时你会收到警告 —— 升级仍会继续运行。)
+缁撴灉浼氬簲鐢ㄥ埌涓€涓柊鍒嗘敮 `template-upgrade/v<version>` 涓婏紝浣犲儚瀹℃煡浠讳綍鍏朵粬鍙樻洿涓€鏍峰幓瀹℃煡骞跺悎骞跺畠銆?
 
 ---
 
-## 场景 1 —— 项目带有清单文件(常见情况)
+## 鍓嶇疆鏉′欢
 
-每个用近期版本脚手架生成的项目都包含 `.fastapi-fullstack.json`。用 `ls .fastapi-fullstack.json` 检查。如果存在，按以下步骤操作。
+- 椤圭洰蹇呴』鏄?*鍏惰嚜韬?git 浠撳簱鐨勬牴鐩綍**(`git rev-parse --show-toplevel` 鎸囧悜椤圭洰鐩綍)銆傚崌绾у悎骞剁殑鏄暣妫电洰褰曟爲锛屽鏋滀竴涓」鐩浜庢洿澶т粨搴撶殑鏌愪釜瀛愮洰褰曢噷锛屼袱杈圭殑璺緞鍚箟灏变笉涓€鑷达紝鏃犳硶瀵归綈銆傞亣鍒拌繖绉嶆儏鍐碉紝宸ュ叿浼氭嫆缁濊繍琛岋紝鑰屼笉鏄骇鍑洪敊璇殑鍚堝苟銆?
+- **骞插噣鐨?git 宸ヤ綔鍖?*(鍏堟妸鏀瑰姩鎻愪氦鎴栨殏瀛樿捣鏉?銆傚惁鍒欏崌绾т細鎷掔粷杩愯锛屼互姝や繚璇佸缁堝彲鎾ら攢銆俙--dry-run` 鏄釜渚嬪锛氬畠鍙互鍦ㄨ剰宸ヤ綔鍖轰笂杩愯锛屼絾姣旇緝鐨勬槸浣犲凡鎻愪氦鐨?`HEAD`,鎵€浠ユ湭鎻愪氦鐨勬敼鍔ㄤ笉浼氬嚭鐜板湪棰勮涓?浣犱細鏀跺埌涓€鏉¤鍛?銆?
+- 鑳借闂?**PyPI**(宸ュ叿浼氫粠宸插彂甯冪殑鍙戣鐗堜腑鎷夊彇鑴氭墜鏋剁増鏈?銆?
+- 浣犵殑椤圭洰 **Makefile** 鎻愪緵浜?`make upgrade-dry-run` / `make upgrade` / `make upgrade-new-features` / `make upgrade-finalize`(鐢ㄨ繎鏈熺増鏈剼鎵嬫灦鐢熸垚鐨勯」鐩兘鑷甫杩欎簺)銆?
+- **鍓嶇椤圭洰锛?* 鍏堝湪 `frontend/` 閲岃繍琛?`bun install`銆傚崌绾т細鐢ㄤ綘宸插畨瑁呯殑 Prettier 鏉ュ綊涓€鍖栨牸寮忥紝杩欐牱鑴氭墜鏋跺 `.ts/.tsx` 鏂囦欢鐨勬敼鍔ㄦ墠鑳藉共鍑€鍦板悎骞讹紱濡傛灉娌℃湁瀹冿紝鍓嶇鏂囦欢浼氶€€鍖栦负浠呯┖鐧界褰掍竴鍖栵紝鍙兘浜х敓铏氬亣宸紓銆?渚濊禆缂哄け鏃朵綘浼氭敹鍒拌鍛?鈥斺€?鍗囩骇浠嶄細缁х画杩愯銆?
 
-### 1. 从干净状态开始
+---
 
-```bash
+## 鍦烘櫙 1 鈥斺€?椤圭洰甯︽湁娓呭崟鏂囦欢(甯歌鎯呭喌)
+
+姣忎釜鐢ㄨ繎鏈熺増鏈剼鎵嬫灦鐢熸垚鐨勯」鐩兘鍖呭惈 `.fastapi-fullstack.json`銆傜敤 `ls .fastapi-fullstack.json` 妫€鏌ャ€傚鏋滃瓨鍦紝鎸変互涓嬫楠ゆ搷浣溿€?
+
+### 1. 浠庡共鍑€鐘舵€佸紑濮?
+
+````bash
 cd my-project
-git status            # 确认工作区是干净的
-git checkout -b before-upgrade   # 可选：一个安全分支
-```
+git status            # 纭宸ヤ綔鍖烘槸骞插噣鐨?
+git checkout -b before-upgrade   # 鍙€夛細涓€涓畨鍏ㄥ垎鏀?
+````
 
-### 2. 预览升级(可选但推荐)
+### 2. 棰勮鍗囩骇(鍙€変絾鎺ㄨ崘)
 
-```bash
-make upgrade-dry-run             # 或者：fastapi-fullstack upgrade --dry-run
-```
+````bash
+make upgrade-dry-run             # 鎴栬€咃細fastapi-fullstack upgrade --dry-run
+````
 
-这会打印一份分组报告，且不改动任何内容：
+杩欎細鎵撳嵃涓€浠藉垎缁勬姤鍛婏紝涓斾笉鏀瑰姩浠讳綍鍐呭锛?
 
-```
-Upgrade plan: v0.2.10 → v0.2.14
+````
+Upgrade plan: v0.2.10 鈫?v0.2.14
 
-New files (3)                         ← 脚手架新增的功能/文件
-New migrations (auto-added) (1)       ← 新的 Alembic 迁移
-Changed migrations (review — these have probably already run) (1)
+New files (3)                         鈫?鑴氭墜鏋舵柊澧炵殑鍔熻兘/鏂囦欢
+New migrations (auto-added) (1)       鈫?鏂扮殑 Alembic 杩佺Щ
+Changed migrations (review 鈥?these have probably already run) (1)
 Auto-updates (template changed, you didn't) (12)
 Auto-merged (both changed, merged cleanly) (2)
 Kept your changes (template unchanged) (5)
 Conflicts (need manual resolution) (1)
-You deleted these (staying deleted) (2)  ← 你删除过的文件；脚手架仍然提供
-Your files (left untouched) (8)       ← 只有你创建的文件
+You deleted these (staying deleted) (2)  鈫?浣犲垹闄よ繃鐨勬枃浠讹紱鑴氭墜鏋朵粛鐒舵彁渚?
+Your files (left untouched) (8)       鈫?鍙湁浣犲垱寤虹殑鏂囦欢
 
 Manual steps after merge
-  → 运行 `make db-upgrade`(新增了迁移)。
-  → 依赖变更时重新运行 `uv lock` / `bun install`。
-```
+  鈫?杩愯 `make db-upgrade`(鏂板浜嗚縼绉?銆?
+  鈫?渚濊禆鍙樻洿鏃堕噸鏂拌繍琛?`uv lock` / `bun install`銆?
+````
 
-### 3. 应用
+### 3. 搴旂敤
 
-```bash
-make upgrade                     # 或者：fastapi-fullstack upgrade
-```
+````bash
+make upgrade                     # 鎴栬€咃細fastapi-fullstack upgrade
+````
 
-工具会创建分支 `template-upgrade/v<version>`,应用每一处安全变更，添加新文件和迁移，并把真正的冲突保留为标准的 git 冲突标记。结束时它会打印出确切的撤销命令。
+宸ュ叿浼氬垱寤哄垎鏀?`template-upgrade/v<version>`,搴旂敤姣忎竴澶勫畨鍏ㄥ彉鏇达紝娣诲姞鏂版枃浠跺拰杩佺Щ锛屽苟鎶婄湡姝ｇ殑鍐茬獊淇濈暀涓烘爣鍑嗙殑 git 鍐茬獊鏍囪銆傜粨鏉熸椂瀹冧細鎵撳嵃鍑虹‘鍒囩殑鎾ら攢鍛戒护銆?
 
-如果想同时采纳你当前版本之后引入的**新的可选功能**(默认关闭 —— 升级不应悄悄开启你从未选择过的功能):
+濡傛灉鎯冲悓鏃堕噰绾充綘褰撳墠鐗堟湰涔嬪悗寮曞叆鐨?*鏂扮殑鍙€夊姛鑳?*(榛樿鍏抽棴 鈥斺€?鍗囩骇涓嶅簲鎮勬倓寮€鍚綘浠庢湭閫夋嫨杩囩殑鍔熻兘):
 
-```bash
-make upgrade-new-features    # 对每个新功能逐个提示 Yes/No
-```
+````bash
+make upgrade-new-features    # 瀵规瘡涓柊鍔熻兘閫愪釜鎻愮ず Yes/No
+````
 
-### 4. 解决冲突(如果有的话)
+### 4. 瑙ｅ喅鍐茬獊(濡傛灉鏈夌殑璇?
 
-在你的 IDE 的三方合并编辑器(PyCharm、VS Code 或 `git mergetool`)中打开冲突文件。标记会显示你的版本与脚手架版本的对比：
+鍦ㄤ綘鐨?IDE 鐨勪笁鏂瑰悎骞剁紪杈戝櫒(PyCharm銆乂S Code 鎴?`git mergetool`)涓墦寮€鍐茬獊鏂囦欢銆傛爣璁颁細鏄剧ず浣犵殑鐗堟湰涓庤剼鎵嬫灦鐗堟湰鐨勫姣旓細
 
-```python
-<<<<<<< ours          # 你的版本
+````python
+<<<<<<< ours          # 浣犵殑鐗堟湰
 API_TIMEOUT = 30
 =======
-API_TIMEOUT = 60      # 脚手架的版本
+API_TIMEOUT = 60      # 鑴氭墜鏋剁殑鐗堟湰
 >>>>>>> theirs
-```
+````
 
-解决后，暂存这些文件：
+瑙ｅ喅鍚庯紝鏆傚瓨杩欎簺鏂囦欢锛?
 
-```bash
+````bash
 git add <resolved-files>
-```
+````
 
-### 5. 收尾
+### 5. 鏀跺熬
 
-```bash
-make upgrade-finalize            # 或者：fastapi-fullstack upgrade finalize
-```
+````bash
+make upgrade-finalize            # 鎴栬€咃細fastapi-fullstack upgrade finalize
+````
 
-这会检查目录树已无冲突，并**把清单文件**升级到新版本。(只要还有冲突它就拒绝运行 —— 这道安全网确保清单不会谎报你的版本。)
+杩欎細妫€鏌ョ洰褰曟爲宸叉棤鍐茬獊锛屽苟**鎶婃竻鍗曟枃浠?*鍗囩骇鍒版柊鐗堟湰銆?鍙杩樻湁鍐茬獊瀹冨氨鎷掔粷杩愯 鈥斺€?杩欓亾瀹夊叏缃戠‘淇濇竻鍗曚笉浼氳皫鎶ヤ綘鐨勭増鏈€?
 
-### 6. 运行后续步骤并合并
+### 6. 杩愯鍚庣画姝ラ骞跺悎骞?
 
-```bash
-uv lock            # 后端依赖变更时
-bun install        # 前端依赖变更时(在 frontend/ 里运行)
-make db-upgrade    # 新增了迁移时
-make test          # 确认没有破坏任何东西
-```
+````bash
+uv lock            # 鍚庣渚濊禆鍙樻洿鏃?
+bun install        # 鍓嶇渚濊禆鍙樻洿鏃?鍦?frontend/ 閲岃繍琛?
+make db-upgrade    # 鏂板浜嗚縼绉绘椂
+make test          # 纭娌℃湁鐮村潖浠讳綍涓滆タ
+````
 
-然后把 `template-upgrade/v<version>` 像任何 PR 一样合并进你的主分支。
+鐒跺悗鎶?`template-upgrade/v<version>` 鍍忎换浣?PR 涓€鏍峰悎骞惰繘浣犵殑涓诲垎鏀€?
 
-### 随时撤销 {#sui-shi-che-xiao}
+### 闅忔椂鎾ら攢 {#sui-shi-che-xiao}
 
-```bash
+````bash
 git checkout -f <your-branch> \
   && git branch -D template-upgrade/v<version> \
   && rm -f .fastapi-fullstack.json.pending
-```
+````
 
-这里的 `-f` 不是可选的。冲突未解决时，普通的 `git checkout` 会直接拒绝；而一旦解决，它反而会把暂存的升级*带到你自己的分支上*,而不是丢弃它 —— 结果是你把整个升级暂存在了 `main` 上，而分支却被删了。`upgrade` 结束时会打印这条确切的命令，用那条就好。
+杩欓噷鐨?`-f` 涓嶆槸鍙€夌殑銆傚啿绐佹湭瑙ｅ喅鏃讹紝鏅€氱殑 `git checkout` 浼氱洿鎺ユ嫆缁濓紱鑰屼竴鏃﹁В鍐筹紝瀹冨弽鑰屼細鎶婃殏瀛樼殑鍗囩骇*甯﹀埌浣犺嚜宸辩殑鍒嗘敮涓?,鑰屼笉鏄涪寮冨畠 鈥斺€?缁撴灉鏄綘鎶婃暣涓崌绾ф殏瀛樺湪浜?`main` 涓婏紝鑰屽垎鏀嵈琚垹浜嗐€俙upgrade` 缁撴潫鏃朵細鎵撳嵃杩欐潯纭垏鐨勫懡浠わ紝鐢ㄩ偅鏉″氨濂姐€?
 
 ---
 
-## 场景 2 —— 没有清单文件的旧项目
+## 鍦烘櫙 2 鈥斺€?娌℃湁娓呭崟鏂囦欢鐨勬棫椤圭洰
 
-在清单功能出现之前生成的项目没有 `.fastapi-fullstack.json`(`ls .fastapi-fullstack.json` → 未找到)。工具无法得知它们当初是基于什么答案生成的，所以你得先创建一个清单文件，审查它，然后像场景 1 那样升级。
+鍦ㄦ竻鍗曞姛鑳藉嚭鐜颁箣鍓嶇敓鎴愮殑椤圭洰娌℃湁 `.fastapi-fullstack.json`(`ls .fastapi-fullstack.json` 鈫?鏈壘鍒?銆傚伐鍏锋棤娉曞緱鐭ュ畠浠綋鍒濇槸鍩轰簬浠€涔堢瓟妗堢敓鎴愮殑锛屾墍浠ヤ綘寰楀厛鍒涘缓涓€涓竻鍗曟枃浠讹紝瀹℃煡瀹冿紝鐒跺悗鍍忓満鏅?1 閭ｆ牱鍗囩骇銆?
 
-### 1. 重建一个候选清单
+### 1. 閲嶅缓涓€涓€欓€夋竻鍗?
 
-```bash
+````bash
 cd my-legacy-project
 fastapi-fullstack upgrade recover
-```
+````
 
-这会检查你项目的文件布局来推断哪些功能是开启的，从 README 页脚读取版本号，并写出一个**候选**文件 `.fastapi-fullstack.json.candidate`。它绝不会碰你的代码，也绝不写入真正的清单 —— 恢复是尽力而为的：
+杩欎細妫€鏌ヤ綘椤圭洰鐨勬枃浠跺竷灞€鏉ユ帹鏂摢浜涘姛鑳芥槸寮€鍚殑锛屼粠 README 椤佃剼璇诲彇鐗堟湰鍙凤紝骞跺啓鍑轰竴涓?*鍊欓€?*鏂囦欢 `.fastapi-fullstack.json.candidate`銆傚畠缁濅笉浼氱浣犵殑浠ｇ爜锛屼篃缁濅笉鍐欏叆鐪熸鐨勬竻鍗?鈥斺€?鎭㈠鏄敖鍔涜€屼负鐨勶細
 
-- 它能可靠地检测**布尔类型的功能开关**(RAG 开/关、是否有前端、任务队列选了哪个、AI 框架选了哪个 等等)。
-- 它**无法**恢复那些不留结构性痕迹的*取值*设置 —— `db_pool_size`、`timezone`、`author_name`、`project_description`、端口、LLM/向量库的选择等等。这些会在一条警告中列出，留给你手动填写。
+- 瀹冭兘鍙潬鍦版娴?*甯冨皵绫诲瀷鐨勫姛鑳藉紑鍏?*(RAG 寮€/鍏炽€佹槸鍚︽湁鍓嶇銆佷换鍔￠槦鍒楅€変簡鍝釜銆丄I 妗嗘灦閫変簡鍝釜 绛夌瓑)銆?
+- 瀹?*鏃犳硶**鎭㈠閭ｄ簺涓嶇暀缁撴瀯鎬х棔杩圭殑*鍙栧€?璁剧疆 鈥斺€?`db_pool_size`銆乣timezone`銆乣author_name`銆乣project_description`銆佺鍙ｃ€丩LM/鍚戦噺搴撶殑閫夋嫨绛夌瓑銆傝繖浜涗細鍦ㄤ竴鏉¤鍛婁腑鍒楀嚭锛岀暀缁欎綘鎵嬪姩濉啓銆?
 
-### 2. 审查并提升清单
+### 2. 瀹℃煡骞舵彁鍗囨竻鍗?
 
-打开 `.fastapi-fullstack.json.candidate`,如果检测到的 `package_version` 不对就改正它，并补上警告中标记的任何取值(在 `context` 对象内)。context 越准确，升级中的噪声就越少(context 不准确会让本没改过的文件显得"被改过" —— 安全，但会很吵)。
+鎵撳紑 `.fastapi-fullstack.json.candidate`,濡傛灉妫€娴嬪埌鐨?`package_version` 涓嶅灏辨敼姝ｅ畠锛屽苟琛ヤ笂璀﹀憡涓爣璁扮殑浠讳綍鍙栧€?鍦?`context` 瀵硅薄鍐?銆俢ontext 瓒婂噯纭紝鍗囩骇涓殑鍣０灏辫秺灏?context 涓嶅噯纭細璁╂湰娌℃敼杩囩殑鏂囦欢鏄惧緱"琚敼杩? 鈥斺€?瀹夊叏锛屼絾浼氬緢鍚?銆?
 
-看起来没问题后，把它提升为正式清单并提交：
+鐪嬭捣鏉ユ病闂鍚庯紝鎶婂畠鎻愬崌涓烘寮忔竻鍗曞苟鎻愪氦锛?
 
-```bash
+````bash
 mv .fastapi-fullstack.json.candidate .fastapi-fullstack.json
 git add .fastapi-fullstack.json && git commit -m "chore: add upgrade manifest"
-```
+````
 
-### 3. 像场景 1 那样升级
+### 3. 鍍忓満鏅?1 閭ｆ牱鍗囩骇
 
-至此你的项目就能自我描述了 —— 按**场景 1** 操作(`make upgrade` → 解决冲突 → `make upgrade-finalize`)。以后每次升级都是一次干净、基于清单的运行。
+鑷虫浣犵殑椤圭洰灏辫兘鑷垜鎻忚堪浜?鈥斺€?鎸?*鍦烘櫙 1** 鎿嶄綔(`make upgrade` 鈫?瑙ｅ喅鍐茬獊 鈫?`make upgrade-finalize`)銆備互鍚庢瘡娆″崌绾ч兘鏄竴娆″共鍑€銆佸熀浜庢竻鍗曠殑杩愯銆?
 
-> **提示：** 即便手写了一份清单，也别指望那些"Kept your changes"里的文件全是你真改过的 —— 这是重建 context 不够完美所残留的结果。它是安全的(你的文件绝不会被覆盖),只是意味着能自动应用到那些文件上的脚手架更新更少。
+## 理解报告
 
----
-
-## 看懂这份报告
-
-| 区块 | 含义 | 执行的动作 |
+| 部分 | 含义 | 操作 |
 |---|---|---|
-| **New files** | 脚手架新增了一个你没有的文件。 | 添加。 |
-| **New migrations** | 新的 Alembic 迁移。 | 添加(仅追加，安全)。运行 `make db-upgrade`。 |
-| **Changed migrations** | 脚手架重写了一个你已有的迁移。 | 更新 —— 但它不会重新执行，所以要对照你的真实 schema 审查。 |
-| **Auto-updates** | 脚手架改了你没改过的文件。 | 更新为脚手架的版本。 |
-| **Auto-merged** | 双方都改动了文件，但改的地方不重叠。 | 由 git 干净地合并。 |
-| **Kept your changes** | 你改了脚手架没动过的文件。 | 保持为你的版本。 |
-| **Already converged** | 你和脚手架做了同样的修改。 | 无需操作。 |
-| **Conflicts** | 双方改了同一行，或以不同方式添加了同一个文件。 | 保留冲突标记，交给你处理。 |
-| **Your files** | 只有你创建的文件。 | 绝不触碰。 |
-| **Removed by template** | 脚手架删除了一个你没改过的文件。 | 建议删除。 |
-| **You deleted these** | 你删了一个脚手架仍提供且未改动的文件。 | 保持删除 —— 无需操作。 |
-| **Other changes** | 上面这张表没覆盖到的任何情况。 | 审查分支。应当很少见 —— 看到的话值得反馈。 |
+| **新文件** | 模板新增了你没有的文件。 | 已添加。 |
+| **新迁移** | 新的 Alembic 迁移文件。 | 已添加（仅追加，安全）。运行 make db-upgrade。 |
+| **已更改的迁移** | 模板重写了你已有的迁移文件。 | 已更新——但不会再执行，请对照实际数据库 schema 检查。 |
+| **自动更新** | 模板更改了你未修改的文件。 | 更新为模板版本。 |
+| **自动合并** | 双方都更改了文件，但改动不重叠。 | 由 git 干净合并。 |
+| **保留你的更改** | 你更改了模板未修改的文件。 | 保留你的版本。 |
+| **已趋同** | 你和模板做了相同更改。 | 无需操作。 |
+| **冲突** | 双方修改了相同行，或以不同方式添加了相同文件。 | 保留冲突标记供你处理。 |
+| **你的文件** | 仅由你创建的文件。 | 从未触碰。 |
+| **模板删除** | 模板删除了你未修改的文件。 | 建议删除。 |
+| **你已删除** | 你删除了模板仍提供且未更改的文件。 | 保持删除——无需操作。 |
+| **其他更改** | 上表未涵盖的任何内容。 | 请审查分支。应很少见——如果出现值得报告。 |
 
 ---
 
-## 绝不会被触碰的内容
+## 永远不会被触碰的内容
 
-合并始终跳过以下这些 —— 它们从不会被读取、写入或合并：
+合并始终跳过以下内容——它们从不被读取、写入或合并：
 
-- **密钥**:`.env`、`.env.*` —— 但已提交的示例文件(`.env.example`、`.env.sample`、`.env.template`)除外，它们会正常合并，以便某个发行版新增的配置项能到达你这里
-- **锁文件**:`uv.lock`、`package-lock.json`、`bun.lock`、`bun.lockb`(依赖变更时在升级后重新生成)
-- `.git/`、`node_modules/`、`.venv/`、构建产物、`__pycache__/`、缓存
-- `.gitattributes` 和 git 子模块
-- 系统垃圾文件：`.DS_Store`、`Thumbs.db`
-- **符号链接**,无论你的还是脚手架的。被跟踪的符号链接绝不会被删除或重新暂存，脚手架也无法投递一个链接。唯一值得知道的一个例外：某个*未跟踪的*符号链接恰好处在升级要写入文件的位置，它会被那个文件替换(不会有内容顺着链接写入 —— 但链接会消失)。需要保留就先把它挪开。
-- 清单文件本身(`.fastapi-fullstack.json`)—— 只由 `upgrade finalize` 来升级版本号。它的临时文件(`.pending`、`.candidate`)在新项目里会被 gitignore
+- **密钥**：.env、.env.*——但已提交的示例文件（.env.example、.env.sample、.env.template）除外，它们会正常合并，以便版本新增的设置能到达你手中
+- **锁定文件**：uv.lock、package-lock.json、un.lock、un.lockb（如果依赖有变化，升级后重新生成）
+- .git/、
+ode_modules/、.venv/、构建产物、__pycache__/、缓存
+- .gitattributes 和 git 子模块
+- 系统垃圾文件：.DS_Store、Thumbs.db
+- **符号链接**，包括你的和模板的。被跟踪的符号链接永远不会被删除或重新暂存，模板也无法提供符号链接。一个值得注意的例外：一个*未跟踪*的符号链接恰好在升级要写入文件的位置时，会被该文件替代（不会通过链接写入——但链接会消失）。如果你需要它，请先将其移开。
+- 清单本身（.fastapi-fullstack.json）——仅由 upgrade finalize 更新。其临时文件（.pending、.candidate）在新项目中已被 gitignore
 
-Alembic 迁移**不**在排除之列 —— 它们像任何其他文件一样参与合并。它们只是有自己单独的报告区块，因为失败模式不一样：**新的**迁移会被自动添加(仅追加，安全),你自己的迁移作为客户端专属文件原样保留，而脚手架**改动过**的迁移则单列在 *Changed migrations* 下。
+Alembic 迁移**不被排除**——它们像其他文件一样合并。它们拥有自己的报告部分，因为故障模式不同：**新**迁移自动添加（仅追加，安全），你自己的迁移保留为仅客户端文件，而模板**更改**的迁移会在*已更改的迁移*下单独列出。
 
-读一读那一节。你已有的某个迁移几乎肯定已经在数据库里执行过了，而 alembic 依据 revision id 来判断 —— 所以被重写的函数体不会重新执行，文件也就悄悄地不再描述它当初生成的那个 schema。升级仍会应用这个变更(它在一个分支上，而且发行版有时确实会修复一个真正有问题的迁移),但得由你来决定：保留它，还是在合并前 `git checkout HEAD~ -- <file>`。
+请仔细阅读该部分。你已有的迁移几乎肯定已针对你的数据库运行过，而 alembic 依赖修订 ID——因此重写的主体不会重新执行，文件会悄然停止描述它实际产生的 schema。升级仍会应用更改（它在分支上，并且某个版本有时确实会修复一个确实有问题的迁移），但你需要决定：保留它，还是在合并前执行 git checkout HEAD~ -- <file>。
 
 ---
 
-## 清单文件 —— `.fastapi-fullstack.json`
+## 清单 —— .fastapi-fullstack.json
 
-写入每个生成的项目。它记录生成器版本和项目构建所基于的全部答案，使升级可复现。它**不包含任何密钥**(密钥形态的值在写入前会被剥离),因此可以安全提交 —— 而且你应该提交它。
+写入每个生成的项目。它记录了生成器版本以及项目构建所依据的完整答案集，因此升级是可重现的。它**不包含任何密钥**（密钥形式的值在写入前会被剥离），因此提交它是安全的——并且你应该提交它。
 
 ```json
 {
-  "template": "https://github.com/vstorm-co/full-stack-ai-agent-template",
-  "template_ref": "0.2.14",
-  "package_version": "0.2.14",
-  "generated_at": "2026-07-01T10:00:00Z",
-  "context_hash": "sha256:…",
-  "context": { "project_name": "…", "enable_rag": false, "...": "…" }
+  "template": ""https://github.com/vstorm-co/full-stack-ai-agent-template"",
+  "template_ref": ""0.2.14"",
+  "package_version": ""0.2.14"",
+  "generated_at": ""2026-07-01T10:00:00Z"",
+  "context_hash": ""sha256:..."",
+  "context": { "project_name": ""..."", "enable_rag": false, ""..."": ""..."" }
 }
 ```
 
-`upgrade finalize` 是**唯一**会更新 `package_version` 的操作 —— 而且只在干净、无冲突的解决之后 —— 所以清单绝不会声称一个你尚未完全合并的版本。
+upgrade finalize 是**唯一**会更新 package_version 的操作——并且只在干净、无冲突的解决之后——因此清单永远不会声称你未完全合并的版本。
 
 ---
 
 ## 命令参考
 
 ```bash
-# 在项目内部(通过 Makefile 桥接)
-make upgrade-dry-run               # 预览报告，不改动任何内容
+# 在项目内（Makefile 封装）
+make upgrade-dry-run               # 预览报告，不做任何更改
 make upgrade                       # 执行升级
-make upgrade-new-features          # 升级 + 采纳新增功能
-make upgrade-finalize              # 解决冲突后更新清单版本号
+make upgrade-new-features          # 升级 + 选择加入新增功能
+make upgrade-finalize              # 解决后更新清单
 
-# 额外/一次性参数通过普通 upgrade 目标的 ARGS 传入：
+# 额外/一次性标志通过 ARGS 传入普通 upgrade 目标：
 make upgrade ARGS=--to=0.3.0
 
-# 底层 CLI(从任意位置用 --path 运行，或在项目目录里运行)
+# 底层 CLI（从任何位置运行，使用 --path，或从项目目录运行）
 fastapi-fullstack upgrade [--path DIR] [--to VERSION] [--dry-run] [--with-new-features] [--force]
 fastapi-fullstack upgrade finalize [--path DIR]
 fastapi-fullstack upgrade recover  [--path DIR]
 ```
 
-| 标志 | 作用 |
+| 标志 | 效果 |
 |---|---|
-| `--dry-run` | 打印报告，不改动任何内容。 |
-| `--to VERSION` | 升级到指定版本，而非最新版本。 |
-| `--with-new-features` | 提示是否采纳你当前版本之后新增的可选功能(默认关闭)。 |
-| `--force` | 若 `template-upgrade/v…` 分支已存在则重建它，**并**覆盖升级将要落到其上的未跟踪文件(不加它时，遇到冲突会中止并列出清单)。 |
-| `--path DIR` | 目标项目目录(默认为当前目录)。 |
-
----
-
-## 给脚手架维护者 —— `UPGRADES.yaml`
+| --dry-run | 打印报告，不做任何更改。 |
+| --to VERSION | 升级到特定版本而非最新版本。 |
+| --with-new-features | 提示是否采用自你的版本以来新增的可选功能（默认关闭）。 |
+| --force | 即使工作区不干净也强制运行。 |
 
 内容 diff 无法识别某个文件在版本间被**重命名/移动**,也无法识别某个 cookiecutter **变量被重命名** —— 它会把这些读成无关的删除 + 添加，从而丢失客户端的改动。把这些结构性事实记录到 `UPGRADES.yaml`(仓库根目录),每个发行版一个块：
 
@@ -267,6 +259,7 @@ fastapi-fullstack upgrade recover  [--path DIR]
       to:   "backend/app/core/settings.py"
     - from: "backend/app/rag/"
       to:   "backend/app/knowledge/"
+## 给脚手架维护者 —— `UPGRADES.yaml`
   variable_renames:              # 各版本间被重命名的 cookiecutter context 键
     - from: "use_pgvector"
       to:   "vector_store"

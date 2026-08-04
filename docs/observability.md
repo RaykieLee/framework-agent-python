@@ -156,7 +156,7 @@ LOGFIRE_SERVICE_VERSION=1.0.0
 In the generator, you can choose which components to instrument:
 
 ```bash
-fastapi-fullstack new
+framework-agent-python new
 # ✓ Enable Logfire observability
 #   ✓ Instrument FastAPI
 #   ✓ Instrument Database

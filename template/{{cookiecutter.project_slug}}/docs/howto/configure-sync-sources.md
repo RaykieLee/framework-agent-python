@@ -1,7 +1,7 @@
 {%- if cookiecutter.enable_rag %}
-# How to: Configure Sync Sources
+# 如何：配置同步源
 
-## Overview
+### 概述
 
 Sync sources let you automatically pull documents from external services
 (Google Drive, S3/MinIO) into your RAG collections. Each source is a
@@ -28,7 +28,7 @@ every sync operation.
 
 ---
 
-## Quick Start -- CLI
+## 快速开始 -- CLI
 
 ### List available connector types
 
@@ -82,7 +82,7 @@ in the `rag-sources` listing.
 
 ---
 
-## Quick Start -- UI
+## 快速开始 -- UI
 
 1. Navigate to **Knowledge Base** and open the **Sync** tab.
 2. Click **"+ Add Source"**.
@@ -100,7 +100,7 @@ in the UI you can also do with `curl` or any HTTP client.
 
 ---
 
-## Sync Modes
+## 同步模式
 
 | Mode | Behavior |
 |------|----------|
@@ -115,7 +115,7 @@ without adding new ones. Choose `full` for a clean re-import every time.
 
 ---
 
-## Schedule
+## 调度
 
 The `schedule_minutes` field controls how often the source syncs
 automatically:
@@ -145,7 +145,7 @@ Without a background task system, only manual triggers (CLI or API) work.
 
 ---
 
-## Google Drive Setup
+## Google Drive 设置
 
 ### 1. Create a service account
 
@@ -193,7 +193,7 @@ formats (PDF, XLSX, PPTX) during download.
 
 ---
 
-## S3 / MinIO Setup
+## S3 / MinIO 设置
 
 ### 1. Configure the environment
 
@@ -218,7 +218,7 @@ For MinIO, the endpoint is typically `http://minio:9000` (Docker) or
 
 ---
 
-## API Reference
+## API 参考
 
 All sync source endpoints live under `/api/v1/rag/sync/`. They require
 admin-level authentication when JWT auth is enabled.
@@ -286,7 +286,7 @@ integrations programmatically.
 
 ---
 
-## Updating a Source
+## 更新源
 
 You can update any subset of fields on an existing source with `PATCH`:
 
@@ -308,7 +308,7 @@ Set `is_active` to `false` to pause a source without deleting it.
 
 ---
 
-## Monitoring Sync Operations
+## 监控同步操作
 
 Every sync creates a `SyncLog` entry with the following fields:
 
@@ -336,7 +336,7 @@ curl http://localhost:{{ cookiecutter.backend_port }}/api/v1/rag/sync/logs?colle
 
 ---
 
-## Adding Custom Connectors
+## 添加自定义连接器
 
 To add a new connector type (e.g. Notion, Confluence, Dropbox), see
 [How to: Add a New Sync Connector](./add-sync-connector.md).
@@ -356,7 +356,7 @@ and UI.
 
 ---
 
-## Troubleshooting
+## 故障排除
 
 ### "No sync sources configured"
 
@@ -390,7 +390,7 @@ Verify that `S3_RAG_ACCESS_KEY`, `S3_RAG_SECRET_KEY`, and
 `S3_RAG_ENDPOINT` are set correctly in `.env`. For MinIO, ensure the
 endpoint includes the port (e.g. `http://localhost:9000`).
 
-### Scheduled syncs are not running
+### 调度d syncs are not running
 
 A background task system must be running. Check that your worker process
 is active:

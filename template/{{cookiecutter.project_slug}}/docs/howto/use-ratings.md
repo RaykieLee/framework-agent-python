@@ -1,24 +1,24 @@
-# Using Message Ratings
+# 使用消息评分
 
 Users can rate AI assistant responses to provide feedback on answer quality.
 This feedback helps improve the AI and gives administrators insight into response quality.
 
-## Rating Messages
+## 评分消息
 
-### Like/Dislike
+### 喜欢/不喜欢
 
 Each AI assistant message displays two buttons:
 
 - **Like (👍)** — Click to indicate the response was helpful
 - **Dislike (👎)** — Click to indicate the response had issues
 
-### Toggle Behavior
+### 切换行为
 
 - Clicking the same button again **removes** your rating
 - Clicking the opposite button **changes** your rating (like → dislike or vice versa)
 - Only assistant messages can be rated (not your own messages)
 
-### Adding Feedback
+### 添加反馈
 
 When you dislike a response, a dialog appears asking **"What went wrong?"**
 
@@ -32,32 +32,32 @@ Common reasons to dislike:
 - Too verbose or too brief
 - Poor formatting or structure
 
-## Rating Counts
+## 评分统计
 
 Each message shows the total number of likes and dislikes from all users.
 Your own rating is highlighted (green for like, red for dislike).
 
-## For Administrators
+## 管理人员
 
-### Ratings Dashboard
+### 评分仪表盘
 
 Navigate to **Admin → Response Ratings** (or `/admin/ratings`) to access the analytics dashboard.
 
-#### Summary Statistics
+#### 汇总统计
 
 - **Total ratings** — All ratings across the system
 - **Likes** — Count of positive ratings
 - **Dislikes** — Count of negative ratings
 - **Average** — Overall satisfaction score (-1.0 to 1.0)
 
-#### Ratings Chart
+#### 评分图表
 
 A bar chart shows ratings over time (default: last 30 days).
 Green bars represent likes, red bars represent dislikes.
 
 Use the **Days** dropdown to adjust the time window (7, 30, 90, or 365 days).
 
-### Filtering Ratings
+### 筛选评分
 
 Use the filter dropdowns to narrow down results:
 
@@ -66,7 +66,7 @@ Use the filter dropdowns to narrow down results:
 | Rating type | All / Likes Only / Dislikes Only |
 | Comments | All / With comments only |
 
-### Ratings Table
+### 评分表格
 
 The table shows individual ratings with:
 
@@ -77,7 +77,7 @@ The table shows individual ratings with:
 - **User** — Who submitted the rating
 - **Actions** — Link to view the full conversation
 
-### Exporting Data
+### 导出数据
 
 Export ratings for external analysis:
 
@@ -86,12 +86,12 @@ Export ratings for external analysis:
 
 Exports respect the current filters (e.g., export only dislikes with comments).
 
-### Viewing Conversations
+### 查看对话
 
 Click **"View conversation"** on any rating to open the chat interface with that conversation loaded.
 This is useful for understanding the context of a rating.
 
-## Admin Conversations Page
+## 管理员对话页面
 
 Navigate to **Admin → All Conversations** (or `/admin/conversations`) to view all user conversations.
 
@@ -102,7 +102,7 @@ This page provides:
 - Filter by date range (preset or custom)
 - Quick links to view conversation details
 
-## Direct Conversation Links
+## 直接对话链接
 
 You can share a direct link to a specific conversation by adding the `id` parameter to the chat URL:
 
@@ -118,15 +118,15 @@ This is useful for:
 
 Click **"View conversation"** from any rating or the admin conversations list to open a direct link.
 
-## API Access
+## API 访问
 
 For programmatic access to ratings data, use the admin API endpoints:
 
-| Endpoint | Method | Description |
+| 端点 | 方法 | 说明 |
 |----------|--------|-------------|
 | `/admin/ratings` | GET | List ratings with pagination and filters |
 | `/admin/ratings/summary` | GET | Aggregate statistics |
 | `/admin/ratings/export` | GET | Export ratings (JSON/CSV) |
 | `/admin/conversations` | GET | List all conversations |
 
-All admin endpoints require admin authentication via JWT token.
+所有管理员端点需要通过 JWT 令牌的管理员认证。

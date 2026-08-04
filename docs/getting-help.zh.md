@@ -10,9 +10,9 @@
 
 ## GitHub
 
-- [Issues](https://github.com/vstorm-co/full-stack-ai-agent-template/issues) - 报告 bug 或提出功能需求
-- [讨论](https://github.com/vstorm-co/full-stack-ai-agent-template/discussions) - 提问和分享想法
-- [Pull Requests](https://github.com/vstorm-co/full-stack-ai-agent-template/pulls) - 为项目做贡献
+- [Issues](https://github.com/vstorm-co/framework-agent-python/issues) - 报告 bug 或提出功能需求
+- [讨论](https://github.com/vstorm-co/framework-agent-python/discussions) - 提问和分享想法
+- [Pull Requests](https://github.com/vstorm-co/framework-agent-python/pulls) - 为项目做贡献
 
 ## 常见问题
 
@@ -33,9 +33,9 @@
 在项目生成时选择：
 
 ```bash
-fastapi-fullstack create my_app --auth jwt     # JWT 令牌
-fastapi-fullstack create my_app --auth api_key # API 密钥
-fastapi-fullstack create my_app --auth both    # 两种方式都要
+framework-agent-python create my_app --auth jwt     # JWT 令牌
+framework-agent-python create my_app --auth api_key # API 密钥
+framework-agent-python create my_app --auth both    # 两种方式都要
 ```
 
 ### 如何部署到生产环境？

@@ -1,20 +1,20 @@
 ---
 name: background-task
-description: Add or modify work that runs outside the request/response cycle — emails, document ingestion, webhooks, cleanups, scheduled jobs. Use when something is slow or fire-and-forget, or when adding a periodic/cron task. This project's queue is {{ cookiecutter.background_tasks }}.
+description: 添加或修改在请求/响应周期之外运行的工作 — emails, document ingestion, webhooks, cleanups, scheduled jobs. 在操作耗时或即发即弃时使用, or when adding a periodic/cron task. This project's queue is {{ cookiecutter.background_tasks }}.
 ---
 
-# Background Tasks ({{ cookiecutter.background_tasks }})
+# 后台任务 ({{ cookiecutter.background_tasks }})
 
 Tasks live in `backend/app/worker/tasks/` (e.g. `email_tasks.py`, `rag_tasks.py`, `cleanup_tasks.py`). The app uses **{{ cookiecutter.background_tasks }}**. An in-process fallback (`worker/background/`) exists for trivial cases.
 
-## When to use a task vs. inline
+## 何时使用任务 vs 内联
 
 - **Task:** anything slow, retryable, or fire-and-forget — sending email, ingesting/embedding documents, calling slow external APIs, periodic cleanups, materialized-view refreshes.
 - **Inline:** fast, transactional work that the response depends on.
 
-## Add a task
+## 添加任务
 
-1. **Define it** in `backend/app/worker/tasks/<area>.py`:
+1. **定义它** in `backend/app/worker/tasks/<area>.py`:
 {%- if cookiecutter.use_celery %}
    ```python
    from app.worker.celery_app import celery_app
@@ -47,7 +47,7 @@ Tasks live in `backend/app/worker/tasks/` (e.g. `email_tasks.py`, `rag_tasks.py`
    Fire-and-forget from a service: `asyncio.create_task(send_welcome_email_flow(user_id))`.
 {%- endif %}
 
-2. **Call it from a service** (not from the route directly) — keep business logic in `services/`, enqueue at the end of the unit of work.
+2. **从服务层调用** (not from the route directly) — keep business logic in `services/`, enqueue at the end of the unit of work.
 
 3. **Schedule it (optional):**
 {%- if cookiecutter.use_celery %}
@@ -71,7 +71,7 @@ Tasks live in `backend/app/worker/tasks/` (e.g. `email_tasks.py`, `rag_tasks.py`
    the `prefect-server` + `prefect-runner` start with `make dev`; watch runs at <http://localhost:4200>.
 {%- endif %}
 
-## Rules
+## 规则
 
 - Tasks take **serializable args** (ids, primitives) — not ORM objects or sessions. Re-fetch inside the task with a fresh session.
 - Make tasks **idempotent** where possible (safe to retry).

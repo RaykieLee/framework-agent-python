@@ -1,93 +1,93 @@
-# Security
-
-## Reporting a vulnerability
-
-Email: **{{ cookiecutter.author_email }}** (or open a private security advisory on the repo). Please include:
-
-- Affected version / commit
-- Steps to reproduce
-- Impact assessment (data exposure / privilege escalation / DoS / …)
-
-We aim to acknowledge within 48h and ship a fix within 7 days for high-severity issues.
+ # 安全
+ 
+ ## 报告漏洞
+ 
+ 邮箱：**{{ cookiecutter.author_email }}**（或在仓库上打开私有安全公告）。请包含：
+ 
+ - 受影响的版本 / 提交
+ - 复现步骤
+ - 影响评估（数据泄露 / 权限提升 / 拒绝服务等）
+ 
+ 我们承诺在 48 小时内确认，高严重性问题在 7 天内发布修复。
 
 ---
 
-## Security model
+ ## 安全模型
 
-### Authentication
+ ### 认证
 
 {%- if cookiecutter.use_jwt %}
-- **JWT (`HS256`)** signed with `SECRET_KEY`. Access token TTL = `ACCESS_TOKEN_EXPIRE_MINUTES` (default 30 min). Refresh token TTL = `REFRESH_TOKEN_EXPIRE_MINUTES` (default 7 days).
-- **Password hashing:** bcrypt via `passlib`. Plain passwords never persisted.
+ - **JWT（`HS256`）** 使用 `SECRET_KEY` 签名。访问令牌 TTL = `ACCESS_TOKEN_EXPIRE_MINUTES`（默认 30 分钟）。刷新令牌 TTL = `REFRESH_TOKEN_EXPIRE_MINUTES`（默认 7 天）。
+ - **密码哈希：** 通过 `passlib` 使用 bcrypt。明文密码绝不持久化。
 {%- if cookiecutter.enable_oauth_google %}
-- **OAuth 2.0 (Google)** — auth-code flow. Token validated server-side, internal user record looked up/created by email.
+ - **OAuth 2.0（Google）** — 授权码流程。服务端验证令牌，通过邮箱查找/创建内部用户记录。
 {%- endif %}
 {%- if cookiecutter.enable_session_management %}
-- **Session management** — DB-backed sessions with revocation. Each refresh-token issuance creates a session row; `/sessions` endpoint lets users see + revoke devices.
+ - **会话管理** — 基于数据库的会话，支持撤销。每次颁发刷新令牌时创建会话记录；`/sessions` 端点允许用户查看 + 撤销设备。
 {%- else %}
-- **Stateless JWT** — no DB session table. Logout is client-side (drop tokens). For server-side revocation, regenerate with `--session-management`.
+ - **无状态 JWT** — 无数据库会话表。登出在客户端进行（丢弃令牌）。如需服务端撤销，请使用 `--session-management` 重新生成。
 {%- endif %}
 {%- endif %}
 {%- if cookiecutter.use_api_key %}
-- **Admin API key** — static `settings.API_KEY` matched via `X-API-Key` header for service-to-service calls. Constant-time compared with `secrets.compare_digest()`.
+ - **管理 API 密钥** — 静态 `settings.API_KEY`，通过 `X-API-Key` 头匹配，用于服务间调用。使用 `secrets.compare_digest()` 进行常量时间比较。
 {%- endif %}
 
-### Authorization
+ ### 授权
 
-- **Role-based** via `RoleChecker` dep (`UserRole.USER` / `UserRole.ADMIN`).
+ - **基于角色** 通过 `RoleChecker` 依赖实现（`UserRole.USER` / `UserRole.ADMIN`）。
 {%- if cookiecutter.enable_admin_panel %}
-- **Admin pages** require `role=admin`. Sensitive ops (impersonate user, system-health) gated separately.
+ - **管理页面** 需要 `role=admin`。敏感操作（模拟用户、系统健康检查）单独控制。
 {%- endif %}
 {%- if cookiecutter.enable_teams %}
-- **Workspace scope** — every authenticated request resolves an `ActiveOrg` (default = personal org). Resources scoped by `organization_id` foreign key.
-- **Org roles:** `OWNER` / `ADMIN` / `MEMBER`. Owner can transfer ownership + delete org.
+ - **工作空间范围** — 每个经过认证的请求解析一个 `ActiveOrg`（默认 = 个人组织）。资源通过 `organization_id` 外键限定范围。
+ - **组织角色：** `OWNER` / `ADMIN` / `MEMBER`。所有者可以转移所有权 + 删除组织。
 {%- endif %}
 
-### Transport / network
+ ### 传输 / 网络
 
-- **CORS** — origin list from `settings.CORS_ORIGINS`. Restrict to your domains in production.
-- **HTTPS** — enforce via reverse proxy (Nginx / Traefik / ALB). Strict-Transport-Security header set in middleware when `ENVIRONMENT=production`.
-- **CSP** — frontend sets `frame-ancestors 'none'` by default to prevent click-jacking.{% if cookiecutter.use_frontend %} See `frontend/next.config.ts` headers block.{% endif %}
+ - **CORS** — 来源列表来自 `settings.CORS_ORIGINS`。生产环境中限制为你自己的域名。
+ - **HTTPS** — 通过反向代理（Nginx / Traefik / ALB）强制执行。当 `ENVIRONMENT=production` 时，中间件设置 Strict-Transport-Security 头。
+ - **CSP** — 前端默认设置 `frame-ancestors 'none'` 以防止点击劫持。{% if cookiecutter.use_frontend %} 参见 `frontend/next.config.ts` 的 headers 块。{% endif %}
 
-### Data
+ ### 数据
 
-- **Secrets** — read from environment via `pydantic-settings`. Never committed. See `.env.example` + `ENV_VARS.md`.
+ - **密钥** — 通过 `pydantic-settings` 从环境变量读取。永不提交到代码仓库。参见 `.env.example` 和 `ENV_VARS.md`。
 {%- if cookiecutter.enable_admin_features_audit_log %}
-- **Audit log** — admin-mutating actions (user updates, deletes, impersonations, role changes) recorded in `app_admin_audit_log` table with actor + IP + payload snapshot.
+ - **审计日志** — 管理员变更操作（用户更新、删除、模拟、角色更改）记录到 `app_admin_audit_log` 表中，包含操作者、IP 和负载快照。
 {%- endif %}
 {%- if cookiecutter.enable_billing %}
-- **Stripe webhooks** — signature verified via `stripe.Webhook.construct_event(secret=STRIPE_WEBHOOK_SECRET)`. Idempotency table prevents replay.
+ - **Stripe Webhook** — 通过 `stripe.Webhook.construct_event(secret=STRIPE_WEBHOOK_SECRET)` 验证签名。幂等表防止重放。
 {%- endif %}
 {%- if cookiecutter.enable_rag %}
-- **RAG documents** — file uploads scoped per-org. No public read endpoint; all retrieval happens server-side during chat.
+ - **RAG 文档** — 文件上传按组织限定范围。没有公开的读取端点；所有检索在聊天期间在服务端进行。
 {%- endif %}
 
-### Hardening checklist for production
+ ### 生产环境加固检查清单
 
-- [ ] Rotate `SECRET_KEY` and `API_KEY` from generated defaults.
-- [ ] Set `DEBUG=false` and `ENVIRONMENT=production`.
-- [ ] Restrict `CORS_ORIGINS` to your domain(s).
+ - [ ] 轮换 `SECRET_KEY` 和 `API_KEY`，不要使用生成的默认值。
+ - [ ] 设置 `DEBUG=false` 和 `ENVIRONMENT=production`。
+ - [ ] 将 `CORS_ORIGINS` 限制为你的域名。
 {%- if cookiecutter.enable_rate_limiting %}
-- [ ] Tune `RATE_LIMIT_REQUESTS` / `RATE_LIMIT_PERIOD` in `.env`.
+ - [ ] 在 `.env` 中调整 `RATE_LIMIT_REQUESTS` / `RATE_LIMIT_PERIOD`。
 {%- endif %}
 {%- if cookiecutter.enable_prometheus %}
-- [ ] Set `PROMETHEUS_AUTH_TOKEN` if `/metrics` is exposed on a public endpoint.
+ - [ ] 如果 `/metrics` 暴露在公共端点上，设置 `PROMETHEUS_AUTH_TOKEN`。
 {%- endif %}
 {%- if cookiecutter.enable_sentry %}
-- [ ] Set `SENTRY_DSN` to ship errors. Verify PII scrubbing rules in `core/sentry.py`.
+ - [ ] 设置 `SENTRY_DSN` 以发送错误。确认 `core/sentry.py` 中的 PII 清除规则。
 {%- endif %}
-- [ ] Enforce HTTPS at the proxy layer.
-- [ ] Run `pip-audit` / `bun audit` in CI for dependency vulnerabilities.
-- [ ] Configure database backups + restore test schedule.
+ - [ ] 在代理层强制执行 HTTPS。
+ - [ ] 在 CI 中运行 `pip-audit` / `bun audit` 检查依赖漏洞。
+ - [ ] 配置数据库备份 + 恢复测试计划。
 {%- if cookiecutter.enable_billing %}
-- [ ] Subscribe Stripe webhook to all relevant events; verify endpoint via Stripe CLI.
+ - [ ] 订阅 Stripe Webhook 到所有相关事件；通过 Stripe CLI 验证端点。
 {%- endif %}
 
-## Known limitations
+ ## 已知限制
 
-- **No 2FA / MFA** out of the box. Plan to add TOTP via `pyotp` — see `notes/thingstofix.md` §A.13.
-- **No SAML / OIDC** beyond Google OAuth. Enterprise SSO needs custom IdP integration.
-- **No automatic PII redaction** in logs — be careful what you log.
+ - **开箱即用不支持 2FA / MFA**。计划通过 `pyotp` 添加 TOTP——参见 `notes/thingstofix.md` §A.13。
+ - **除 Google OAuth 外，不支持 SAML / OIDC**。企业 SSO 需要自定义 IdP 集成。
+ - **日志中没有自动 PII 编辑**——注意记录的内容。
 {%- if cookiecutter.use_jwt and not cookiecutter.enable_session_management %}
-- **No server-side session revocation** — JWTs valid until expiry. Compromised tokens require `SECRET_KEY` rotation (invalidates ALL sessions). Enable `--session-management` for selective revocation.
+ - **不支持服务端会话撤销**——JWT 在过期前一直有效。令牌泄露需要轮换 `SECRET_KEY`（会使所有会话失效）。启用 `--session-management` 进行选择性撤销。
 {%- endif %}

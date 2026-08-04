@@ -5,30 +5,30 @@
 - Python 3.11+
 - [uv](https://docs.astral.sh/uv/)(推荐)或 pip
 
-## 安装 fastapi-fullstack
+## 安装 framework-agent-python
 
 === "uv(推荐)"
 
     ```bash
-    uv tool install fastapi-fullstack
+    uv tool install framework-agent-python
     ```
 
 === "pip"
 
     ```bash
-    pip install fastapi-fullstack
+    pip install framework-agent-python
     ```
 
 === "pipx"
 
     ```bash
-    pipx install fastapi-fullstack
+    pipx install framework-agent-python
     ```
 
 ## 验证安装
 
 ```bash
-fastapi-fullstack --version
+framework-agent-python --version
 ```
 
 ## 创建你的第一个项目
@@ -37,7 +37,7 @@ fastapi-fullstack --version
 
 ```bash
 # 1. 生成你的项目 —— 只需回答向导的提示
-fastapi-fullstack
+framework-agent-python
 
 # 2. 后端 + PostgreSQL 启动，迁移已执行，默认管理员已初始化
 cd my_app
@@ -55,13 +55,13 @@ cd frontend && bun install && bun dev
 
 ```bash
 # 用显式参数进行非交互式生成
-fastapi-fullstack create my_app --database postgresql --frontend nextjs
+framework-agent-python create my_app --database postgresql --frontend nextjs
 
-# 预设(运行 `fastapi-fullstack templates` 查看完整列表)
-fastapi-fullstack create my_app --preset ai-agent
+# 预设(运行 `framework-agent-python templates` 查看完整列表)
+framework-agent-python create my_app --preset ai-agent
 
 # 最简项目
-fastapi-fullstack create my_app --minimal
+framework-agent-python create my_app --minimal
 ```
 
 ## 可用预设

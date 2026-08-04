@@ -3,15 +3,15 @@ description: API design, REST conventions, auth, pagination, response format
 globs: ["backend/app/api/**/*.py"]
 ---
 
-# API Conventions
+# API 约定
 
-## Route Structure
+## 路由结构
 
 - All routes under `/api/v1/` prefix
 - One file per domain entity in `api/routes/v1/`
 - Use `APIRouter()` with tags
 
-## HTTP Methods & Status Codes
+## HTTP 方法与状态码
 
 ```python
 # GET — read
@@ -30,7 +30,7 @@ globs: ["backend/app/api/**/*.py"]
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 ```
 
-## Pagination
+## 分页
 
 ```python
 @router.get("", response_model=ConversationList)
@@ -44,7 +44,7 @@ async def list_items(
     return ConversationList(items=items, total=total)
 ```
 
-## Authentication
+## 认证
 
 - `CurrentUser` — JWT Bearer token (any authenticated user)
 - `CurrentAdmin` — JWT + admin role check via `RoleChecker`
@@ -61,7 +61,7 @@ async def delete_user(user: CurrentAdmin) -> Any: ...
 async def webhook_callback(api_key: ValidAPIKey) -> Any: ...
 ```
 
-## Response Format
+## 响应格式
 
 All route handlers return `-> Any`. The `response_model` parameter handles serialization.
 
@@ -76,7 +76,7 @@ Error responses follow this JSON structure:
 }
 ```
 
-## File Upload
+## 文件上传
 
 ```python
 @router.post("/me/avatar", response_model=UserRead)

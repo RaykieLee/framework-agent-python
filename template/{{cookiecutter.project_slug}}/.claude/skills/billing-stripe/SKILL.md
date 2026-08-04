@@ -1,13 +1,13 @@
 ---
 name: billing-stripe
-description: Work with Stripe billing — subscriptions, plans/prices, the Customer Portal, credits, usage metering, invoices, and webhook events. Use when changing plans, handling a new Stripe webhook, debugging a payment/subscription flow, or touching credit balances and usage.
+description: 处理 Stripe 计费 — subscriptions, plans/prices, the Customer Portal, credits, usage metering, invoices, and webhook events. 在更改方案、处理新的 Stripe Webhook 时使用, debugging a payment/subscription flow, or touching credit balances and usage.
 ---
 
-# Billing & Credits (Stripe)
+# 计费与积分（Stripe）
 
 Billing is a **thick service** at `backend/app/services/billing/`. Routes never touch Stripe directly — everything goes through `BillingService` (the facade in `facade.py`, re-exported from `__init__.py`).
 
-## Layout
+## 布局
 
 | File | Responsibility |
 |------|---------------|
@@ -22,7 +22,7 @@ Billing is a **thick service** at `backend/app/services/billing/`. Routes never 
 
 Data model: `plan` / `price` mirror Stripe products; `subscription` is one-per-org; `stripe_event` is an idempotency log; `credit_transaction` is an immutable ledger; `usage_event` records per-message token spend, rolled up into the `mv_usage_daily` materialized view.
 
-## Common tasks
+## 常见任务
 
 **Handle a new webhook event:** add a handler module/function under `services/billing/handlers/`, dispatch it from `webhook_handler.py`, and record it in `stripe_event` for idempotency (skip if already processed). Verify the signature — never trust unsigned payloads.
 
@@ -32,11 +32,11 @@ Data model: `plan` / `price` mirror Stripe products; `subscription` is one-per-o
 
 **Meter usage:** write a `usage_event` (input/output/cached tokens, model, provider, credits charged) — the daily rollup and dashboard charts read from `mv_usage_daily` (refreshed by a background task).
 
-## Local testing
+## 本地测试
 
 Use the Stripe CLI to forward webhooks: `stripe listen --forward-to localhost:8000/api/v1/billing/webhook`. Use Stripe test keys/mode. The webhook endpoint is unauthenticated but signature-verified.
 
-## Rules
+## 规则
 
 - Routes call `BillingService`; never import `stripe_client` or a sub-service directly from a route.
 - Every webhook is idempotent via `stripe_event` — re-delivery must be a no-op.

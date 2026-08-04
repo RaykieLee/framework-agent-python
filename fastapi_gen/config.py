@@ -1,4 +1,4 @@
-"""Configuration models for project generation."""
+"""??????????"""
 
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -11,7 +11,7 @@ GENERATOR_NAME = "fastapi-fullstack"
 
 
 def get_generator_version() -> str:
-    """Get the current generator version from package metadata."""
+    """???????????????"""
     try:
         return version(GENERATOR_NAME)
     except Exception:
@@ -19,14 +19,14 @@ def get_generator_version() -> str:
 
 
 class DatabaseType(StrEnum):
-    """Supported database types."""
+    """?????????"""
 
     POSTGRESQL = "postgresql"
     NONE = "none"
 
 
 class BackgroundTaskType(StrEnum):
-    """Supported background task systems."""
+    """??????????"""
 
     NONE = "none"
     CELERY = "celery"
@@ -36,7 +36,7 @@ class BackgroundTaskType(StrEnum):
 
 
 class CIType(StrEnum):
-    """Supported CI/CD systems."""
+    """??? CI/CD ???"""
 
     GITHUB = "github"
     GITLAB = "gitlab"
@@ -44,21 +44,21 @@ class CIType(StrEnum):
 
 
 class FrontendType(StrEnum):
-    """Supported frontend frameworks."""
+    """????????"""
 
     NONE = "none"
     NEXTJS = "nextjs"
 
 
 class OAuthProvider(StrEnum):
-    """Supported OAuth2 providers."""
+    """??? OAuth2 ????"""
 
     NONE = "none"
     GOOGLE = "google"
 
 
 class AuthMode(StrEnum):
-    """High-level authentication strategy.
+    """???????
 
     - ``local``: backend issues + validates its own JWTs via email/password +
       optional OAuth. Owns user storage including hashed passwords.
@@ -74,7 +74,7 @@ class AuthMode(StrEnum):
 
 
 class AIFrameworkType(StrEnum):
-    """Supported AI agent frameworks."""
+    """??? AI Agent ???"""
 
     NONE = "none"  # plain SaaS — no AI/chat/agents generated
     PYDANTIC_AI = "pydantic_ai"
@@ -85,7 +85,7 @@ class AIFrameworkType(StrEnum):
 
 
 class LLMProviderType(StrEnum):
-    """Supported LLM providers.
+    """??? LLM ????
 
     `ALL` installs SDKs for every provider and lets users pick the model at
     runtime via the chat model picker — useful when you want to compare
@@ -100,31 +100,31 @@ class LLMProviderType(StrEnum):
 
 
 class RateLimitStorageType(StrEnum):
-    """Rate limiting storage backends."""
+    """???????"""
 
     MEMORY = "memory"
     REDIS = "redis"
 
 
 class ReverseProxyType(StrEnum):
-    """Reverse proxy configuration options."""
+    """?????????"""
 
-    TRAEFIK_INCLUDED = "traefik_included"  # Include Traefik service + labels
-    TRAEFIK_EXTERNAL = "traefik_external"  # External Traefik, include labels only
-    NGINX_INCLUDED = "nginx_included"  # Include Nginx service in docker-compose
-    NGINX_EXTERNAL = "nginx_external"  # External Nginx, config template only
-    NONE = "none"  # No reverse proxy, expose ports directly
+    TRAEFIK_INCLUDED = "traefik_included"  # ?? Traefik ?? + ??
+    TRAEFIK_EXTERNAL = "traefik_external"  # ?? Traefik??????
+    NGINX_INCLUDED = "nginx_included"  # ? docker-compose ??? Nginx ??
+    NGINX_EXTERNAL = "nginx_external"  # ?? Nginx??????
+    NONE = "none"  # ????????????
 
 
 class OrmType(StrEnum):
-    """Supported ORM libraries for SQL databases."""
+    """??? SQL ??? ORM ??"""
 
     SQLALCHEMY = "sqlalchemy"
     SQLMODEL = "sqlmodel"
 
 
 class LogfireFeatures(BaseModel):
-    """Logfire instrumentation features."""
+    """Logfire ??????"""
 
     fastapi: bool = True
     database: bool = True
@@ -134,7 +134,7 @@ class LogfireFeatures(BaseModel):
 
 
 class EmbeddingProviderType(StrEnum):
-    """Define the embedding provider for LLM models."""
+    """?? LLM ?????????"""
 
     OPENAI = "openai"
     VOYAGE = "voyage"
@@ -143,7 +143,7 @@ class EmbeddingProviderType(StrEnum):
 
 
 class RerankerType(StrEnum):
-    """Define the reranker type and provider for reranking purposes."""
+    """???????????????"""
 
     NONE = "none"
     COHERE = "cohere"  # rerank-v3.5
@@ -151,7 +151,7 @@ class RerankerType(StrEnum):
 
 
 class DocumentParserType(StrEnum):
-    """Define the document parser used to process non-PDF documents.
+    """??????? PDF ???????
     Note: PDF parsing is now controlled separately via PdfParserType.
     This setting applies to TXT, MD, and DOCX files only.
     """
@@ -160,7 +160,7 @@ class DocumentParserType(StrEnum):
 
 
 class PdfParserType(StrEnum):
-    """Define the PDF parser used to process PDF documents.
+    """?????? PDF ???????
     PYMUPDF: Local PDF extraction using PyMuPDF. Supports text, tables
              (→ markdown), images, headers/footers detection, OCR fallback.
     LLAMAPARSE: AI-powered cloud extraction. Handles 130+ formats,
@@ -169,14 +169,14 @@ class PdfParserType(StrEnum):
                extraction, built-in OCR via Tesseract.js. Requires Node.js.
     """
 
-    PYMUPDF = "pymupdf"  # Local PDF extraction (default)
-    LLAMAPARSE = "llamaparse"  # LlamaParse cloud API
-    LITEPARSE = "liteparse"  # LiteParse local AI-native
-    ALL = "all"  # All parsers installed, runtime selection via PDF_PARSER env var
+    PYMUPDF = "pymupdf"  # ?? PDF ??????
+    LLAMAPARSE = "llamaparse"  # LlamaParse ?? API
+    LITEPARSE = "liteparse"  # LiteParse ?? AI ??
+    ALL = "all"  # ??????????? PDF_PARSER ?????????
 
 
 class VectorStoreType(StrEnum):
-    """Define a Vector Store type."""
+    """??????????"""
 
     MILVUS = "milvus"
     QDRANT = "qdrant"
@@ -185,15 +185,15 @@ class VectorStoreType(StrEnum):
 
 
 class EmailProviderType(StrEnum):
-    """Supported transactional email providers."""
+    """???????????"""
 
     RESEND = "resend"
     SMTP = "smtp"
-    LOG = "log"  # Prints to console — useful for development
+    LOG = "log"  # ????????????
 
 
 class NewsletterProviderType(StrEnum):
-    """Dedicated newsletter/audience providers (separate from transactional email)."""
+    """???????/???????????????"""
 
     RESEND = "resend"  # Resend Audiences API
     MAILCHIMP = "mailchimp"
@@ -201,15 +201,15 @@ class NewsletterProviderType(StrEnum):
 
 
 class TenancyMode(StrEnum):
-    """Tenancy architecture for multi-tenancy scenarios."""
+    """???????????"""
 
-    SINGLE = "single"  # Single workspace / single tenant
-    MULTI_ORG = "multi_org"  # Multi-tenant organisations (requires --teams)
-    PLATFORM = "platform"  # Each org owns multiple sub-projects
+    SINGLE = "single"  # ?????? / ???
+    MULTI_ORG = "multi_org"  # ???????? --teams?
+    PLATFORM = "platform"  # ???????????
 
 
 class PaymentProviderType(StrEnum):
-    """Supported payment processors (Stripe is the only fully implemented one)."""
+    """?????????? Stripe ??????"""
 
     STRIPE = "stripe"
     PADDLE = "paddle"
@@ -218,16 +218,16 @@ class PaymentProviderType(StrEnum):
 
 
 class BillingModelType(StrEnum):
-    """High-level billing model for the generated project."""
+    """????????????"""
 
-    SUBSCRIPTION = "subscription"  # Recurring plans (current default)
-    USAGE = "usage"  # Pure pay-as-you-go credits
-    HYBRID = "hybrid"  # Subscription base + overage credits
-    ONE_TIME = "one_time"  # Single purchase / lifetime deal
+    SUBSCRIPTION = "subscription"  # ???????????
+    USAGE = "usage"  # ???????
+    HYBRID = "hybrid"  # ???? + ????
+    ONE_TIME = "one_time"  # ???? / ????
 
 
 class BrandColorType(StrEnum):
-    """Brand color presets for the generated frontend."""
+    """????????????"""
 
     BLUE = "blue"
     GREEN = "green"
@@ -237,7 +237,7 @@ class BrandColorType(StrEnum):
 
 
 class RAGFeatures(BaseModel):
-    """RAG features."""
+    """RAG ???"""
 
     enable_rag: bool = False
     enable_google_drive_ingestion: bool = False
@@ -250,7 +250,7 @@ class RAGFeatures(BaseModel):
 
 
 class ProjectConfig(BaseModel):
-    """Full project configuration.
+    """???????
 
     Interactive prompt order: basic info → database → orm → oauth → session →
     background tasks → logfire → integrations → dev tools → reverse proxy →
@@ -260,7 +260,7 @@ class ProjectConfig(BaseModel):
 
     # Basic info
     project_name: str = Field(..., min_length=1, pattern=r"^[a-z][a-z0-9_]*$")
-    project_description: str = "A FastAPI project"
+    project_description: str = "一个 FastAPI 项目"
 
     author_name: str = "Your Name"
     author_email: EmailStr = "your@email.com"
@@ -409,25 +409,25 @@ class ProjectConfig(BaseModel):
     @computed_field
     @property
     def project_slug(self) -> str:
-        """Return project slug (underscores instead of hyphens)."""
+        """???? slug???????????"""
         return self.project_name.replace("-", "_")
 
     @computed_field
     @property
     def use_ai(self) -> bool:
-        """True when an AI framework is selected (i.e. ai_framework != none)."""
+        """???? AI ???? True?? ai_framework != none??"""
         return self.ai_framework != AIFrameworkType.NONE
 
     @computed_field
     @property
     def use_sqlalchemy(self) -> bool:
-        """Check if SQLAlchemy ORM is selected."""
+        """??????? SQLAlchemy ORM?"""
         return self.orm_type == OrmType.SQLALCHEMY
 
     @computed_field
     @property
     def use_sqlmodel(self) -> bool:
-        """Check if SQLModel ORM is selected."""
+        """??????? SQLModel ORM?"""
         return self.orm_type == OrmType.SQLMODEL
 
     @model_validator(mode="after")
@@ -437,17 +437,17 @@ class ProjectConfig(BaseModel):
         Raises ValueError for invalid combinations:
         - Admin panel requires a database (PostgreSQL or SQLite)
         - Admin panel (SQLAdmin) does not support MongoDB
-        - Caching requires Redis to be enabled
+        - ?????? Redis
         - Session management requires a database
         - Conversation persistence requires a database
         - SQLModel requires a SQL database (PostgreSQL or SQLite)
         """
         if self.database == DatabaseType.NONE:
-            raise ValueError("A database is required (JWT auth needs user storage)")
+            raise ValueError("??????JWT ?????????")
         if self.orm_type == OrmType.SQLMODEL and self.database != DatabaseType.POSTGRESQL:
-            raise ValueError("SQLModel requires PostgreSQL database")
+            raise ValueError("SQLModel ?? PostgreSQL ???")
         if self.enable_caching and not self.enable_redis:
-            raise ValueError("Caching requires Redis to be enabled")
+            raise ValueError("?????? Redis")
         if (
             self.ai_framework != AIFrameworkType.NONE
             and self.llm_provider == LLMProviderType.OPENROUTER
@@ -466,7 +466,7 @@ class ProjectConfig(BaseModel):
             and self.rate_limit_storage == RateLimitStorageType.REDIS
             and not self.enable_redis
         ):
-            raise ValueError("Rate limiting with Redis storage requires Redis to be enabled")
+            raise ValueError("?? Redis ????????? Redis")
 
         # pgvector requires PostgreSQL
         if (
@@ -474,7 +474,7 @@ class ProjectConfig(BaseModel):
             and self.rag_features.vector_store == VectorStoreType.PGVECTOR
             and self.database != DatabaseType.POSTGRESQL
         ):
-            raise ValueError("pgvector requires PostgreSQL database")
+            raise ValueError("pgvector ?? PostgreSQL ???")
 
         # LangSmith requires LangChain-ecosystem framework
         if self.enable_langsmith and self.ai_framework not in (
@@ -516,7 +516,7 @@ class ProjectConfig(BaseModel):
                 "Quick fix: set --ai-framework pydantic_ai (or any other), or drop --rag."
             )
         if not self.use_ai and self.enable_langsmith:
-            raise ValueError("--langsmith requires an AI framework. Quick fix: drop --langsmith.")
+            raise ValueError("--langsmith ?? AI ?????????? --langsmith?")
         if not self.use_ai and (self.use_slack or self.use_telegram):
             raise ValueError(
                 "Slack/Telegram channels require an AI framework — a channel bot exists "
@@ -535,7 +535,7 @@ class ProjectConfig(BaseModel):
         # per_org_quotas requires teams
         if self.enable_per_org_quotas and not self.enable_teams:
             raise ValueError(
-                "--per-org-quotas requires --teams (quotas are scoped to organisations)."
+                "--per-org-quotas ?? --teams??????????"
             )
 
         # Admin panel requires SQLAlchemy (SQLAdmin doesn't fully support SQLModel)

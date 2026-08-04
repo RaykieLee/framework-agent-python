@@ -1,8 +1,8 @@
 site_name: Full-Stack AI Agent Template
 site_description: Production-Ready AI/LLM Applications — In Minutes, Not Weeks
-site_url: https://vstorm-co.github.io/full-stack-ai-agent-template/
-repo_url: https://github.com/vstorm-co/full-stack-ai-agent-template
-repo_name: vstorm-co/full-stack-ai-agent-template
+site_url: https://vstorm-co.github.io/framework-agent-python/
+repo_url: https://github.com/vstorm-co/framework-agent-python
+repo_name: vstorm-co/framework-agent-python
 
 theme:
   name: material
@@ -155,10 +155,10 @@ extra:
     deprecated: Deprecated
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/vstorm-co/full-stack-ai-agent-template
+      link: https://github.com/vstorm-co/framework-agent-python
       name: GitHub
     - icon: fontawesome/brands/python
-      link: https://pypi.org/project/fastapi-fullstack/
+      link: https://pypi.org/project/framework-agent-python/
       name: PyPI
   analytics:
     provider: google

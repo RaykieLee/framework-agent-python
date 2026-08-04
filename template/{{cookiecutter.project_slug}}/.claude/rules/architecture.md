@@ -3,13 +3,13 @@ description: Layered architecture patterns — Routes, Services, Repositories, D
 globs: ["backend/app/**/*.py"]
 ---
 
-# Architecture
+# 架构
 
 ## Layered Architecture: Routes → Services → Repositories
 
 Routes NEVER import or call repositories directly. Always go through a service.
 
-## Repositories (`app/repositories/`)
+## 仓库 (`app/repositories/`)
 
 Pure data access — stateless functions (not classes):
 
@@ -46,7 +46,7 @@ Rules:
 - Return the entity (or None for get/delete), never return IDs or dicts
 - Functions are async (PostgreSQL via asyncpg)
 
-## Services (`app/services/`)
+## 服务 (`app/services/`)
 
 Business logic — class-based with DB session:
 
@@ -74,7 +74,7 @@ Rules:
 - Services call repo functions, never build raw queries
 - One service per domain entity
 
-## Thin vs. thick domains
+## 薄域 vs 厚域
 
 Services come in two shapes — choose based on whether the domain owns infrastructure (clients, adapters, pipelines, parsers, templates):
 
@@ -103,7 +103,7 @@ Rules for thick subpackages:
 - Domain-specific exceptions live in the subpackage and inherit from `core/exceptions.py` base classes.
 - Top-level `app/` is reserved for framework concerns (`api/`, `core/`, `db/`, `repositories/`, `schemas/`, `services/`, `worker/`, `agents/`, `commands/`, `clients/`). No new top-level domain packages.
 
-## Dependency Injection (`app/api/deps.py`)
+## 依赖注入 (`app/api/deps.py`)
 
 Use `Annotated` type aliases — never raw `Depends()` in route signatures:
 

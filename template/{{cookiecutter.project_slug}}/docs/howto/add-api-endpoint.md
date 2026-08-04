@@ -1,12 +1,12 @@
-# How to: Add a New API Endpoint
+# 如何：添加新的 API 端点
 
 This example adds a "Notification" endpoint following the repository + service
 pattern. Routes **never** contain direct database calls — all data access goes
 through a service, which delegates to a repository.
 
-## Step-by-Step
+### 分步指南
 
-### 1. Create the schema (`app/schemas/`)
+### 1. 创建模式 (`app/schemas/`)
 
 ```python
 # app/schemas/notification.py
@@ -33,7 +33,7 @@ class NotificationResponse(BaseModel):
 
 {%- if cookiecutter.use_database %}
 
-### 2. Create the database model (`app/db/models/`)
+### 2. 创建数据库模型 (`app/db/models/`)
 
 ```python
 # app/db/models/notification.py
@@ -79,7 +79,7 @@ class Notification(SQLModel, table=True):
 
 Don't forget to import it in `app/db/models/__init__.py`.
 
-### 3. Create the repository (`app/repositories/`)
+### 3. 创建仓库 (`app/repositories/`)
 
 ```python
 # app/repositories/notification.py
@@ -112,7 +112,7 @@ class NotificationRepository:
         return list(result.scalars().all())
 ```
 
-### 4. Create the service (`app/services/`)
+### 4. 创建服务 (`app/services/`)
 
 ```python
 # app/services/notification.py
@@ -147,7 +147,7 @@ class NotificationService:
 ```
 {%- endif %}
 
-### 5. Register dependency (`app/api/deps.py`)
+### 5. 注册依赖 (`app/api/deps.py`)
 
 ```python
 from app.services.notification import NotificationService
@@ -161,7 +161,7 @@ def get_notification_service(db: DBSession) -> NotificationService:
 NotificationSvc = Annotated[NotificationService, Depends(get_notification_service)]
 ```
 
-### 6. Create the route (`app/api/routes/v1/`)
+### 6. 创建路由 (`app/api/routes/v1/`)
 
 ```python
 # app/api/routes/v1/notifications.py
@@ -197,7 +197,7 @@ async def list_unread(
     return await service.list_unread()
 ```
 
-### 7. Register the route
+### 7. 注册路由
 
 In `app/api/routes/v1/__init__.py`:
 
@@ -209,13 +209,13 @@ v1_router.include_router(
 )
 ```
 
-### 8. Create and apply migration
+### 8. 创建并应用迁移
 
 ```bash
 make db-migrate    # Enter message: "Add notifications table"
 make db-upgrade
 ```
 
-### 9. Test it
+### 9. 测试
 
 Visit `http://localhost:{{ cookiecutter.backend_port }}/docs` and try the new endpoint.

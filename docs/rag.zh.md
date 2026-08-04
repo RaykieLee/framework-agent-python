@@ -18,13 +18,13 @@
 
 ```bash
 # Interactive wizard
-fastapi-fullstack new
+framework-agent-python new
 
 # With RAG enabled
-fastapi-fullstack create my_project --enable-rag
+framework-agent-python create my_project --enable-rag
 
 # Full RAG with all features
-fastapi-fullstack create my_project --enable-rag --pdf-parser llamaparse --reranker cohere
+framework-agent-python create my_project --enable-rag --pdf-parser llamaparse --reranker cohere
 ```
 
 ---
@@ -158,7 +158,7 @@ vector = service.embed_query("your search query")
 使用 Cohere 的 rerank API。需要 `COHERE_API_KEY`。
 
 ```bash
-fastapi-fullstack create my_project --enable-rag --reranker cohere
+framework-agent-python create my_project --enable-rag --reranker cohere
 ```
 
 ### Cross-Encoder 重排序器
@@ -166,7 +166,7 @@ fastapi-fullstack create my_project --enable-rag --reranker cohere
 在本地使用 HuggingFace Cross-Encoder 模型。私有模型需要 `HF_TOKEN`(公开模型可选)。
 
 ```bash
-fastapi-fullstack create my_project --enable-rag --reranker cross_encoder
+framework-agent-python create my_project --enable-rag --reranker cross_encoder
 ```
 
 默认模型：`cross-encoder/ms-marco-MiniLM-L6-v2`。可用 `CROSS_ENCODER_MODEL` 环境变量覆盖。
@@ -351,7 +351,7 @@ const results = await ragApi.searchDocuments({
 ### Cohere 重排序器
 
 ```bash
-fastapi-fullstack create my_project --enable-rag --enable-reranker cohere
+framework-agent-python create my_project --enable-rag --enable-reranker cohere
 ```
 
 ### Cross-Encoder 重排序器
@@ -359,7 +359,7 @@ fastapi-fullstack create my_project --enable-rag --enable-reranker cohere
 在本地使用 Sentence Transformers:
 
 ```bash
-fastapi-fullstack create my_project --enable-rag --enable-reranker cross_encoder
+framework-agent-python create my_project --enable-rag --enable-reranker cross_encoder
 ```
 
 ---
@@ -369,7 +369,7 @@ fastapi-fullstack create my_project --enable-rag --enable-reranker cross_encoder
 启用 Google Drive 作为文档来源：
 
 ```bash
-fastapi-fullstack create my_project --enable-rag --enable-google-drive-ingestion
+framework-agent-python create my_project --enable-rag --enable-google-drive-ingestion
 ```
 
 需要在 Google Cloud Console 中配置 OAuth2。

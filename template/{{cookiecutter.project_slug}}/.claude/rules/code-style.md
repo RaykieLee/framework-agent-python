@@ -3,14 +3,14 @@ description: Code style, formatting, naming, imports, and type hints
 globs: ["backend/**/*.py", "*.py"]
 ---
 
-# Code Style
+# 代码风格
 
-## Formatting
+## 格式化
 
 - Use `ruff` for linting and formatting: `ruff check . --fix && ruff format .`
 - Line length: 120 characters
 
-## Type Hints
+## 类型提示
 
 - Type hints on ALL function signatures — parameters and return types
 - Use modern syntax: `str | None` not `Optional[str]`, `list[User]` not `List[User]`
@@ -24,7 +24,7 @@ globs: ["backend/**/*.py", "*.py"]
       from app.db.models.session import Session
   ```
 
-## Naming
+## 命名
 
 | Element | Convention | Example |
 |---------|-----------|---------|
@@ -36,7 +36,7 @@ globs: ["backend/**/*.py", "*.py"]
 | DB tables | snake_case plural | `users`, `conversations` |
 | API URLs | kebab-case | `/api/v1/conversations` |
 
-## Imports — strictly ordered, separated by blank lines
+## 导入 — strictly ordered, separated by blank lines
 
 ```python
 # 1. Standard library
@@ -58,7 +58,7 @@ from app.core.exceptions import NotFoundError
 from app.schemas.user import UserCreate, UserRead
 ```
 
-## Other Conventions
+## 其他约定
 
 - `datetime.now(UTC)` not `datetime.utcnow()`
 - `secrets.compare_digest()` for constant-time comparisons

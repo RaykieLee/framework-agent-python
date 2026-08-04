@@ -3,9 +3,9 @@ description: Testing standards, fixtures, async test patterns
 globs: ["backend/tests/**/*.py", "tests/**/*.py", "**/test_*.py", "**/conftest.py"]
 ---
 
-# Testing
+# 测试
 
-## Running Tests
+## 运行测试
 
 ```bash
 cd backend
@@ -15,12 +15,12 @@ uv run pytest -k "test_name" -v            # by name
 uv run pytest --cov=app                    # with coverage
 ```
 
-## Structure
+## 结构
 
 - Mirror source layout: `app/services/user.py` → `tests/services/test_user.py`
 - Shared fixtures in `tests/conftest.py`
 
-## Naming
+## 命名
 
 ```python
 # test_<action>_<scenario>_<expected_result>
@@ -29,7 +29,7 @@ def test_get_conversation_not_found_raises_not_found_error
 def test_list_conversations_returns_only_user_owned
 ```
 
-## Fixtures
+## 夹具
 
 ```python
 @pytest.fixture
@@ -41,7 +41,7 @@ async def test_user(db: AsyncSession) -> User:
     return await user_repo.create(db, email="test@example.com", hashed_password="hashed")
 ```
 
-## Async Tests
+## 异步测试
 
 ```python
 import pytest
@@ -52,7 +52,7 @@ async def test_get_user_by_id(user_service: UserService, test_user: User):
     assert result.email == test_user.email
 ```
 
-## API Tests
+## API 测试
 
 Use `httpx.AsyncClient`, not `TestClient`:
 
@@ -68,7 +68,7 @@ async def test_create_user(client: AsyncClient, auth_headers: dict):
     assert response.json()["email"] == "new@example.com"
 ```
 
-## Exception Testing
+## 异常测试
 
 ```python
 @pytest.mark.asyncio
@@ -77,7 +77,7 @@ async def test_get_user_not_found(user_service: UserService):
         await user_service.get_by_id(UUID("00000000-0000-0000-0000-000000000000"))
 ```
 
-## Rules
+## 规则
 
 - Each test is independent — no shared mutable state
 - Use plain `assert` (pytest rewrites for detailed output)

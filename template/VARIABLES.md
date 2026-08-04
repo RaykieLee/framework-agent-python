@@ -1,36 +1,36 @@
-# Cookiecutter Template Variables
+# Cookiecutter 模板变量
 
-This document describes all variables available in `cookiecutter.json` for the fastapi-fullstack template.
+本文档描述了 `cookiecutter.json` 中 fastapi-fullstack 模板可用的所有变量。
 
-## Table of Contents
+## 目录
 
-- [Metadata](#metadata)
-- [Project Information](#project-information)
-- [Database Settings](#database-settings)
-- [Authentication](#authentication)
+- [元数据](#metadata)
+- [项目信息](#project-information)
+- [数据库设置](#database-settings)
+- [认证](#authentication)
 - [OAuth](#oauth)
-- [Observability (Logfire)](#observability-logfire)
-- [Background Tasks](#background-tasks)
-- [Redis & Caching](#redis--caching)
-- [Rate Limiting](#rate-limiting)
-- [Features](#features)
-- [RAG (Retrieval-Augmented Generation)](#rag-retrieval-augmented-generation)
+- [可观测性（Logfire）](#observability-logfire)
+- [后台任务](#background-tasks)
+- [Redis 与缓存](#redis--caching)
+- [限流](#rate-limiting)
+- [功能](#features)
+- [RAG（检索增强生成）](#rag-retrieval-augmented-generation)
 - [AI Agent](#ai-agent)
 - [WebSocket](#websocket)
-- [Development Tools](#development-tools)
-- [Deployment](#deployment)
-- [Frontend](#frontend)
-- [Email](#email)
-- [Teams & Billing](#teams--billing)
+- [开发工具](#development-tools)
+- [部署](#deployment)
+- [前端](#frontend)
+- [邮件](#email)
+- [团队与计费](#teams--billing)
 - [Embed & White-label](#embed--white-label)
 
 ---
 
-## Metadata
+## 元数据
 
-These variables are set automatically by the generator.
+这些变量由生成器自动设置。
 
-| Variable | Type | Default | Description |
+| 变量 | 类型 | 默认值 | 说明 |
 |----------|------|---------|-------------|
 | `generator_name` | string | `"fastapi-fullstack"` | Name of the generator tool |
 | `generator_version` | string | `"DYNAMIC"` | Version of the generator (set at runtime) |
@@ -38,9 +38,9 @@ These variables are set automatically by the generator.
 
 ---
 
-## Project Information
+## 项目信息
 
-| Variable | Type | Default | Description |
+| 变量 | 类型 | 默认值 | 说明 |
 |----------|------|---------|-------------|
 | `project_name` | string | `"my_project"` | Name of the project. Must match pattern `^[a-z][a-z0-9_]*$` |
 | `project_slug` | computed | - | URL-safe version derived from `project_name` |
@@ -51,9 +51,9 @@ These variables are set automatically by the generator.
 
 ---
 
-## Database Settings
+## 数据库设置
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `database` | enum | `"postgresql"` | Database type. Values: `postgresql`, `none` | - |
 | `use_postgresql` | bool | `true` | PostgreSQL is selected | Computed from `database` |
@@ -62,21 +62,21 @@ These variables are set automatically by the generator.
 | `db_max_overflow` | int | `10` | Max overflow connections above pool size | Requires SQL database |
 | `db_pool_timeout` | int | `30` | Timeout (seconds) waiting for connection | Requires SQL database |
 
-### ORM Library
+### ORM 库
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `orm_type` | enum | `"sqlalchemy"` | ORM library. Values: `sqlalchemy`, `sqlmodel` | Requires SQL database |
 | `use_sqlalchemy` | bool | `true` | SQLAlchemy is selected | Computed from `orm_type` |
 | `use_sqlmodel` | bool | `false` | SQLModel is selected | Computed from `orm_type` |
 
-**Notes:**
+**注意：**
 
 - SQLModel provides simplified syntax combining SQLAlchemy and Pydantic
 - SQLModel is only available for PostgreSQL and SQLite (not MongoDB)
 - SQLModel uses the same database session and migrations as SQLAlchemy
 
-**Notes:**
+**注意：**
 
 - PostgreSQL uses `asyncpg` for async operations
 - MongoDB uses `motor` for async operations
@@ -84,9 +84,9 @@ These variables are set automatically by the generator.
 
 ---
 
-## Authentication
+## 认证
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `auth` | string | `"both"` | Authentication mode (always "both" = JWT + API Key) | Always "both" |
 | `use_jwt` | bool | `true` | JWT authentication is enabled | Always true |
@@ -104,7 +104,7 @@ These variables are set automatically by the generator.
 
 ## OAuth
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `oauth_provider` | enum | `"none"` | OAuth provider. Values: `google`, `none` | - |
 | `enable_oauth` | bool | `false` | OAuth is enabled | Computed from `oauth_provider` |
@@ -115,9 +115,9 @@ These variables are set automatically by the generator.
 
 ---
 
-## Observability (Logfire)
+## 可观测性（Logfire）
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `enable_logfire` | bool | `true` | Enable Logfire observability | - |
 | `logfire_fastapi` | bool | `true` | Instrument FastAPI with Logfire | Requires `enable_logfire` |
@@ -128,9 +128,9 @@ These variables are set automatically by the generator.
 
 ---
 
-## Background Tasks
+## 后台任务
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `background_tasks` | enum | `"none"` | Background task system. Values: `celery`, `taskiq`, `arq`, `prefect`, `none` | - |
 | `use_celery` | bool | `false` | Celery is selected | Computed from `background_tasks` |
@@ -139,29 +139,29 @@ These variables are set automatically by the generator.
 | `use_prefect` | bool | `false` | Prefect is selected | Computed from `background_tasks` |
 | `prefect_cloud` | bool | `false` | Use Prefect Cloud instead of self-hosted server | Requires `use_prefect` |
 
-**Notes:**
+**注意：**
 
 - Celery requires Redis as broker
 - Taskiq and ARQ also benefit from Redis
 
 ---
 
-## Redis & Caching
+## Redis 与缓存
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `enable_redis` | bool | `false` | Enable Redis integration | - |
 | `enable_caching` | bool | `false` | Enable response caching | Requires Redis |
 
-**Notes:**
+**注意：**
 
 - Redis is automatically enabled when using Celery, ARQ, or Redis-based rate limiting
 
 ---
 
-## Rate Limiting
+## 限流
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `enable_rate_limiting` | bool | `false` | Enable API rate limiting | - |
 | `rate_limit_requests` | int | `100` | Number of requests allowed | Requires `enable_rate_limiting` |
@@ -170,16 +170,16 @@ These variables are set automatically by the generator.
 | `rate_limit_storage_memory` | bool | `true` | Memory storage is selected | Computed from `rate_limit_storage` |
 | `rate_limit_storage_redis` | bool | `false` | Redis storage is selected | Computed from `rate_limit_storage` |
 
-**Notes:**
+**注意：**
 
 - Memory storage is not suitable for multi-process deployments
 - Redis storage requires Redis to be enabled
 
 ---
 
-## Features
+## 功能
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `enable_pagination` | bool | `true` | Enable pagination utilities | - |
 | `enable_sentry` | bool | `false` | Enable Sentry error tracking | - |
@@ -207,9 +207,9 @@ These variables are set automatically by the generator.
 
 ---
 
-## RAG (Retrieval-Augmented Generation)
+## RAG（检索增强生成）
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `enable_rag` | bool | `false` | Enable RAG functionality with vector database | - |
 | `vector_store` | enum | `"milvus"` | Vector store backend. Values: `milvus`, `qdrant`, `chromadb`, `pgvector` | Requires `enable_rag` |
@@ -235,7 +235,7 @@ These variables are set automatically by the generator.
 | `enable_s3_ingestion` | bool | `false` | Enable S3/MinIO as document source | Requires RAG |
 | `enable_rag_image_description` | bool | `false` | Extract images from documents and describe via LLM vision API | Requires RAG |
 
-**Notes:**
+**注意：**
 
 - RAG requires a vector database (Milvus, Qdrant, ChromaDB, or pgvector)
 - Embedding provider is auto-derived from LLM provider (OpenAI→openai, Anthropic→voyage, Google→gemini, OpenRouter→sentence_transformers)
@@ -246,14 +246,14 @@ These variables are set automatically by the generator.
 
 ---
 
-## Messaging Channels
+## 消息渠道
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `use_telegram` | bool | `false` | Enable Telegram bot integration (multi-bot, polling + webhook, role-based access) | Requires JWT auth |
 | `use_slack` | bool | `false` | Enable Slack bot integration (Events API, threads, @mention support) | Requires JWT auth |
 
-**Notes:**
+**注意：**
 
 - Telegram bots can run in polling mode (default, no public URL needed) or webhook mode (requires HTTPS)
 - Multiple bots are supported — each bot can have its own access policy, model override, and system prompt
@@ -265,7 +265,7 @@ These variables are set automatically by the generator.
 
 ## AI Agent
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `ai_framework` | enum | `"pydantic_ai"` | AI framework. Values: `pydantic_ai`, `langchain`, `langgraph`, `deepagents`, `pydantic_deep`, `none` | - |
 | `use_ai` | bool | `true` | Any AI framework is selected (false when `ai_framework=none`) | Computed from `ai_framework` |
@@ -293,7 +293,7 @@ These variables are set automatically by the generator.
 | `enable_deep_research` | bool | `false` | Turns the assistant into a deep research agent: a TODO planner (`pydantic-ai-todo`), researcher/analyst/writer subagents (`subagents-pydantic-ai`), and an automatic context manager (`summarization-pydantic-ai`). The planner delegates web work to subagents and streams a live research panel (plan checklist, subagent status, context-usage meter). TODO state persists in PostgreSQL when available, else in memory. Activated at runtime with `ENABLE_DEEP_RESEARCH=true`; the client can opt a single turn out with `deep_research=false`. **PydanticAI only.** | Requires `use_pydantic_ai` |
 | `enable_mcp_client` | bool | `false` | Lets end users connect external Model Context Protocol servers (Notion, Linear, Jira, Stripe, GitHub, …) as extra agent tools from **Settings → Integrations**. Ships a curated marketplace catalog, per-user connections (Fernet-encrypted tokens), a connectivity test, one-click OAuth 2.1 sign-in (auth-code + PKCE, dynamic client registration) and static-token auth, over both streamable-HTTP and SSE transports. Deployment-wide servers can also be pinned via the `MCP_SERVERS` env var. Tools are prefixed per server and badged "MCP" in the chat. Unreachable/unauthorized servers are skipped per turn instead of failing the chat. **PydanticAI only.** | Requires `use_pydantic_ai` + `--database postgresql` |
 
-**Notes:**
+**注意：**
 
 - PydanticAI uses `iter()` for full event streaming over WebSocket
 - LangGraph implements a ReAct (Reasoning + Acting) agent pattern with graph-based architecture
@@ -304,7 +304,7 @@ These variables are set automatically by the generator.
 
 ## WebSocket
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `websocket_auth` | enum | `"jwt"` | WebSocket authentication | Always `jwt` |
 | `websocket_auth_jwt` | bool | `true` | JWT auth for WebSocket | Always true |
@@ -313,9 +313,9 @@ These variables are set automatically by the generator.
 
 ---
 
-## Development Tools
+## 开发工具
 
-| Variable | Type | Default | Description |
+| 变量 | 类型 | 默认值 | 说明 |
 |----------|------|---------|-------------|
 | `enable_pytest` | bool | `true` | Include pytest configuration and fixtures |
 | `enable_precommit` | bool | `true` | Include pre-commit hooks configuration |
@@ -326,9 +326,9 @@ These variables are set automatically by the generator.
 
 ---
 
-## Deployment
+## 部署
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `ci_type` | enum | `"github"` | CI/CD system. Values: `github`, `gitlab`, `none` | - |
 | `use_github_actions` | bool | `true` | GitHub Actions is selected | Computed from `ci_type` |
@@ -352,9 +352,9 @@ These variables are set automatically by the generator.
 
 ---
 
-## Frontend
+## 前端
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `frontend` | enum | `"none"` | Frontend framework. Values: `nextjs`, `none` | - |
 | `use_frontend` | bool | `false` | Any frontend is enabled | Computed from `frontend` |
@@ -380,9 +380,9 @@ These variables are set automatically by the generator.
 
 ---
 
-## Teams & Billing
+## 团队与计费
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `enable_teams` | bool | `false` | Enable multi-tenant teams: Organizations, OrganizationMembers, Invitations, role-based access (OWNER/ADMIN/MEMBER/VIEWER), Personal Org auto-create on signup | Requires JWT auth + SQL DB |
 | `tenancy` | enum | `"single"` | Tenancy mode. Values: `single` (one workspace), `multi_org` (per-org isolation), `platform` (platform-level multi-tenancy with cross-org admin) | Requires `enable_teams` for non-single |
@@ -412,7 +412,7 @@ These variables are set automatically by the generator.
 | `billing_credits_free_tier_grant` | int | `500` | One-time credit grant on signup (free tier) | Requires `enable_credits_system` |
 | `billing_credits_low_threshold` | int | `50` | Credit balance threshold below which a low-credits email is sent | Requires `enable_credits_system` |
 
-**Notes:**
+**注意：**
 
 - When `enable_teams=true`, every new user gets a Personal Organization (is_personal=True) automatically on registration
 - All resources (Conversations, RAGDocuments, etc.) are scoped to an Organization via `organization_id`
@@ -422,9 +422,9 @@ These variables are set automatically by the generator.
 
 ---
 
-## Email
+## 邮件
 
-| Variable | Type | Default | Description | Dependencies |
+| 变量 | 类型 | 默认值 | 说明 | Dependencies |
 |----------|------|---------|-------------|--------------|
 | `enable_email` | bool | `false` | Enable transactional email sending (welcome, invitation, password reset, billing notifications) | - |
 | `email_provider` | enum | `"log"` | Email provider. Values: `resend`, `smtp`, `log` (`log` prints emails to console — useful for development) | Requires `enable_email` |
@@ -436,7 +436,7 @@ These variables are set automatically by the generator.
 
 ---
 
-## Variable Naming Conventions
+## 变量命名约定
 
 The template uses consistent naming patterns:
 
@@ -447,7 +447,7 @@ The template uses consistent naming patterns:
 | `X_Y` | Grouped settings | `db_pool_size`, `rate_limit_requests` |
 | `logfire_X` | Logfire instrumentation for X | `logfire_fastapi`, `logfire_database` |
 
-## Computed Variables
+## 计算变量
 
 Many `use_*` and `enable_*` variables are computed from their parent enum variable:
 

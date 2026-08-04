@@ -156,7 +156,7 @@ LOGFIRE_SERVICE_VERSION=1.0.0
 在生成器中，你可以选择对哪些组件做 instrumentation:
 
 ```bash
-fastapi-fullstack new
+framework-agent-python new
 # ✓ 启用 Logfire 可观测性
 #   ✓ 对 FastAPI 做 instrumentation
 #   ✓ 对数据库做 instrumentation

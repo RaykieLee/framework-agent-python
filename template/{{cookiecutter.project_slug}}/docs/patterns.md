@@ -1,8 +1,8 @@
-# Code Patterns
+# 代码模式
 
-## Dependency Injection
+## 依赖注入
 
-Use FastAPI's `Depends()` for injecting dependencies:
+使用 FastAPI 的 `Depends()` 进行依赖注入：
 
 ```python
 from app.api.deps import get_db, get_current_user
@@ -16,22 +16,19 @@ async def list_conversations(
     return await service.get_by_user(current_user.id)
 ```
 
-> **Important:** Routes never contain direct database calls. All data access
-> goes through a service, which in turn delegates to a repository.
+> **重要：** 路由层绝不包含直接数据库调用。所有数据访问都经过服务层，服务层再委托给仓库层。
 
-Available dependencies in `app/api/deps.py`:
-- `get_db` - Database session
-- `get_current_user` - Authenticated user (raises 401 if not authenticated)
-- `get_current_user_optional` - User or None
+`app/api/deps.py` 中可用的依赖：
+- `get_db` — 数据库会话
+- `get_current_user` — 已认证用户（未认证时抛出 401）
+- `get_current_user_optional` — 用户或 None
 {%- if cookiecutter.enable_redis %}
-- `get_redis` - Redis connection
+- `get_redis` — Redis 连接
 {%- endif %}
 
-## Service Layer Pattern
+## 服务层模式
 
-Every feature uses the same pattern: a service class receives a DB session,
-instantiates its repository, and provides business-level methods. Services
-are the **only** layer that raises domain exceptions.
+每个功能使用相同的模式：服务类接收 DB 会话，实例化其仓库，并提供业务级方法。服务层是**唯一**抛出领域异常的层。
 
 ```python
 class ConversationService:
@@ -55,10 +52,9 @@ All current services follow this pattern: `UserService`, `ConversationService`,
 {%- if cookiecutter.enable_rag %}, `RagDocumentService`, `RagSyncService`, `SyncSourceService`
 {%- endif %}.
 
-## Repository Layer Pattern
+## 仓库层模式
 
-Repositories handle data access only. They contain **no** business logic and
-always use `flush()` instead of `commit()` so the caller controls transactions:
+仓库层仅处理数据访问。它们**不包含**业务逻辑，始终使用 `flush()` 而非 `commit()`，以便调用者控制事务：
 
 ```python
 class ConversationRepository:
@@ -83,9 +79,9 @@ class ConversationRepository:
         return list(result.scalars().all())
 ```
 
-## Exception Handling
+## 异常处理
 
-Use domain exceptions in services:
+在服务层中使用领域异常：
 
 ```python
 from app.core.exceptions import NotFoundError, AlreadyExistsError, ValidationError
@@ -103,28 +99,28 @@ if await self.repo.exists_by_email(self.db, email):
     )
 ```
 
-Exception handlers convert to HTTP responses automatically.
+异常处理器自动转换为 HTTP 响应。
 
-## Schema Patterns
+## 模式模式
 
-Separate schemas for different operations:
+为不同操作分离模式：
 
 ```python
-# Base with shared fields
+# 包含共享字段的基础类
 class UserBase(BaseModel):
     email: str
     full_name: str | None = None
 
-# For creation (input)
+# 用于创建（输入）
 class UserCreate(UserBase):
     password: str
 
-# For updates (all optional)
+# 用于更新（全部可选）
 class UserUpdate(BaseModel):
     full_name: str | None = None
     email: str | None = None
 
-# For responses (with DB fields)
+# 用于响应（包含数据库字段）
 class UserResponse(UserBase):
     id: UUID
     created_at: datetime
@@ -134,17 +130,15 @@ class UserResponse(UserBase):
 ```
 {%- if cookiecutter.enable_rag %}
 
-## Connector Pattern (RAG Sync)
+## 连接器模式（RAG 同步）
 
-Remote document sources (Google Drive, S3, etc.) use a pluggable connector
-pattern defined in `app/services/rag/connectors/`. Each connector inherits from
-`BaseSyncConnector` and is registered in the `CONNECTOR_REGISTRY` dictionary.
+远程文档源（Google Drive、S3 等）使用 `app/services/rag/connectors/` 中定义的可插拔连接器模式。每个连接器继承自 `BaseSyncConnector`，并在 `CONNECTOR_REGISTRY` 字典中注册。
 
-### Adding a new connector
+### 添加新连接器
 
-1. Create a file in `app/services/rag/connectors/` (e.g. `sharepoint.py`).
-2. Subclass `BaseSyncConnector` and implement the required methods.
-3. Register the connector in `CONNECTOR_REGISTRY`.
+1. 在 `app/services/rag/connectors/` 中创建文件（例如 `sharepoint.py`）。
+2. 继承 `BaseSyncConnector` 并实现所需方法。
+3. 在 `CONNECTOR_REGISTRY` 中注册连接器。
 
 ```python
 from app.services.rag.connectors import BaseSyncConnector, RemoteFile, CONNECTOR_REGISTRY
@@ -175,9 +169,9 @@ off to the ingestion pipeline.
 {%- endif %}
 {%- if cookiecutter.use_frontend %}
 
-## Frontend Patterns
+## 前端模式
 
-### Authentication (HTTP-only cookies)
+### 认证（HTTP-only Cookie）
 
 ```typescript
 import { useAuth } from '@/hooks/use-auth';
@@ -187,7 +181,7 @@ function Component() {
 }
 ```
 
-### State Management (Zustand)
+### 状态管理（Zustand）
 
 ```typescript
 import { useAuthStore } from '@/stores/auth-store';
@@ -195,7 +189,7 @@ import { useAuthStore } from '@/stores/auth-store';
 const { user, setUser, logout } = useAuthStore();
 ```
 
-### WebSocket Chat
+### WebSocket 聊天
 
 ```typescript
 import { useChat } from '@/hooks/use-chat';

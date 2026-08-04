@@ -1,17 +1,17 @@
 ---
 name: alembic-migration
-description: Create, review, and apply database schema changes with Alembic. Use whenever a SQLAlchemy model is added or changed, a column/index/constraint needs to change, or a data backfill is required — anything that alters the PostgreSQL schema.
+description: 使用 Alembic 创建、审查和应用数据库模式变更. 在添加或更改 SQLAlchemy 模型时使用, a column/index/constraint needs to change, or a data backfill is required — anything that alters the PostgreSQL schema.
 ---
 
-# Alembic Migrations
+# Alembic 迁移
 
 This project uses **async SQLAlchemy 2.0 + Alembic** on PostgreSQL. Migrations live in `backend/alembic/versions/` and are numbered (`0001_…`, `0002_…`).
 
-## Workflow
+## 工作流程
 
-1. **Change the model first** in `backend/app/db/models/` (`Mapped[...]` + `mapped_column()`, `__repr__`, relationships with `ondelete="CASCADE"`). Make sure the model is imported in `backend/app/db/models/__init__.py` so autogenerate sees it.
+1. **先修改模型** in `backend/app/db/models/` (`Mapped[...]` + `mapped_column()`, `__repr__`, relationships with `ondelete="CASCADE"`). Make sure the model is imported in `backend/app/db/models/__init__.py` so autogenerate sees it.
 
-2. **Autogenerate** the migration:
+2. **自动生成**迁移:
    ```bash
    cd backend && uv run alembic revision --autogenerate -m "add <thing>"
    # or: make db-migrate
@@ -30,11 +30,11 @@ This project uses **async SQLAlchemy 2.0 + Alembic** on PostgreSQL. Migrations l
    ```
    Then round-trip once to prove `downgrade()` works: `alembic downgrade -1 && alembic upgrade head`.
 
-## Data migrations / backfills
+## 数据迁移 / 回填
 
 For backfills, add explicit `op.execute(...)` or a small data-loop in `upgrade()` (see the existing `*_backfill_*.py` migrations for the pattern). Keep schema and data changes in separate, well-named revisions when practical.
 
-## Rules
+## 规则
 
 - Never edit a migration that has already been applied in shared environments — add a new one.
 - `make dev` / `make bootstrap` run `alembic upgrade head` automatically; you don't need a separate step in dev.

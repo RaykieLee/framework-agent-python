@@ -10,9 +10,9 @@
 
 ## GitHub
 
-- [Issues](https://github.com/vstorm-co/full-stack-ai-agent-template/issues) - Report bugs or request features
-- [Discussions](https://github.com/vstorm-co/full-stack-ai-agent-template/discussions) - Ask questions and share ideas
-- [Pull Requests](https://github.com/vstorm-co/full-stack-ai-agent-template/pulls) - Contribute to the project
+- [Issues](https://github.com/vstorm-co/framework-agent-python/issues) - Report bugs or request features
+- [Discussions](https://github.com/vstorm-co/framework-agent-python/discussions) - Ask questions and share ideas
+- [Pull Requests](https://github.com/vstorm-co/framework-agent-python/pulls) - Contribute to the project
 
 ## FAQ
 
@@ -33,9 +33,9 @@ The template uses **PostgreSQL** (async, SQLAlchemy 2.0 + Alembic) as its single
 Choose during project generation:
 
 ```bash
-fastapi-fullstack create my_app --auth jwt     # JWT tokens
-fastapi-fullstack create my_app --auth api_key # API keys
-fastapi-fullstack create my_app --auth both    # Both methods
+framework-agent-python create my_app --auth jwt     # JWT tokens
+framework-agent-python create my_app --auth api_key # API keys
+framework-agent-python create my_app --auth both    # Both methods
 ```
 
 ### How do I deploy to production?

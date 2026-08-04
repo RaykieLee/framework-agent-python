@@ -1,6 +1,6 @@
-# How to: Customize the Agent Prompt
+# 如何：自定义 Agent 提示词
 
-## Where to Edit
+## 编辑位置
 
 All agent prompts are centralized in:
 
@@ -8,13 +8,13 @@ All agent prompts are centralized in:
 app/agents/prompts.py
 ```
 
-## Default Prompt
+## 默认提示词
 
 ```python
 DEFAULT_SYSTEM_PROMPT = """You are a helpful assistant."""
 ```
 
-## Best Practices
+## 最佳实践
 
 ### 1. Be specific about the agent's role
 
@@ -29,7 +29,7 @@ Your responsibilities:
 Tone: Professional but friendly. Use simple language."""
 ```
 
-### 2. Define output format
+### 2. 定义输出格式
 
 ```python
 DEFAULT_SYSTEM_PROMPT = """You are a data analyst assistant.
@@ -43,7 +43,7 @@ When you don't know something, say so clearly."""
 ```
 {%- if cookiecutter.enable_rag %}
 
-### 3. RAG-aware prompt
+### 3. RAG 感知提示词
 
 The RAG prompt is in `get_system_prompt_with_rag()`. It instructs the agent to:
 - Search the knowledge base before answering
@@ -70,7 +70,7 @@ Sources format:
 ```
 {%- endif %}
 
-### 4. Multi-persona agents
+### 4. 多角色 Agent
 
 Create different prompts for different use cases:
 
@@ -89,7 +89,7 @@ def get_prompt(persona: str = "default") -> str:
     return prompts.get(persona, DEFAULT_SYSTEM_PROMPT)
 ```
 
-## Tips
+### 提示
 
 - Keep prompts concise — shorter prompts = faster, cheaper responses
 - Test with real user queries, not just ideal cases

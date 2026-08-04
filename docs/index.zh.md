@@ -3,16 +3,16 @@
   <em>生产就绪的 AI/LLM 应用 —— 几分钟，而非几周</em>
 </p>
 <p align="center">
-  <a href="https://github.com/vstorm-co/full-stack-ai-agent-template/actions/workflows/ci.yml"><img src="https://github.com/vstorm-co/full-stack-ai-agent-template/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://codecov.io/gh/vstorm-co/full-stack-ai-agent-template"><img src="https://img.shields.io/badge/coverage-100%25-brightgreen" alt="Coverage"></a>
-  <a href="https://pypi.org/project/fastapi-fullstack/"><img src="https://img.shields.io/pypi/v/fastapi-fullstack.svg" alt="PyPI"></a>
+  <a href="https://github.com/vstorm-co/framework-agent-python/actions/workflows/ci.yml"><img src="https://github.com/vstorm-co/framework-agent-python/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://codecov.io/gh/vstorm-co/framework-agent-python"><img src="https://img.shields.io/badge/coverage-100%25-brightgreen" alt="Coverage"></a>
+  <a href="https://pypi.org/project/framework-agent-python/"><img src="https://img.shields.io/pypi/v/framework-agent-python.svg" alt="PyPI"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue" alt="Python"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
 </p>
 
 ---
 
-**Full-Stack AI Agent Template** 是一个面向 AI/LLM 应用的生产就绪项目生成器，内置 25+ 项企业级集成。基于 FastAPI、Next.js 15 和你选择的 AI 框架构建。以 `fastapi-fullstack` CLI 的形式安装。
+**Full-Stack AI Agent Template** 是一个面向 AI/LLM 应用的生产就绪项目生成器，内置 25+ 项企业级集成。基于 FastAPI、Next.js 15 和你选择的 AI 框架构建。以 `framework-agent-python` CLI 的形式安装。
 
 生成完整、类型安全的应用，自带认证、WebSocket 流式输出、可观测性和部署配置 —— 全部在几分钟内完成。
 
@@ -30,10 +30,10 @@
 
 ```bash
 # 1. 安装生成器
-uv tool install fastapi-fullstack    # 或者： pipx install / pip install
+uv tool install framework-agent-python    # 或者： pipx install / pip install
 
 # 2. 生成你的项目(交互式向导)
-fastapi-fullstack
+framework-agent-python
 
 # 3. 后端 + PostgreSQL 启动，迁移已执行，管理员已初始化
 cd my_app && make bootstrap

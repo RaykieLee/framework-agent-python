@@ -1,7 +1,7 @@
 {%- if cookiecutter.enable_rag %}
-# How to: Add a New RAG Document Source
+# 如何：添加新的 RAG 文档源
 
-## Overview
+### 概述
 
 Document sources are implemented as **sync connectors** — pluggable adapters
 that fetch files from external systems for ingestion into the RAG pipeline.
@@ -19,9 +19,9 @@ Built-in connectors:
 Adding a new source only requires implementing a connector class. It
 automatically works with the CLI, API, and frontend UI.
 
-## Step-by-Step
+### 分步指南
 
-### 1. Create the connector class
+### 1. 创建连接器类
 
 ```python
 # app/services/rag/connectors/my_source.py
@@ -98,7 +98,7 @@ class MySourceConnector(BaseSyncConnector):
             return False, f"Cannot connect to MySource: {e}"
 ```
 
-### 2. Define CONFIG_SCHEMA
+### 2. 定义 CONFIG_SCHEMA
 
 The `CONFIG_SCHEMA` dictionary is used to:
 - Validate connector configuration via the API
@@ -114,7 +114,7 @@ Each field can have:
 - `help` — tooltip/help text
 - `default` — default value for optional fields
 
-### 3. Register in CONNECTOR_REGISTRY
+### 3. 在 CONNECTOR_REGISTRY 中注册
 
 In `app/services/rag/connectors/__init__.py`, add the import and registration:
 
@@ -129,7 +129,7 @@ Once registered, the connector is automatically available to:
 - **API** — `POST /api/v1/rag/sync/sources` endpoint
 - **UI** — appears in the sync source management interface
 
-### 4. Add to post_gen_project.py cleanup
+### 4. 添加到 post_gen_project.py 清理逻辑
 
 In `template/hooks/post_gen_project.py`, add a conditional removal so the
 connector file is deleted when the feature is not selected during project
@@ -140,7 +140,7 @@ if not use_my_source_ingestion:
     remove_path("backend/app/services/rag/connectors/my_source.py")
 ```
 
-### 5. Use it
+### 5. 使用它
 
 **Via CLI:**
 
@@ -170,7 +170,7 @@ curl -X POST http://localhost:{{ cookiecutter.backend_port }}/api/v1/rag/sync/so
     -H "Authorization: Bearer $TOKEN"
 ```
 
-## Tips
+### 提示
 
 - Set `RemoteFile.source_path` to a unique URI (e.g., `mysource://file_id`) for deduplication
 - The `validate_config()` method is called when creating/updating sync sources via the API

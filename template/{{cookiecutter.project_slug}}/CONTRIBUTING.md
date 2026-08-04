@@ -1,91 +1,91 @@
-# Contributing to {{ cookiecutter.project_name }}
-
-## Development setup
-
-```bash
-# Backend (uv-based)
-cd backend
-uv sync                    # install all deps including dev extras
-cp .env.example .env       # then fill in required vars (see ENV_VARS.md)
-uv run uvicorn app.main:app --reload --port {{ cookiecutter.backend_port }}
-uv run alembic upgrade head  # apply migrations
-
+ # 为 {{ cookiecutter.project_name }} 贡献代码
+ 
+ ## 开发环境搭建
+ 
+ ```bash
+ # 后端（基于 uv）
+ cd backend
+ uv sync                    # 安装所有依赖，包括开发依赖
+ cp .env.example .env       # 然后填写所需变量（参见 ENV_VARS.md）
+ uv run uvicorn app.main:app --reload --port {{ cookiecutter.backend_port }}
+ uv run alembic upgrade head  # 应用迁移
+ 
+ {%- if cookiecutter.use_frontend %}
+ # 前端（基于 bun）
+ cd ../frontend
+ bun install
+ bun dev                    # http://localhost:{{ cookiecutter.frontend_port }}
+ {%- endif %}
+ {%- if cookiecutter.enable_docker %}
+ 
+ # 或全部通过 Docker 运行
+ docker compose up
+ {%- endif %}
+ ```
+ 
+ ## 代码风格
+ 
+ - **Python：** ruff（`uv run ruff check . --fix && uv run ruff format .`）。行长度 120。
+ - **类型提示：** 现代语法（`str | None`、`list[X]`、`dict[str, Any]`）。路由签名中使用 `Annotated[T, Depends(...)]` 进行依赖注入。
 {%- if cookiecutter.use_frontend %}
-# Frontend (bun-based)
-cd ../frontend
-bun install
-bun dev                    # http://localhost:{{ cookiecutter.frontend_port }}
+ - **TypeScript：** 严格模式，除非外部 API 已定义类型，否则不使用 `any`。ESLint + Prettier（运行 `bun run lint`）。
 {%- endif %}
-{%- if cookiecutter.enable_docker %}
+ - **导入顺序：** 标准库 → 第三方 → 本地，之间用空行分隔。使用 `TYPE_CHECKING` 块打破循环引用。
+ - **日期时间：** `datetime.now(UTC)`，而非 `datetime.utcnow()`。
+ - **比较：** 令牌/密钥使用 `secrets.compare_digest()`（常量时间比较）。
 
-# Or everything in Docker
-docker compose up
-{%- endif %}
-```
-
-## Code style
-
-- **Python:** ruff (`uv run ruff check . --fix && uv run ruff format .`). Line length 120.
-- **Type hints:** modern syntax (`str | None`, `list[X]`, `dict[str, Any]`). Use `Annotated[T, Depends(...)]` for DI in route signatures.
-{%- if cookiecutter.use_frontend %}
-- **TypeScript:** strict mode, no `any` unless typed external API. ESLint + Prettier (run `bun run lint`).
-{%- endif %}
-- **Imports:** stdlib → third-party → local, separated by blank lines. Use `TYPE_CHECKING` block to break circular refs.
-- **Datetime:** `datetime.now(UTC)` not `datetime.utcnow()`.
-- **Comparisons:** `secrets.compare_digest()` for tokens/keys (constant-time).
-
-## Testing
+ ## 测试
 {% if cookiecutter.enable_pytest %}
 ```bash
 cd backend
-uv run pytest                              # all backend tests
-uv run pytest tests/test_file.py::test -v  # single test
-uv run pytest -k "name_substring" -v       # by name pattern
-uv run pytest --cov=app                    # with coverage
+ uv run pytest                              # 所有后端测试
+ uv run pytest tests/test_file.py::test -v  # 单个测试
+ uv run pytest -k "name_substring" -v       # 按名称模式
+ uv run pytest --cov=app                    # 带覆盖率
 ```
 {%- if cookiecutter.use_frontend %}
 
 ```bash
 cd frontend
-bun test                  # vitest
-bunx tsc --noEmit         # type-check without emit
+ bun test                  # vitest
+ bunx tsc --noEmit         # 类型检查（不输出文件）
 ```
 {%- endif %}
 {%- else %}
-Tests are not generated for this project. Run `uv run python -m unittest discover` to invoke any ad-hoc tests you add.
+ 本项目未生成测试。运行 `uv run python -m unittest discover` 来执行你添加的任何临时测试。
 {%- endif %}
 
-## Architecture rules
+ ## 架构规则
+ 
+ - **路由层**绝不直接导入仓库层。始终通过服务层访问。
+ - **服务层**抛出领域异常（`NotFoundError`、`AlreadyExistsError`）——"未找到"情况绝不返回 `None`。
+ - **仓库层**使用 `db.flush()` + `db.refresh()`，绝不能使用 `db.commit()`（会话在 `get_db_session` 中自动提交）。
+ - **Pydantic 模式：** 每个操作分离 `*Create`、`*Update`、`*Read`、`*List`。
+ - **迁移：** 每个逻辑更改对应一个 Alembic 修订版本；绝不编辑已合并的迁移。
 
-- **Routes** never import repositories directly. Always go through a service.
-- **Services** raise domain exceptions (`NotFoundError`, `AlreadyExistsError`) — never return `None` for "not found".
-- **Repositories** use `db.flush()` + `db.refresh()`, NEVER `db.commit()` (session auto-commits in `get_db_session`).
-- **Pydantic schemas:** separate `*Create`, `*Update`, `*Read`, `*List` per operation.
-- **Migrations:** one Alembic revision per logical change; never edit a merged migration.
-
-See `docs/architecture.md` for the full layered architecture rules.
+ 查看 `docs/architecture.md` 获取完整的分层架构规则。
 {%- if cookiecutter.enable_precommit %}
 
-## Pre-commit
-
-Configured via `.pre-commit-config.yaml`. Install once:
-
-```bash
-uv run pre-commit install
-```
-
-Will run ruff + (frontend lint if present) on every commit. Bypass with `--no-verify` only when fixing a hook bug.
+ ## Pre-commit
+ 
+ 通过 `.pre-commit-config.yaml` 配置。安装一次：
+ 
+ ```bash
+ uv run pre-commit install
+ ```
+ 
+ 每次提交时将运行 ruff +（如果存在前端则运行前端代码检查）。仅在修复 Hook 错误时使用 `--no-verify` 跳过。
 {%- endif %}
 
-## Pull-request checklist
-
-- [ ] `uv run ruff check . && uv run ruff format --check .` clean
+ ## 拉取请求检查清单
+ 
+ - [ ] `uv run ruff check . && uv run ruff format --check .` 通过
 {%- if cookiecutter.use_frontend %}
-- [ ] `cd frontend && bunx tsc --noEmit` clean
+ - [ ] `cd frontend && bunx tsc --noEmit` 通过
 {%- endif %}
 {%- if cookiecutter.enable_pytest %}
-- [ ] Tests added for new code paths; `uv run pytest` green
+ - [ ] 新代码路径添加了测试；`uv run pytest` 通过
 {%- endif %}
-- [ ] If schema changed: alembic migration committed (`uv run alembic revision --autogenerate -m "..."`)
-- [ ] Updated `ENV_VARS.md` if new env vars added
-- [ ] Updated `CHANGELOG.md` (if applicable)
+ - [ ] 如果模式变更：提交了 Alembic 迁移（`uv run alembic revision --autogenerate -m "..."`）
+ - [ ] 如果添加了新的环境变量，已更新 `ENV_VARS.md`
+ - [ ] 已更新 `CHANGELOG.md`（如适用）

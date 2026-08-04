@@ -17,11 +17,11 @@ The template supports 5 AI frameworks for building intelligent agents:
 Select your framework during project creation:
 
 ```bash
-fastapi-fullstack create my_project --ai-framework pydantic_ai   # default
-fastapi-fullstack create my_project --ai-framework pydantic_deep
-fastapi-fullstack create my_project --ai-framework langchain
-fastapi-fullstack create my_project --ai-framework langgraph
-fastapi-fullstack create my_project --ai-framework deepagents
+framework-agent-python create my_project --ai-framework pydantic_ai   # default
+framework-agent-python create my_project --ai-framework pydantic_deep
+framework-agent-python create my_project --ai-framework langchain
+framework-agent-python create my_project --ai-framework langgraph
+framework-agent-python create my_project --ai-framework deepagents
 ```
 
 ---
@@ -302,7 +302,7 @@ When RAG is enabled, agents can search a knowledge base for relevant documents.
 ### Enabling RAG with AI Agent
 
 ```bash
-fastapi-fullstack create my_project --enable-rag --enable-ai-agent
+framework-agent-python create my_project --enable-rag --enable-ai-agent
 ```
 
 ### Using the RAG Tool

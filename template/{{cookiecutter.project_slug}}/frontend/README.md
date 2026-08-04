@@ -1,52 +1,51 @@
-# {{ cookiecutter.project_name }} — Frontend
+# {{ cookiecutter.project_name }} — 前端
 
-Next.js 15 (App Router) + React 19 + TypeScript + Tailwind CSS, with the AI chat
-interface, auth, and dashboard for **{{ cookiecutter.project_name }}**.
+Next.js 15（App Router）+ React 19 + TypeScript + Tailwind CSS，为 **{{ cookiecutter.project_name }}** 提供 AI 聊天界面、认证和仪表盘。
 
-## Prerequisites
+## 前提条件
 
-- [Bun](https://bun.sh) (recommended) or Node.js 18+
-- The backend running at `http://localhost:{{ cookiecutter.backend_port }}` (see the project root `README.md` — `make dev`)
+- [Bun](https://bun.sh)（推荐）或 Node.js 18+
+- 后端运行在 `http://localhost:{{ cookiecutter.backend_port }}` (参见项目根目录 `README.md` — `make dev`)
 
-## Getting Started
+## 快速开始
 
 ```bash
-bun install        # install dependencies
-bun dev            # start the dev server on http://localhost:{{ cookiecutter.frontend_port }}
+bun install        # 安装依赖
+bun dev            # 启动开发服务器于 http://localhost:{{ cookiecutter.frontend_port }}
 ```
 
-Or run it in Docker from the project root: `make dev-frontend`.
+或者从项目根目录通过 Docker 运行：`make dev-frontend`。
 
-## Environment
+## 环境
 
-Copy `.env.example` to `.env.local` and adjust as needed:
+将 `.env.example` 复制为 `.env.local`，根据需要进行调整：
 
-| Variable | Description |
+| 变量 | 说明 |
 |----------|-------------|
-| `BACKEND_URL` | Backend HTTP base URL (server-side calls / proxying) |
-| `BACKEND_WS_URL` | Backend WebSocket URL for the chat stream |
-| `NEXT_PUBLIC_AUTH_ENABLED` | Toggle auth UI (`true` when JWT/OAuth is enabled) |
+| `BACKEND_URL` | 后端 HTTP 基础 URL（服务端调用 / 代理）|
+| `BACKEND_WS_URL` | 聊天流的后端 WebSocket URL |
+| `NEXT_PUBLIC_AUTH_ENABLED` | 切换认证 UI（JWT/OAuth 启用时为 `true`）|
 {%- if cookiecutter.enable_oauth %}
-| `NEXT_PUBLIC_API_URL` | Public API URL used by OAuth redirects |
+| `NEXT_PUBLIC_API_URL` | OAuth 重定向使用的公开 API URL |
 {%- endif %}
 {%- if cookiecutter.enable_rag %}
-| `NEXT_PUBLIC_RAG_ENABLED` | Show knowledge-base / RAG UI |
+| `NEXT_PUBLIC_RAG_ENABLED` | 显示知识库 / RAG UI |
 {%- endif %}
 
-## Scripts
+## 脚本
 
 ```bash
-bun dev              # dev server (hot reload)
-bun run build        # production build
-bun run start        # serve the production build
+bun dev              # 开发服务器（热重载）
+bun run build        # 生产构建
+bun run start        # 提供生产构建服务
 bun run lint         # ESLint
-bun run lint:fix     # ESLint with autofix
+bun run lint:fix     # ESLint 自动修复
 bun run format       # Prettier
-bun run type-check   # tsc --noEmit
-bun run test:e2e     # Playwright end-to-end tests
+bun run type-check   # 类型检查
+bun run test:e2e     # Playwright 端到端测试
 ```
 
-## Project Structure
+## 项目结构
 
 ```
 src/
@@ -60,16 +59,16 @@ src/
 └── middleware.ts   # locale routing + auth guards
 ```
 
-## Internationalization
+## 国际化
 
-Routes are locale-prefixed (`/{locale}/…`) via [next-intl](https://next-intl-docs.vercel.app/).
-Add a locale by extending `i18n.ts` and providing its message catalog.
+路由以语言前缀开头 (`/{locale}/…`) 通过 [next-intl](https://next-intl-docs.vercel.app/)。
+通过扩展 `i18n.ts` 并提供其消息目录来添加语言。
 
-## Deployment (Vercel)
+## 部署（Vercel）
 
 ```bash
 npx vercel --prod
 ```
 
-In the Vercel dashboard set `BACKEND_URL`, `BACKEND_WS_URL`, and
-`NEXT_PUBLIC_AUTH_ENABLED=true`. See the project root `docs/deploy.md` for details.
+在 Vercel 控制面板中设置 `BACKEND_URL`, `BACKEND_WS_URL`, and
+`NEXT_PUBLIC_AUTH_ENABLED=true`. 详情参见项目根目录 `docs/deploy.md`。

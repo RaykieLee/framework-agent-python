@@ -1,94 +1,94 @@
-# Security Policy
+﻿# 安全策略
 
-## Supported Versions
+## 支持的版本
 
-| Version | Supported |
+| 版本 | 支持状态 |
 |---------|-----------|
-| 0.2.x (latest) | ✅ |
+| 0.2.x（最新） | ✅ |
 | < 0.2.0 | ❌ |
 
-Only the latest minor release receives security fixes. We recommend always using the latest version.
+仅最新次版本接收安全修复。建议始终使用最新版本。
 
-## Reporting a Vulnerability
+## 报告漏洞
 
-**Please do not report security vulnerabilities via public GitHub Issues.**
+**请勿通过公开的 GitHub Issues 报告安全漏洞。**
 
-To report a vulnerability, email the maintainers at:
+如发现漏洞，请通过电子邮件发送给维护者：
 
 **security@vstorm.co**
 
-Include in your report:
-- Description of the vulnerability
-- Steps to reproduce (CLI invocation or generated project behavior)
-- Affected versions
-- Potential impact
-- Any suggested fix (optional)
+报告中请包含：
+- 漏洞描述
+- 复现步骤（CLI 调用或生成的项目行为）
+- 受影响的版本
+- 潜在影响
+- 任何建议的修复方案（可选）
 
-## Response Timeline
+## 响应时间线
 
-| Stage | Target |
+| 阶段 | 目标时间 |
 |-------|--------|
-| Acknowledgement | Within 48 hours |
-| Initial assessment | Within 5 business days |
-| Fix or mitigation | Within 30 days for critical/high |
-| Public disclosure | After fix is released |
+| 确认收到 | 48 小时内 |
+| 初步评估 | 5 个工作日内 |
+| 修复或缓解措施 | 关键/高危 30 天内 |
+| 公开披露 | 修复发布后 |
 
-We follow coordinated disclosure — we ask that you give us time to release a fix before public disclosure.
+我们遵循协调披露原则 — 请给予我们时间发布修复后再公开披露。
 
-## Scope
+## 范围
 
-In scope:
-- Vulnerabilities in the CLI generator itself (`fastapi-fullstack` package)
-- Security issues in the generated project template code (auth, JWT handling, SSRF, etc.)
-- Unsafe defaults in generated project configuration
-- Path traversal or template injection via cookiecutter inputs
+范围包括：
+- CLI 生成器本身的漏洞（`framework-agent-python` 包）
+- 生成的项目模板代码中的安全问题（认证、JWT 处理、SSRF 等）
+- 生成项目配置中的不安全默认值
+- 通过 cookiecutter 输入的路径遍历或模板注入
 
-Out of scope:
-- Vulnerabilities in third-party dependencies (report to the respective project)
-- Security issues introduced by users after project generation
-- Issues requiring physical access to the machine
+范围不包括：
+- 第三方依赖中的漏洞（请向相应项目报告）
+- 用户在项目生成后引入的安全问题
+- 需要物理访问机器的问题
 
-## Security Requirements — What You Can and Cannot Expect
+## 安全要求 — 您可以和不可期待的内容
 
-### What the generated project provides
+### 生成项目提供的内容
 
-Generated projects ship with the following security controls enabled by default:
+生成的项目默认启用以下安全控制：
 
-| Control | Implementation | OWASP |
+| 控制项 | 实现方式 | OWASP |
 |---------|---------------|-------|
-| **Authentication** | JWT access + refresh tokens, bcrypt password hashing, API key auth | A07:2021 |
-| **Authorization** | Role-based access control (RBAC) with `RoleChecker` dependency | A01:2021 |
-| **SQL Injection prevention** | SQLAlchemy ORM with parameterized queries (no raw SQL) | A03:2021 |
-| **XSS prevention** | HTML sanitization utilities, Pydantic input validation | A03:2021 |
-| **SSRF protection** | `validate_webhook_url()` blocks private/reserved/loopback IPs, DNS rebinding checks | A10:2021 |
-| **CORS** | Explicit origin allowlists, `*` blocked in production | A05:2021 |
-| **CSRF protection** | HTTP-only cookies for tokens, SameSite cookie attributes | A01:2021 |
-| **Input validation** | All API inputs validated via Pydantic v2 strict schemas | A03:2021 |
-| **Secret management** | `.env`-based configuration, `.gitignore` excludes secrets | A02:2021 |
-| **Dependency scanning** | `pip-audit` in CI scans for known CVEs on every build | A06:2021 |
-| **Path traversal prevention** | `sanitize_filename()` and `validate_safe_path()` utilities | A01:2021 |
-| **Encrypted token storage** | Channel bot tokens encrypted at rest with Fernet (AES-128-CBC) | A02:2021 |
-| **Constant-time comparison** | `secrets.compare_digest()` for API key verification | A02:2021 |
-| **Webhook signature verification** | HMAC-SHA256 for Telegram and Slack webhook endpoints | A08:2021 |
+| **身份认证** | JWT 访问 + 刷新令牌、bcrypt 密码哈希、API 密钥认证 | A07:2021 |
+| **授权** | 基于角色的访问控制（RBAC），使用 `RoleChecker` 依赖 | A01:2021 |
+| **SQL 注入防护** | SQLAlchemy ORM 使用参数化查询（无原始 SQL） | A03:2021 |
+| **XSS 防护** | HTML 清理工具、Pydantic 输入验证 | A03:2021 |
+| **SSRF 防护** | `validate_webhook_url()` 阻止私有/保留/回环 IP、DNS 重绑定检查 | A10:2021 |
+| **CORS** | 显式来源白名单，生产环境禁用 `*` | A05:2021 |
+| **CSRF 防护** | HTTP-only cookie 存储令牌、SameSite cookie 属性 | A01:2021 |
+| **输入验证** | 所有 API 输入通过 Pydantic v2 严格 schema 验证 | A03:2021 |
+| **密钥管理** | 基于 `.env` 的配置，`.gitignore` 排除密钥文件 | A02:2021 |
+| **依赖扫描** | CI 中使用 `pip-audit` 在每次构建时扫描已知 CVE | A06:2021 |
+| **路径遍历防护** | `sanitize_filename()` 和 `validate_safe_path()` 工具函数 | A01:2021 |
+| **加密令牌存储** | 渠道机器人令牌使用 Fernet (AES-128-CBC) 静态加密 | A02:2021 |
+| **常量时间比较** | API 密钥验证使用 `secrets.compare_digest()` | A02:2021 |
+| **Webhook 签名验证** | Telegram 和 Slack webhook 端点使用 HMAC-SHA256 | A08:2021 |
 
-### What is NOT provided (user responsibility)
+### 不提供的内容（用户责任）
 
-- **Network security** — Firewalls, VPNs, TLS termination are your responsibility. The template includes Traefik with Let's Encrypt for HTTPS, but you must configure DNS and deployment.
-- **Infrastructure hardening** — OS patching, container image scanning, Kubernetes network policies are out of scope.
-- **Data encryption at rest** — Database-level encryption (TDE) is not configured by default. Enable it at the database layer.
-- **Rate limiting tuning** — Default rate limits are generous for development. Tune for production workloads.
-- **LLM output safety** — The template does not filter or sanitize LLM outputs. Implement content moderation if user-facing.
-- **Secrets rotation** — JWT secret keys and encryption keys are generated once. Implement rotation for production.
-- **Audit logging** — Request-level logging is included, but compliance audit trails (SOC2, HIPAA) require additional implementation.
-- **Penetration testing** — Generated code follows security best practices but has not been formally pen-tested. Test before production deployment.
+- **网络安全** — 防火墙、VPN、TLS 终止由您负责。模板包含 Traefik 和 Let's Encrypt 用于 HTTPS，但您必须配置 DNS 和部署。
+- **基础设施加固** — 操作系统补丁、容器镜像扫描、Kubernetes 网络策略不在范围内。
+- **静态数据加密** — 默认不配置数据库级加密（TDE）。请在数据库层启用。
+- **速率限制调优** — 默认速率限制适合开发环境。请针对生产工作负载调优。
+- **LLM 输出安全** — 模板不过滤或清理 LLM 输出。如面向用户，请实现内容审核。
+- **密钥轮换** — JWT 密钥和加密密钥仅在生成时创建一次。请在生产环境实现轮换。
+- **审计日志** — 包含请求级日志，但合规审计追踪（SOC2、HIPAA）需要额外实现。
+- **渗透测试** — 生成的代码遵循安全最佳实践，但未经过正式的渗透测试。生产部署前请进行测试。
 
-### CLI generator security
+### CLI 生成器安全
 
-- `pip-audit` in CI — scans for known CVEs on every build
-- `ty` type checking — catches type-related issues at build time
-- Ruff linting — enforces safe coding patterns
-- 100% test coverage — all template combinations tested
+- CI 中的 `pip-audit` — 在每次构建时扫描已知 CVE
+- `ty` 类型检查 — 在构建时捕获类型相关问题
+- Ruff 代码检查 — 强制执行安全的编码模式
+- 100% 测试覆盖率 — 所有模板组合均已测试
 
-## Acknowledgements
+## 致谢
 
-We thank all security researchers who responsibly disclose vulnerabilities to us. Confirmed reporters will be credited in the release notes unless they prefer to remain anonymous.
+我们感谢所有负责任地向我们披露漏洞的安全研究人员。确认的提交者将在发布说明中致谢，除非他们希望保持匿名。

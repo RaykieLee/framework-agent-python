@@ -1,61 +1,57 @@
 {%- if cookiecutter.use_jwt %}
-# Permissions & Access Control
+# 权限与访问控制
 
-## Roles
+## 角色
 
-Two roles are defined in `app/db/models/user.py`:
+在 `app/db/models/user.py` 中定义了两个角色：
 
-- **admin** -- Full access to all features. Can manage users, RAG collections,
-  sync sources, webhooks, and export data.
-- **user** -- Standard access. Can chat with the AI agent, manage their own
-  profile, view their own conversations, upload files to chat, and search
-  the knowledge base.
+- **admin** — 完全访问所有功能。可以管理用户、RAG 集合、同步源、Webhook 和导出数据。
+- **user** — 标准访问权限。可以与 AI Agent 聊天、管理个人资料、查看自己的对话、上传文件到聊天和搜索知识库。
 
-Admins implicitly have all user permissions. The `User.has_role()` method
-returns `True` for any role if the user is an admin.
+管理员隐式拥有所有用户权限。如果用户是管理员，`User.has_role()` 方法对任何角色返回 `True`。
 
-## Dependency Aliases
+## 依赖别名
 
-These are defined in `app/api/deps.py` and used throughout the route layer:
+这些在 `app/api/deps.py` 中定义，并在整个路由层中使用：
 
-| Alias | Resolves To | Access Level |
+| 别名 | 解析为 | 访问级别 |
 |-------|------------|--------------|
-| `CurrentUser` | `Depends(get_current_user)` | Any authenticated user |
-| `CurrentAdmin` | `Depends(RoleChecker(UserRole.ADMIN))` | Admin role required |
-| `CurrentSuperuser` | `Depends(get_current_active_superuser)` | Admin role required (legacy alias) |
+| `CurrentUser` | `Depends(get_current_user)` | 任何已认证用户 |
+| `CurrentAdmin` | `Depends(RoleChecker(UserRole.ADMIN))` | 需要管理员角色 |
+| `CurrentSuperuser` | `Depends(get_current_active_superuser)` | 需要管理员角色（旧别名）|
 
-## Endpoint Access Matrix
+## 端点访问矩阵
 
-### Authentication
+### 认证
 
-| Endpoint | Method | Admin | User | Unauthenticated | Notes |
+| 端点 | 方法 | 管理员 | 用户 | 未认证 | 备注 |
 |----------|--------|-------|------|-----------------|-------|
-| `/auth/login` | POST | Y | Y | Y | Returns JWT tokens |
-| `/auth/register` | POST | Y | Y | Y | Creates new user account |
-| `/auth/refresh` | POST | Y | Y | -- | Requires valid refresh token |
+| `/auth/login` | POST | Y | Y | Y | 返回 JWT 令牌 |
+| `/auth/register` | POST | Y | Y | Y | 创建新用户账户 |
+| `/auth/refresh` | POST | Y | Y | -- | 需要有效的刷新令牌 |
 
-### Users
+### 用户
 
-| Endpoint | Method | Admin | User | Notes |
+| 端点 | 方法 | 管理员 | 用户 | 备注 |
 |----------|--------|-------|------|-------|
-| `/users/me` | GET | Y | Y | Own profile |
-| `/users/me` | PATCH | Y | Y | Own profile; non-admins cannot change role |
-| `/users/me/avatar` | POST | Y | Y | Upload own avatar image |
-| `/users/avatar/{user_id}` | GET | Y | Y | Public avatar access |
-| `/users` | GET | Y | -- | List all users (admin only) |
-| `/users/{id}` | GET | Y | -- | View any user (admin only) |
-| `/users/{id}` | PATCH | Y | -- | Update any user including role (admin only) |
-| `/users/{id}` | DELETE | Y | -- | Delete any user (admin only) |
+| `/users/me` | GET | Y | Y | 自己的个人资料 |
+| `/users/me` | PATCH | Y | Y | 自己的个人资料；非管理员不能更改角色 |
+| `/users/me/avatar` | POST | Y | Y | 上传自己的头像 |
+| `/users/avatar/{user_id}` | GET | Y | Y | 公开头像访问 |
+| `/users` | GET | Y | -- | 列出所有用户（仅管理员）|
+| `/users/{id}` | GET | Y | -- | 查看任何用户（仅管理员）|
+| `/users/{id}` | PATCH | Y | -- | 更新任何用户包括角色（仅管理员）|
+| `/users/{id}` | DELETE | Y | -- | 删除任何用户（仅管理员）|
 
 ### AI Agent
 
-| Endpoint | Method | Admin | User | Notes |
+| 端点 | 方法 | 管理员 | 用户 | 备注 |
 |----------|--------|-------|------|-------|
-| `/agent/ws/agent` | WS | Y | Y | WebSocket chat with AI agent |
+| `/agent/ws/agent` | WS | Y | Y | 与 AI Agent 的 WebSocket 聊天 |
 
-### Conversations
+### 对话
 
-| Endpoint | Method | Admin | User | Notes |
+| 端点 | 方法 | 管理员 | 用户 | 备注 |
 |----------|--------|-------|------|-------|
 | `/conversations` | GET | Y | Y | Own conversations only (filtered by user_id) |
 | `/conversations` | POST | Y | Y | Create new conversation |
@@ -67,9 +63,9 @@ These are defined in `app/api/deps.py` and used throughout the route layer:
 | `/conversations/{id}/messages` | POST | Y | Y | Add message to own conversation |
 | `/conversations/export` | GET | Y | -- | Export all conversations (admin only) |
 
-### Message Ratings
+### 消息评分
 
-| Endpoint | Method | Admin | User | Notes |
+| 端点 | 方法 | 管理员 | 用户 | 备注 |
 |----------|--------|-------|------|-------|
 | `/conversations/{id}/messages/{msg_id}/rate` | POST | Y | Y | Rate/update a message (like/dislike) |
 | `/conversations/{id}/messages/{msg_id}/rate` | DELETE | Y | Y | Remove own rating |
@@ -78,9 +74,9 @@ These are defined in `app/api/deps.py` and used throughout the route layer:
 | `/admin/ratings/export` | GET | Y | -- | Export ratings JSON/CSV (admin only) |
 | `/admin/conversations` | GET | Y | -- | List all conversations (admin only) |
 
-### Files
+### 文件
 
-| Endpoint | Method | Admin | User | Notes |
+| 端点 | 方法 | 管理员 | 用户 | 备注 |
 |----------|--------|-------|------|-------|
 | `/files/upload` | POST | Y | Y | Upload file for chat |
 | `/files/{id}` | GET | Y | Y | Download own files only (ownership check) |
@@ -88,9 +84,9 @@ These are defined in `app/api/deps.py` and used throughout the route layer:
 
 {%- if cookiecutter.enable_rag %}
 
-### RAG (Knowledge Base)
+### RAG（知识库）
 
-| Endpoint | Method | Admin | User | Notes |
+| 端点 | 方法 | 管理员 | 用户 | 备注 |
 |----------|--------|-------|------|-------|
 | `/rag/supported-formats` | GET | Y | Y | List supported file formats |
 | `/rag/search` | POST | Y | Y | Search knowledge base (all users) |
@@ -118,9 +114,9 @@ These are defined in `app/api/deps.py` and used throughout the route layer:
 
 {%- if cookiecutter.enable_webhooks and cookiecutter.use_database %}
 
-### Webhooks
+### Webhook
 
-| Endpoint | Method | Admin | User | Notes |
+| 端点 | 方法 | 管理员 | 用户 | 备注 |
 |----------|--------|-------|------|-------|
 | `/webhooks` | GET | Y | -- | List webhooks (admin only) |
 | `/webhooks` | POST | Y | -- | Create webhook (admin only) |
@@ -132,15 +128,15 @@ These are defined in `app/api/deps.py` and used throughout the route layer:
 | `/webhooks/{id}/deliveries` | GET | Y | -- | Delivery history |
 {%- endif %}
 
-### Health
+### 健康检查
 
-| Endpoint | Method | Admin | User | Unauthenticated | Notes |
+| 端点 | 方法 | 管理员 | 用户 | 未认证 | 备注 |
 |----------|--------|-------|------|-----------------|-------|
 | `/health` | GET | Y | Y | Y | No auth required |
 
-## How It Works
+## 工作原理
 
-### JWT Flow
+### JWT 流程
 
 1. User sends credentials to `POST /auth/login`.
 2. Server validates credentials, returns `access_token` + `refresh_token`.
@@ -148,7 +144,7 @@ These are defined in `app/api/deps.py` and used throughout the route layer:
 4. `get_current_user` dependency extracts the JWT, verifies it, loads the user.
 5. If the token is expired, the client uses `POST /auth/refresh` to get a new one.
 
-### Role Checking
+### 角色检查
 
 `RoleChecker` is a callable class that wraps `get_current_user`:
 
@@ -167,7 +163,7 @@ class RoleChecker:
 - The user's role matches the required role, OR
 - The user is an admin (admin has all permissions).
 
-### IDOR Protection
+### IDOR 防护
 
 Resources owned by users (conversations, files) are protected at the service
 layer. The service receives the current user's ID from the route and uses it
@@ -184,7 +180,7 @@ chat_file = await file_upload_svc.get_user_file(file_id, current_user.id)
 
 {%- if cookiecutter.enable_rag %}
 
-### RAG Access Model
+### RAG 访问模型
 
 RAG operates on a **global** access model:
 
@@ -198,7 +194,7 @@ RAG operates on a **global** access model:
 
 {%- if cookiecutter.use_api_key %}
 
-### API Key Authentication
+### API 密钥认证
 
 For programmatic access, clients can authenticate via API key:
 
@@ -211,9 +207,9 @@ API key auth grants full access (no role distinction). Use it for trusted
 server-to-server communication.
 {%- endif %}
 
-## Creating Users
+## 创建用户
 
-### Via CLI
+### 通过 CLI
 
 ```bash
 # Create a regular user
@@ -226,7 +222,7 @@ uv run {{ cookiecutter.project_slug }} user create-admin --email admin@example.c
 uv run {{ cookiecutter.project_slug }} user set-role user@example.com --role admin
 ```
 
-### Via Make
+### 通过 Make
 
 ```bash
 make create-admin    # Interactive admin creation
@@ -234,14 +230,14 @@ make user-create     # Interactive user creation
 make user-list       # List all users
 ```
 
-### Via Quickstart
+### 通过快速开始
 
 ```bash
 make quickstart      # Creates admin@example.com / admin123 automatically
 ```
 
 {%- else %}
-# Permissions & Access Control
+# 权限与访问控制
 
 This project was generated without JWT authentication. All endpoints are
 publicly accessible. To add authentication, regenerate the project with

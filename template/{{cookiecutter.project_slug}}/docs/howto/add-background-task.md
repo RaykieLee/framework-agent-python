@@ -1,12 +1,12 @@
-# How to: Add a Background Task
+# 如何：添加后台任务
 
-## Overview
+### 概述
 
 Background tasks run asynchronously outside the request-response cycle. Your project uses **{{ cookiecutter.background_tasks }}** as the task queue.
 
-## Step-by-Step
+### 分步指南
 
-### 1. Create the task
+### 1. 创建任务
 
 {%- if cookiecutter.use_celery %}
 ```python
@@ -57,7 +57,7 @@ async def send_notification_flow(user_id: str, message: str) -> dict:
 ```
 {%- endif %}
 
-### 2. Call it from your API
+### 2. 从 API 中调用
 
 ```python
 # In any route or service:
@@ -92,7 +92,7 @@ asyncio.create_task(send_notification_flow("user_123", "Your order is ready!"))
 {%- endif %}
 ```
 
-### 3. Add scheduling (optional)
+### 3. 添加定时调度（可选）
 
 {%- if cookiecutter.use_celery %}
 In `celery_app.py`, add to `beat_schedule`:
@@ -134,7 +134,7 @@ deployments.append(await send_notification_flow.ato_deployment(
 ```
 {%- endif %}
 
-### 4. Run the worker
+### 4. 运行 Worker
 
 ```bash
 {%- if cookiecutter.use_celery %}

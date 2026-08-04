@@ -3,9 +3,9 @@ description: Exception handling patterns and security conventions
 globs: ["backend/app/core/**/*.py", "backend/app/services/**/*.py"]
 ---
 
-# Exceptions & Security
+# 异常与安全
 
-## Domain Exceptions (`app/core/exceptions.py`)
+## 领域异常 (`app/core/exceptions.py`)
 
 All extend `AppException`. Always pass `message` and `details`:
 
@@ -22,7 +22,7 @@ Exception handlers in `api/exception_handlers.py` automatically:
 - Return consistent JSON error format
 - Add `WWW-Authenticate: Bearer` header on 401
 
-## Security Patterns
+## 安全模式
 
 JWT auth (`core/security.py`):
 - `create_access_token(subject)` / `create_refresh_token(subject)` — encode with `jwt.encode()`
@@ -38,7 +38,7 @@ API keys:
 - `secrets.compare_digest()` for constant-time comparison
 - `APIKeyHeader(name=settings.API_KEY_HEADER, auto_error=False)`
 
-## Role-Based Access Control
+## 基于角色的访问控制
 
 ```python
 class RoleChecker:

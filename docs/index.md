@@ -3,16 +3,16 @@
   <em>Production-Ready AI/LLM Applications — In Minutes, Not Weeks</em>
 </p>
 <p align="center">
-  <a href="https://github.com/vstorm-co/full-stack-ai-agent-template/actions/workflows/ci.yml"><img src="https://github.com/vstorm-co/full-stack-ai-agent-template/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://codecov.io/gh/vstorm-co/full-stack-ai-agent-template"><img src="https://img.shields.io/badge/coverage-100%25-brightgreen" alt="Coverage"></a>
-  <a href="https://pypi.org/project/fastapi-fullstack/"><img src="https://img.shields.io/pypi/v/fastapi-fullstack.svg" alt="PyPI"></a>
+  <a href="https://github.com/vstorm-co/framework-agent-python/actions/workflows/ci.yml"><img src="https://github.com/vstorm-co/framework-agent-python/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://codecov.io/gh/vstorm-co/framework-agent-python"><img src="https://img.shields.io/badge/coverage-100%25-brightgreen" alt="Coverage"></a>
+  <a href="https://pypi.org/project/framework-agent-python/"><img src="https://img.shields.io/pypi/v/framework-agent-python.svg" alt="PyPI"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue" alt="Python"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
 </p>
 
 ---
 
-**Full-Stack AI Agent Template** is a production-ready project generator for AI/LLM applications with 25+ enterprise integrations. Built with FastAPI, Next.js 15, and your choice of AI framework. Install it as the `fastapi-fullstack` CLI.
+**Full-Stack AI Agent Template** is a production-ready project generator for AI/LLM applications with 25+ enterprise integrations. Built with FastAPI, Next.js 15, and your choice of AI framework. Install it as the `framework-agent-python` CLI.
 
 Generate complete, type-safe applications with authentication, WebSocket streaming, observability, and deployment configs — all in minutes.
 
@@ -30,10 +30,10 @@ Generate complete, type-safe applications with authentication, WebSocket streami
 
 ```bash
 # 1. Install the generator
-uv tool install fastapi-fullstack    # or: pipx install / pip install
+uv tool install framework-agent-python    # or: pipx install / pip install
 
 # 2. Generate your project (interactive wizard)
-fastapi-fullstack
+framework-agent-python
 
 # 3. Backend + PostgreSQL up, migrations applied, admin seeded
 cd my_app && make bootstrap

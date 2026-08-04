@@ -1,13 +1,12 @@
-# Adding New Features
-
-## Adding a New API Endpoint
-
-This example adds a "Notification" feature end-to-end, following the
-repository + service pattern used throughout the codebase. **Routes never
-contain direct database calls** — all data access goes through a service,
-which delegates to a repository.
-
-1. **Create schema** in `schemas/`
+ # 添加新功能
+ 
+ ## 添加新的 API 端点
+ 
+ 本示例从头到尾添加一个"通知"功能，遵循代码库中使用的
+ 仓库 + 服务模式。**路由层绝不包含直接数据库调用**——所有数据访问通过服务层，
+ 服务层再委托给仓库层。
+ 
+ 1. **在 `schemas/` 中创建模式**
    ```python
    # schemas/notification.py
    from datetime import datetime
@@ -31,7 +30,7 @@ which delegates to a repository.
        created_at: datetime
    ```
 
-2. **Create model** in `db/models/`
+ 2. **在 `db/models/` 中创建模型**
    ```python
    # db/models/notification.py
    from uuid import uuid4
@@ -58,9 +57,9 @@ which delegates to a repository.
        )
    ```
 
-   Don't forget to import it in `db/models/__init__.py`.
+ 不要忘记在 `db/models/__init__.py` 中导入它。
 
-3. **Create repository** in `repositories/`
+ 3. **在 `repositories/` 中创建仓库**
    ```python
    # repositories/notification.py
    from uuid import UUID
@@ -92,7 +91,7 @@ which delegates to a repository.
            return list(result.scalars().all())
    ```
 
-4. **Create service** in `services/`
+ 4. **在 `services/` 中创建服务**
    ```python
    # services/notification.py
    from uuid import UUID
@@ -125,7 +124,7 @@ which delegates to a repository.
            return await self.repo.list_unread(self.db)
    ```
 
-5. **Register dependency** in `api/deps.py`
+ 5. **在 `api/deps.py` 中注册依赖**
    ```python
    from app.services.notification import NotificationService
 
@@ -138,7 +137,7 @@ which delegates to a repository.
    NotificationSvc = Annotated[NotificationService, Depends(get_notification_service)]
    ```
 
-6. **Create route** in `api/routes/v1/`
+ 6. **在 `api/routes/v1/` 中创建路由**
    ```python
    # api/routes/v1/notifications.py
    from fastapi import APIRouter, status
@@ -166,7 +165,7 @@ which delegates to a repository.
        return await service.list_unread()
    ```
 
-7. **Register router** in `api/routes/v1/__init__.py`
+ 7. **在 `api/routes/v1/__init__.py` 中注册路由**
    ```python
    from app.api.routes.v1 import notifications
 
@@ -175,63 +174,63 @@ which delegates to a repository.
    )
    ```
 
-## Adding a Custom CLI Command
+ ## 添加自定义 CLI 命令
 
-Commands are auto-discovered from `app/commands/`.
+ 命令从 `app/commands/` 自动发现。
 
 ```python
-# app/commands/my_command.py
-from app.commands import command, success, error
-import click
-
-@command("my-command", help="Description of what this does")
-@click.option("--name", "-n", required=True, help="Name parameter")
-def my_command(name: str):
-    # Your logic here
-    success(f"Done: {name}")
+ # app/commands/my_command.py
+ from app.commands import command, success, error
+ import click
+ 
+ @command("my-command", help="描述该命令的功能")
+ @click.option("--name", "-n", required=True, help="名称参数")
+ def my_command(name: str):
+     # 你的逻辑在这里
+     success(f"完成：{name}")
 ```
 
-Run with: `uv run {{ cookiecutter.project_slug }} cmd my-command --name test`
+ 运行：`uv run {{ cookiecutter.project_slug }} cmd my-command --name test`
 {%- if cookiecutter.use_pydantic_ai %}
 
-## Adding an AI Agent Tool (PydanticAI)
+ ## 添加 AI Agent 工具（PydanticAI）
 
 ```python
-# app/agents/assistant.py
-@agent.tool
-async def my_tool(ctx: RunContext[Deps], param: str) -> dict:
-    """Tool description for LLM - be specific about what it does."""
-    # Access dependencies via ctx.deps
-    result = await some_operation(param)
-    return {"result": result}
+ # app/agents/assistant.py
+ @agent.tool
+ async def my_tool(ctx: RunContext[Deps], param: str) -> dict:
+     """LLM 使用的工具描述——具体说明其功能。"""
+     # 通过 ctx.deps 访问依赖
+     result = await some_operation(param)
+     return {"result": result}
 ```
 {%- endif %}
 {%- if cookiecutter.use_langchain %}
 
-## Adding an AI Agent Tool (LangChain)
+ ## 添加 AI Agent 工具（LangChain）
 
 ```python
-# app/agents/langchain_assistant.py
-from langchain.tools import tool
-
-@tool
-def my_tool(param: str) -> dict:
-    """Tool description for LLM - be specific about what it does."""
-    result = some_operation(param)
-    return {"result": result}
+ # app/agents/langchain_assistant.py
+ from langchain.tools import tool
+ 
+ @tool
+ def my_tool(param: str) -> dict:
+     """LLM 使用的工具描述——具体说明其功能。"""
+     result = some_operation(param)
+     return {"result": result}
 ```
 {%- endif %}
 
-## Adding a Database Migration
+ ## 添加数据库迁移
 
 ```bash
-# Create migration
-uv run alembic revision --autogenerate -m "Add notifications table"
-
-# Apply migration
-uv run alembic upgrade head
-
-# Or use CLI
-uv run {{ cookiecutter.project_slug }} db migrate -m "Add notifications table"
-uv run {{ cookiecutter.project_slug }} db upgrade
+ # 创建迁移
+ uv run alembic revision --autogenerate -m "添加通知表"
+ 
+ # 应用迁移
+ uv run alembic upgrade head
+ 
+ # 或使用 CLI
+ uv run {{ cookiecutter.project_slug }} db migrate -m "添加通知表"
+ uv run {{ cookiecutter.project_slug }} db upgrade
 ```

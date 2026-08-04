@@ -1,13 +1,13 @@
 ---
 name: frontend-feature
-description: Build a new page, view, or data-driven feature in the Next.js frontend. Use when adding a route under the dashboard/marketing area, wiring UI to a backend endpoint, adding client state, or creating a localized page. Covers App Router, data fetching, Zustand stores, and i18n.
+description: 在 Next.js 前端中构建新页面、视图或数据驱动的功能. 在仪表盘/营销区域下添加路由时使用, wiring UI to a backend endpoint, adding client state, or creating a localized page. Covers App Router, data fetching, Zustand stores, and i18n.
 ---
 
-# Frontend Feature (Next.js 15 + React 19)
+# 前端功能（Next.js 15 + React 19）
 
 The frontend lives in `frontend/src/` — App Router, TypeScript, Tailwind, `next-intl`, and Zustand. Routes are **locale-prefixed**: `app/[locale]/…`.
 
-## Layout
+## 布局
 
 | Path | Purpose |
 |------|---------|
@@ -18,7 +18,7 @@ The frontend lives in `frontend/src/` — App Router, TypeScript, Tailwind, `nex
 | `src/stores/` | Zustand stores (one per concern, re-exported from `index.ts`) |
 | `src/hooks/` | `useChat`, `useWebSocket`, etc. |
 
-## Steps
+## 步骤
 
 1. **Page** — add `src/app/[locale]/(dashboard)/<feature>/page.tsx`. Default to a **Server Component**; add `"use client"` only where you need interactivity. Read params via the async App Router APIs.
 
@@ -39,7 +39,7 @@ The frontend lives in `frontend/src/` — App Router, TypeScript, Tailwind, `nex
    bun dev            # check the page renders against a running backend (make dev)
    ```
 
-## Rules
+## 规则
 
 - Server Components by default; `"use client"` only when needed (state, effects, event handlers).
 - All API calls go through `src/lib/` clients; components consume hooks/clients, not raw `fetch`.

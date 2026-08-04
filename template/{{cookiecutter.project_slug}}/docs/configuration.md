@@ -1,146 +1,143 @@
-# Configuration Reference
-
-All configuration is managed via environment variables, loaded from
-`backend/.env` using [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/).
-
-Settings are defined in `app/core/config.py` and accessed via the global
-`settings` object:
-
-```python
-from app.core.config import settings
-
-print(settings.AI_MODEL)
-print(settings.DEBUG)
-```
-
-## Getting Started
+ # 配置参考
+ 
+ 所有配置通过环境变量管理，从 `backend/.env` 加载，
+ 使用 [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/)。
+ 
+ 设置在 `app/core/config.py` 中定义，通过全局 `settings` 对象访问：
+ 
+ ```python
+ from app.core.config import settings
+ 
+ print(settings.AI_MODEL)
+ print(settings.DEBUG)
+ ```
+ 
+ ## 快速开始
 
 ```bash
 cd backend
 
-# Copy the example file (may already exist if generated with --generate-env)
-cp .env.example .env
-
-# Generate a secure secret key
-openssl rand -hex 32
-# Paste the output as SECRET_KEY in .env
+ # 复制示例文件（如果使用 --generate-env 生成则可能已存在）
+ cp .env.example .env
+ 
+ # 生成安全的密钥
+ openssl rand -hex 32
+ # 将输出粘贴到 .env 中的 SECRET_KEY
 ```
 
-## Project Settings
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PROJECT_NAME` | `{{ cookiecutter.project_name }}` | Display name for the project |
-| `API_V1_STR` | `/api/v1` | API version prefix |
-| `DEBUG` | `false` | Enable debug mode (verbose errors, auto-reload) |
-| `ENVIRONMENT` | `local` | One of: `development`, `local`, `staging`, `production` |
-| `TIMEZONE` | `{{ cookiecutter.timezone }}` | IANA timezone (e.g. `UTC`, `Europe/Warsaw`, `America/New_York`) |
-| `MODELS_CACHE_DIR` | `./models_cache` | Directory for cached ML models |
-| `MEDIA_DIR` | `./media` | Directory for uploaded files |
-| `MAX_UPLOAD_SIZE_MB` | `50` | Maximum file upload size in megabytes |
+ ## 项目设置
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `PROJECT_NAME` | `{{ cookiecutter.project_name }}` | 项目显示名称 |
+ | `API_V1_STR` | `/api/v1` | API 版本前缀 |
+ | `DEBUG` | `false` | 启用调试模式（详细错误、自动重载） |
+ | `ENVIRONMENT` | `local` | 可选值：`development`、`local`、`staging`、`production` |
+ | `TIMEZONE` | `{{ cookiecutter.timezone }}` | IANA 时区（例如 `UTC`、`Europe/Warsaw`、`America/New_York`） |
+ | `MODELS_CACHE_DIR` | `./models_cache` | 缓存 ML 模型的目录 |
+ | `MEDIA_DIR` | `./media` | 上传文件目录 |
+ | `MAX_UPLOAD_SIZE_MB` | `50` | 最大文件上传大小（MB） |
 
 {%- if cookiecutter.use_jwt %}
 
-## Authentication
-
-### JWT
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `SECRET_KEY` | (insecure default) | JWT signing key. **Must** be changed in production. Generate with: `openssl rand -hex 32` |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | `30` | Access token lifetime |
-| `REFRESH_TOKEN_EXPIRE_MINUTES` | `10080` | Refresh token lifetime (7 days) |
-| `ALGORITHM` | `HS256` | JWT signing algorithm |
-
-Production validation: `SECRET_KEY` must be at least 32 characters and cannot
-use the default value in `ENVIRONMENT=production`.
+ ## 认证
+ 
+ ### JWT
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `SECRET_KEY` |（不安全的默认值）| JWT 签名密钥。生产环境中**必须**更改。生成方式：`openssl rand -hex 32` |
+ | `ACCESS_TOKEN_EXPIRE_MINUTES` | `30` | 访问令牌有效期 |
+ | `REFRESH_TOKEN_EXPIRE_MINUTES` | `10080` | 刷新令牌有效期（7 天） |
+ | `ALGORITHM` | `HS256` | JWT 签名算法 |
+ 
+ 生产环境验证：`SECRET_KEY` 必须至少 32 个字符，且在 `ENVIRONMENT=production` 时不能使用默认值。
 {%- endif %}
 
 {%- if cookiecutter.use_api_key %}
 
-### API Key
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `API_KEY` | `change-me-in-production` | Shared API key for programmatic access |
-| `API_KEY_HEADER` | `X-API-Key` | HTTP header name for API key |
-
-Production validation: `API_KEY` cannot use the default value in
-`ENVIRONMENT=production`.
+ ### API 密钥
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `API_KEY` | `change-me-in-production` | 用于程序化访问的共享 API 密钥 |
+ | `API_KEY_HEADER` | `X-API-Key` | API 密钥的 HTTP 头名称 |
+ 
+ 生产环境验证：`ENVIRONMENT=production` 时，`API_KEY` 不能使用默认值。
 {%- endif %}
 
 {%- if cookiecutter.enable_oauth_google %}
 
-### OAuth2 (Google)
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `GOOGLE_CLIENT_ID` | (empty) | Google OAuth2 client ID |
-| `GOOGLE_CLIENT_SECRET` | (empty) | Google OAuth2 client secret |
-| `GOOGLE_REDIRECT_URI` | `http://localhost:{{ cookiecutter.backend_port }}/api/v1/oauth/google/callback` | OAuth2 callback URL |
-| `FRONTEND_URL` | `http://localhost:{{ cookiecutter.frontend_port }}` | Frontend URL for OAuth2 redirects |
+ ### OAuth2（Google）
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `GOOGLE_CLIENT_ID` |（空）| Google OAuth2 客户端 ID |
+ | `GOOGLE_CLIENT_SECRET` |（空）| Google OAuth2 客户端密钥 |
+ | `GOOGLE_REDIRECT_URI` | `http://localhost:{{ cookiecutter.backend_port }}/api/v1/oauth/google/callback` | OAuth2 回调 URL |
+ | `FRONTEND_URL` | `http://localhost:{{ cookiecutter.frontend_port }}` | 用于 OAuth2 重定向的前端 URL |
 {%- endif %}
 
 
-## Database (PostgreSQL)
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `POSTGRES_HOST` | `localhost` | PostgreSQL host |
-| `POSTGRES_PORT` | `5432` | PostgreSQL port |
-| `POSTGRES_USER` | `postgres` | PostgreSQL user |
-| `POSTGRES_PASSWORD` | (empty) | PostgreSQL password |
-| `POSTGRES_DB` | `{{ cookiecutter.project_slug }}` | Database name |
-| `DB_POOL_SIZE` | `{{ cookiecutter.db_pool_size }}` | Connection pool size |
-| `DB_MAX_OVERFLOW` | `{{ cookiecutter.db_max_overflow }}` | Max overflow connections |
-| `DB_POOL_TIMEOUT` | `{{ cookiecutter.db_pool_timeout }}` | Pool timeout in seconds |
-
-Computed properties:
-- `DATABASE_URL` -- async connection string (`postgresql+asyncpg://...`)
-- `DATABASE_URL_SYNC` -- sync connection string for Alembic
+ ## 数据库（PostgreSQL）
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `POSTGRES_HOST` | `localhost` | PostgreSQL 主机 |
+ | `POSTGRES_PORT` | `5432` | PostgreSQL 端口 |
+ | `POSTGRES_USER` | `postgres` | PostgreSQL 用户 |
+ | `POSTGRES_PASSWORD` |（空）| PostgreSQL 密码 |
+ | `POSTGRES_DB` | `{{ cookiecutter.project_slug }}` | 数据库名称 |
+ | `DB_POOL_SIZE` | `{{ cookiecutter.db_pool_size }}` | 连接池大小 |
+ | `DB_MAX_OVERFLOW` | `{{ cookiecutter.db_max_overflow }}` | 最大溢出连接数 |
+ | `DB_POOL_TIMEOUT` | `{{ cookiecutter.db_pool_timeout }}` | 连接池超时（秒） |
+ 
+ 计算属性：
+ - `DATABASE_URL` — 异步连接字符串（`postgresql+asyncpg://...`）
+ - `DATABASE_URL_SYNC` — 供 Alembic 使用的同步连接字符串
 
 
 
 {%- if cookiecutter.enable_redis %}
 
-## Redis
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `REDIS_HOST` | `localhost` | Redis host |
-| `REDIS_PORT` | `6379` | Redis port |
-| `REDIS_PASSWORD` | (none) | Redis password (optional) |
-| `REDIS_DB` | `0` | Redis database number |
+ ## Redis
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `REDIS_HOST` | `localhost` | Redis 主机 |
+ | `REDIS_PORT` | `6379` | Redis 端口 |
+ | `REDIS_PASSWORD` |（无）| Redis 密码（可选）|
+ | `REDIS_DB` | `0` | Redis 数据库编号 |
 {%- endif %}
 
-## AI Agent
-
-| Variable | Default | Description |
-|----------|---------|-------------|
+ ## AI Agent
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
 {%- if cookiecutter.use_openai %}
-| `OPENAI_API_KEY` | (empty) | OpenAI API key |
-| `AI_MODEL` | `gpt-5.5` | Default LLM model for chat |
+ | `OPENAI_API_KEY` |（空）| OpenAI API 密钥 |
+ | `AI_MODEL` | `gpt-5.5` | 聊天使用的默认 LLM 模型 |
 {%- endif %}
 {%- if cookiecutter.use_anthropic %}
-| `ANTHROPIC_API_KEY` | (empty) | Anthropic API key |
-| `AI_MODEL` | `claude-opus-4-7` | Default LLM model for chat |
+ | `ANTHROPIC_API_KEY` |（空）| Anthropic API 密钥 |
+ | `AI_MODEL` | `claude-opus-4-7` | 聊天使用的默认 LLM 模型 |
 {%- endif %}
 {%- if cookiecutter.use_google %}
-| `GOOGLE_API_KEY` | (empty) | Google AI API key |
-| `AI_MODEL` | `gemini-2.5-flash` | Default LLM model for chat |
+ | `GOOGLE_API_KEY` |（空）| Google AI API 密钥 |
+ | `AI_MODEL` | `gemini-2.5-flash` | 聊天使用的默认 LLM 模型 |
 {%- endif %}
 {%- if cookiecutter.use_openrouter %}
-| `OPENROUTER_API_KEY` | (empty) | OpenRouter API key |
-| `AI_MODEL` | `anthropic/claude-opus-4-7` | Default LLM model for chat |
+ | `OPENROUTER_API_KEY` |（空）| OpenRouter API 密钥 |
+ | `AI_MODEL` | `anthropic/claude-opus-4-7` | 聊天使用的默认 LLM 模型 |
 {%- endif %}
-| `AI_TEMPERATURE` | `0.7` | LLM temperature (0.0 = deterministic, 1.0 = creative) |
-| `AI_AVAILABLE_MODELS` | (auto-configured) | JSON list of models shown in the UI model selector |
-| `AI_FRAMEWORK` | `{{ cookiecutter.ai_framework }}` | AI framework (informational) |
-| `LLM_PROVIDER` | `{{ cookiecutter.llm_provider }}` | LLM provider (informational) |
+ | `AI_TEMPERATURE` | `0.7` | LLM 温度（0.0 = 确定性，1.0 = 创造性）|
+ | `AI_AVAILABLE_MODELS` |（自动配置）| UI 模型选择器中显示的模型 JSON 列表 |
+ | `AI_FRAMEWORK` | `{{ cookiecutter.ai_framework }}` | AI 框架（信息性）|
+ | `LLM_PROVIDER` | `{{ cookiecutter.llm_provider }}` | LLM 提供商（信息性）|
 
-### Customizing Available Models
-
-Override `AI_AVAILABLE_MODELS` in `.env` to customize the model selector:
+ ### 自定义可用模型
+ 
+ 覆盖 `.env` 中的 `AI_AVAILABLE_MODELS` 以自定义模型选择器：
 
 ```bash
 AI_AVAILABLE_MODELS=["gpt-5.5","gpt-5.4","claude-opus-4-7"]
@@ -152,9 +149,9 @@ AI_AVAILABLE_MODELS=["gpt-5.5","gpt-5.4","claude-opus-4-7"]
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LOGFIRE_TOKEN` | (none) | Pydantic Logfire token. Get one at https://logfire.pydantic.dev |
-| `LOGFIRE_SERVICE_NAME` | `{{ cookiecutter.project_slug }}` | Service name in Logfire dashboard |
-| `LOGFIRE_ENVIRONMENT` | `development` | Environment tag |
+ | `LOGFIRE_TOKEN` |（无）| Pydantic Logfire 令牌。在 https://logfire.pydantic.dev 获取 |
+ | `LOGFIRE_SERVICE_NAME` | `{{ cookiecutter.project_slug }}` | Logfire 仪表盘中的服务名称 |
+ | `LOGFIRE_ENVIRONMENT` | `development` | 环境标签 |
 {%- endif %}
 
 {%- if cookiecutter.enable_langsmith %}
@@ -163,10 +160,10 @@ AI_AVAILABLE_MODELS=["gpt-5.5","gpt-5.4","claude-opus-4-7"]
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LANGCHAIN_TRACING_V2` | `true` | Enable LangSmith tracing |
-| `LANGCHAIN_API_KEY` | (none) | LangSmith API key. Get one at https://smith.langchain.com |
-| `LANGCHAIN_PROJECT` | `{{ cookiecutter.project_slug }}` | Project name in LangSmith |
-| `LANGCHAIN_ENDPOINT` | `https://api.smith.langchain.com` | LangSmith API endpoint |
+ | `LANGCHAIN_TRACING_V2` | `true` | 启用 LangSmith 追踪 |
+ | `LANGCHAIN_API_KEY` |（无）| LangSmith API 密钥。在 https://smith.langchain.com 获取 |
+ | `LANGCHAIN_PROJECT` | `{{ cookiecutter.project_slug }}` | LangSmith 中的项目名称 |
+ | `LANGCHAIN_ENDPOINT` | `https://api.smith.langchain.com` | LangSmith API 端点 |
 {%- endif %}
 
 {%- if cookiecutter.enable_web_search %}
@@ -175,94 +172,93 @@ AI_AVAILABLE_MODELS=["gpt-5.5","gpt-5.4","claude-opus-4-7"]
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `TAVILY_API_KEY` | (empty) | Tavily API key for web search tool. Get one at https://tavily.com |
+ | `TAVILY_API_KEY` |（空）| 用于网页搜索工具的 Tavily API 密钥。在 https://tavily.com 获取 |
 {%- endif %}
 
 {%- if cookiecutter.use_deepagents %}
 
-## DeepAgents
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DEEPAGENTS_BACKEND_TYPE` | `state` | Backend: `state` (in-memory, ephemeral) |
-| `DEEPAGENTS_MEMORY_PATHS` | (none) | Comma-separated AGENTS.md memory file paths loaded at agent startup |
-| `DEEPAGENTS_SKILLS_PATHS` | (none) | Comma-separated paths to skill directories |
-| `DEEPAGENTS_ENABLE_FILESYSTEM` | `true` | Enable filesystem tools (ls, read, write, edit, glob, grep) |
-| `DEEPAGENTS_ENABLE_EXECUTE` | `false` | Enable shell execution (disabled by default for security) |
-| `DEEPAGENTS_ENABLE_TODOS` | `true` | Enable write_todos tool |
-| `DEEPAGENTS_ENABLE_SUBAGENTS` | `true` | Enable task tool for spawning subagents |
-| `DEEPAGENTS_INTERRUPT_TOOLS` | (none) | Tools requiring human approval (comma-separated, or `"all"`) |
-| `DEEPAGENTS_ALLOWED_DECISIONS` | `approve,edit,reject` | Allowed decisions for interrupted tools |
+ ## DeepAgents
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `DEEPAGENTS_BACKEND_TYPE` | `state` | 后端：`state`（内存中、临时）|
+ | `DEEPAGENTS_MEMORY_PATHS` |（无）| Agent 启动时加载的逗号分隔的 AGENTS.md 记忆文件路径 |
+ | `DEEPAGENTS_SKILLS_PATHS` |（无）| 逗号分隔的技能目录路径 |
+ | `DEEPAGENTS_ENABLE_FILESYSTEM` | `true` | 启用文件系统工具（ls、read、write、edit、glob、grep）|
+ | `DEEPAGENTS_ENABLE_EXECUTE` | `false` | 启用 Shell 执行（出于安全默认禁用）|
+ | `DEEPAGENTS_ENABLE_TODOS` | `true` | 启用 write_todos 工具 |
+ | `DEEPAGENTS_ENABLE_SUBAGENTS` | `true` | 启用生成子 Agent 的任务工具 |
+ | `DEEPAGENTS_INTERRUPT_TOOLS` |（无）| 需要人工批准的工具（逗号分隔，或 `"all"`）|
+ | `DEEPAGENTS_ALLOWED_DECISIONS` | `approve,edit,reject` | 中断工具的允许决策 |
 {%- endif %}
 
 {%- if cookiecutter.enable_rag %}
 
-## RAG (Retrieval Augmented Generation)
-
-### Vector Database
+ ## RAG（检索增强生成）
+ 
+ ### 向量数据库
 
 {%- if cookiecutter.use_milvus %}
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MILVUS_HOST` | `localhost` | Milvus host |
-| `MILVUS_PORT` | `19530` | Milvus port |
-| `MILVUS_DATABASE` | `default` | Milvus database name |
-| `MILVUS_TOKEN` | `root:Milvus` | Milvus authentication token |
+ | `MILVUS_HOST` | `localhost` | Milvus 主机 |
+ | `MILVUS_PORT` | `19530` | Milvus 端口 |
+ | `MILVUS_DATABASE` | `default` | Milvus 数据库名称 |
+ | `MILVUS_TOKEN` | `root:Milvus` | Milvus 认证令牌 |
 {%- endif %}
 
 {%- if cookiecutter.use_qdrant %}
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `QDRANT_HOST` | `localhost` | Qdrant host |
-| `QDRANT_PORT` | `6333` | Qdrant port |
-| `QDRANT_API_KEY` | (empty) | Qdrant API key (optional) |
+ | `QDRANT_HOST` | `localhost` | Qdrant 主机 |
+ | `QDRANT_PORT` | `6333` | Qdrant 端口 |
+ | `QDRANT_API_KEY` |（空）| Qdrant API 密钥（可选）|
 {%- endif %}
 
 {%- if cookiecutter.use_chromadb %}
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CHROMA_HOST` | (empty) | ChromaDB host. Leave empty for embedded/persistent mode. |
-| `CHROMA_PORT` | `8100` | ChromaDB port (when using client-server mode) |
-| `CHROMA_PERSIST_DIR` | `./chroma_data` | Data directory for embedded mode |
+ | `CHROMA_HOST` |（空）| ChromaDB 主机。留空使用嵌入式/持久化模式。|
+ | `CHROMA_PORT` | `8100` | ChromaDB 端口（使用客户端-服务器模式时）|
+ | `CHROMA_PERSIST_DIR` | `./chroma_data` | 嵌入式模式的数据目录 |
 {%- endif %}
 
 {%- if cookiecutter.use_pgvector %}
 
-pgvector uses the existing PostgreSQL connection. No additional configuration
-is needed.
+ pgvector 使用现有的 PostgreSQL 连接。无需额外配置。
 {%- endif %}
 
-### Embeddings
-
-| Variable | Default | Description |
-|----------|---------|-------------|
+ ### 嵌入
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
 {%- if cookiecutter.use_openai_embeddings %}
-| `EMBEDDING_MODEL` | `text-embedding-3-small` | OpenAI embedding model |
+ | `EMBEDDING_MODEL` | `text-embedding-3-small` | OpenAI 嵌入模型 |
 {%- elif cookiecutter.use_voyage_embeddings %}
-| `EMBEDDING_MODEL` | `voyage-3` | Voyage AI embedding model |
-| `VOYAGE_API_KEY` | (empty) | Voyage AI API key |
+ | `EMBEDDING_MODEL` | `voyage-3` | Voyage AI 嵌入模型 |
+ | `VOYAGE_API_KEY` |（空）| Voyage AI API 密钥 |
 {%- elif cookiecutter.use_gemini_embeddings %}
-| `EMBEDDING_MODEL` | `gemini-embedding-exp-03-07` | Google Gemini embedding model |
+ | `EMBEDDING_MODEL` | `gemini-embedding-exp-03-07` | Google Gemini 嵌入模型 |
 {%- elif cookiecutter.use_sentence_transformers %}
-| `EMBEDDING_MODEL` | `all-MiniLM-L6-v2` | Sentence Transformers model (runs locally) |
+ | `EMBEDDING_MODEL` | `all-MiniLM-L6-v2` | Sentence Transformers 模型（本地运行）|
 {%- else %}
-| `EMBEDDING_MODEL` | `text-embedding-3-small` | Embedding model |
+ | `EMBEDDING_MODEL` | `text-embedding-3-small` | 嵌入模型 |
 {%- endif %}
 
-### Chunking & Retrieval
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `RAG_CHUNK_SIZE` | `512` | Maximum characters per chunk |
-| `RAG_CHUNK_OVERLAP` | `50` | Characters of overlap between chunks |
-| `RAG_CHUNKING_STRATEGY` | `recursive` | Chunking strategy: `recursive`, `markdown`, `fixed` |
-| `RAG_DEFAULT_COLLECTION` | `documents` | Default collection for search (used by agent tool) |
-| `RAG_TOP_K` | `10` | Default number of results to return |
-| `RAG_HYBRID_SEARCH` | `false` | Enable BM25 + vector hybrid search |
-| `RAG_ENABLE_OCR` | `false` | OCR fallback for scanned PDFs (requires `tesseract-ocr`) |
+ ### 分块与检索
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `RAG_CHUNK_SIZE` | `512` | 每个块的最大字符数 |
+ | `RAG_CHUNK_OVERLAP` | `50` | 块之间的重叠字符数 |
+ | `RAG_CHUNKING_STRATEGY` | `recursive` | 分块策略：`recursive`、`markdown`、`fixed` |
+ | `RAG_DEFAULT_COLLECTION` | `documents` | 搜索默认集合（由 Agent 工具使用）|
+ | `RAG_TOP_K` | `10` | 返回结果的默认数量 |
+ | `RAG_HYBRID_SEARCH` | `false` | 启用 BM25 + 向量混合搜索 |
+ | `RAG_ENABLE_OCR` | `false` | 扫描 PDF 的 OCR 回退（需要 `tesseract-ocr`）|
 
 ### Document Parsing
 
@@ -270,16 +266,16 @@ is needed.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PDF_PARSER` | `pymupdf` | PDF parser for RAG ingestion: `pymupdf`, `llamaparse`, `liteparse` |
-| `CHAT_PDF_PARSER` | `pymupdf` | PDF parser for chat file uploads: `pymupdf`, `llamaparse`, `liteparse` |
-| `LLAMAPARSE_API_KEY` | (empty) | LlamaParse API key (required for `llamaparse` parser) |
-| `LLAMAPARSE_TIER` | `agentic` | LlamaParse tier: `fast`, `cost_effective`, `agentic`, `agentic_plus` |
+ | `PDF_PARSER` | `pymupdf` | RAG 摄取的 PDF 解析器：`pymupdf`、`llamaparse`、`liteparse` |
+ | `CHAT_PDF_PARSER` | `pymupdf` | 聊天文件上传的 PDF 解析器：`pymupdf`、`llamaparse`、`liteparse` |
+ | `LLAMAPARSE_API_KEY` |（空）| LlamaParse API 密钥（`llamaparse` 解析器必需）|
+ | `LLAMAPARSE_TIER` | `agentic` | LlamaParse 层级：`fast`、`cost_effective`、`agentic`、`agentic_plus` |
 {%- elif cookiecutter.use_llamaparse %}
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LLAMAPARSE_API_KEY` | (empty) | LlamaParse API key |
-| `LLAMAPARSE_TIER` | `agentic` | LlamaParse tier: `fast`, `cost_effective`, `agentic`, `agentic_plus` |
+ | `LLAMAPARSE_API_KEY` |（空）| LlamaParse API 密钥 |
+ | `LLAMAPARSE_TIER` | `agentic` | LlamaParse 层级：`fast`、`cost_effective`、`agentic`、`agentic_plus` |
 {%- endif %}
 
 {%- if cookiecutter.enable_reranker %}
@@ -290,15 +286,15 @@ is needed.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `COHERE_API_KEY` | (empty) | Cohere API key for reranking |
+ | `COHERE_API_KEY` |（空）| 用于重排的 Cohere API 密钥 |
 {%- endif %}
 
 {%- if cookiecutter.use_cross_encoder_reranker %}
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `HF_TOKEN` | (empty) | HuggingFace token (for gated models) |
-| `CROSS_ENCODER_MODEL` | `cross-encoder/ms-marco-MiniLM-L6-v2` | Cross-encoder model for reranking |
+ | `HF_TOKEN` |（空）| HuggingFace 令牌（用于受限模型）|
+ | `CROSS_ENCODER_MODEL` | `cross-encoder/ms-marco-MiniLM-L6-v2` | 用于重排的交叉编码器模型 |
 {%- endif %}
 {%- endif %}
 
@@ -308,7 +304,7 @@ is needed.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `RAG_IMAGE_DESCRIPTION_MODEL` | (empty, uses `AI_MODEL`) | LLM model for describing images found in documents |
+ | `RAG_IMAGE_DESCRIPTION_MODEL` |（空，使用 `AI_MODEL`）| 用于描述文档中图片的 LLM 模型 |
 {%- endif %}
 
 {%- if cookiecutter.enable_google_drive_ingestion %}
@@ -317,7 +313,7 @@ is needed.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `GOOGLE_DRIVE_CREDENTIALS_FILE` | `credentials/google-drive-sa.json` | Path to Google service account credentials |
+ | `GOOGLE_DRIVE_CREDENTIALS_FILE` | `credentials/google-drive-sa.json` | Google 服务账号凭据文件路径 |
 {%- endif %}
 
 {%- if cookiecutter.enable_s3_ingestion %}
@@ -326,87 +322,86 @@ is needed.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `S3_RAG_ENDPOINT` | (none) | S3/MinIO endpoint URL |
-| `S3_RAG_ACCESS_KEY` | (empty) | Access key |
-| `S3_RAG_SECRET_KEY` | (empty) | Secret key |
-| `S3_RAG_BUCKET` | `{{ cookiecutter.project_slug }}-rag` | Bucket name |
-| `S3_RAG_REGION` | `us-east-1` | AWS region |
+ | `S3_RAG_ENDPOINT` |（无）| S3/MinIO 端点 URL |
+ | `S3_RAG_ACCESS_KEY` |（空）| 访问密钥 |
+ | `S3_RAG_SECRET_KEY` |（空）| 秘密密钥 |
+ | `S3_RAG_BUCKET` | `{{ cookiecutter.project_slug }}-rag` | Bucket 名称 |
+ | `S3_RAG_REGION` | `us-east-1` | AWS 区域 |
 {%- endif %}
 {%- endif %}
 
 {%- if cookiecutter.use_telegram or cookiecutter.use_slack %}
 
-## Messaging Channels
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CHANNEL_ENCRYPTION_KEY` | (empty) | Fernet key for encrypting bot tokens and sync-source connector credentials at rest. Generate with: `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` |
+ ## 消息渠道
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `CHANNEL_ENCRYPTION_KEY` |（空）| 用于加密机器人令牌和同步源连接器凭据的 Fernet 密钥。生成方式：`python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` |
 {%- if cookiecutter.use_telegram %}
-| `TELEGRAM_WEBHOOK_BASE_URL` | (empty) | Base URL for Telegram webhook (e.g. `https://yourdomain.com`). Required only in webhook mode |
+ | `TELEGRAM_WEBHOOK_BASE_URL` |（空）| Telegram Webhook 的基础 URL（例如 `https://yourdomain.com`）。仅在 Webhook 模式下需要 |
 {%- endif %}
 {%- if cookiecutter.use_slack %}
-| `SLACK_SIGNING_SECRET` | (empty) | Slack app signing secret for Events API signature verification |
-| `SLACK_BOT_TOKEN` | (empty) | Slack bot OAuth token (`xoxb-...`) for sending messages via Web API |
-| `SLACK_APP_TOKEN` | (empty) | Slack app-level token (`xapp-...`) for Socket Mode (development only) |
+ | `SLACK_SIGNING_SECRET` |（空）| Slack 应用签名密钥，用于 Events API 签名验证 |
+ | `SLACK_BOT_TOKEN` |（空）| Slack 机器人 OAuth 令牌（`xoxb-...`），用于通过 Web API 发送消息 |
+ | `SLACK_APP_TOKEN` |（空）| Slack 应用级令牌（`xapp-...`），用于 Socket 模式（仅开发）|
 {%- endif %}
 
 {%- endif %}
 
 {%- if cookiecutter.use_celery %}
 
-## Celery
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CELERY_BROKER_URL` | `redis://localhost:6379/0` | Celery broker URL |
-| `CELERY_RESULT_BACKEND` | `redis://localhost:6379/0` | Celery result backend URL |
+ ## Celery
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `CELERY_BROKER_URL` | `redis://localhost:6379/0` | Celery 消息代理 URL |
+ | `CELERY_RESULT_BACKEND` | `redis://localhost:6379/0` | Celery 结果后端 URL |
 {%- endif %}
 
 {%- if cookiecutter.use_taskiq %}
 
-## Taskiq
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `TASKIQ_BROKER_URL` | `redis://localhost:6379/1` | Taskiq broker URL |
-| `TASKIQ_RESULT_BACKEND` | `redis://localhost:6379/1` | Taskiq result backend URL |
+ ## Taskiq
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `TASKIQ_BROKER_URL` | `redis://localhost:6379/1` | Taskiq 消息代理 URL |
+ | `TASKIQ_RESULT_BACKEND` | `redis://localhost:6379/1` | Taskiq 结果后端 URL |
 {%- endif %}
 
 {%- if cookiecutter.use_arq %}
 
-## ARQ (Async Redis Queue)
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `ARQ_REDIS_HOST` | `localhost` | Redis host for ARQ |
-| `ARQ_REDIS_PORT` | `6379` | Redis port for ARQ |
-| `ARQ_REDIS_PASSWORD` | (none) | Redis password for ARQ |
-| `ARQ_REDIS_DB` | `2` | Redis database number for ARQ |
+ ## ARQ（异步 Redis 队列）
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `ARQ_REDIS_HOST` | `localhost` | ARQ 的 Redis 主机 |
+ | `ARQ_REDIS_PORT` | `6379` | ARQ 的 Redis 端口 |
+ | `ARQ_REDIS_PASSWORD` |（无）| ARQ 的 Redis 密码 |
+ | `ARQ_REDIS_DB` | `2` | ARQ 的 Redis 数据库编号 |
 {%- endif %}
 
 {%- if cookiecutter.enable_cors %}
 
-## CORS
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `CORS_ORIGINS` | `["http://localhost:3000","http://localhost:8080"]` | Allowed origins (JSON array) |
-| `CORS_ALLOW_CREDENTIALS` | `true` | Allow credentials (cookies) |
-| `CORS_ALLOW_METHODS` | `["*"]` | Allowed HTTP methods |
-| `CORS_ALLOW_HEADERS` | `["*"]` | Allowed HTTP headers |
-
-Production validation: `CORS_ORIGINS` cannot contain `"*"` in
-`ENVIRONMENT=production`.
+ ## CORS
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `CORS_ORIGINS` | `["http://localhost:3000","http://localhost:8080"]` | 允许的来源（JSON 数组）|
+ | `CORS_ALLOW_CREDENTIALS` | `true` | 允许凭据（Cookie）|
+ | `CORS_ALLOW_METHODS` | `["*"]` | 允许的 HTTP 方法 |
+ | `CORS_ALLOW_HEADERS` | `["*"]` | 允许的 HTTP 头 |
+ 
+ 生产环境验证：`ENVIRONMENT=production` 时，`CORS_ORIGINS` 不能包含 `"*"`。
 {%- endif %}
 
 {%- if cookiecutter.enable_rate_limiting %}
 
-## Rate Limiting
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `RATE_LIMIT_REQUESTS` | `{{ cookiecutter.rate_limit_requests }}` | Maximum requests per period |
-| `RATE_LIMIT_PERIOD` | `{{ cookiecutter.rate_limit_period }}` | Period in seconds |
+ ## 限流
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `RATE_LIMIT_REQUESTS` | `{{ cookiecutter.rate_limit_requests }}` | 每周期最大请求数 |
+ | `RATE_LIMIT_PERIOD` | `{{ cookiecutter.rate_limit_period }}` | 周期（秒）|
 {%- endif %}
 
 {%- if cookiecutter.enable_sentry %}
@@ -415,7 +410,7 @@ Production validation: `CORS_ORIGINS` cannot contain `"*"` in
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `SENTRY_DSN` | (none) | Sentry DSN for error tracking |
+ | `SENTRY_DSN` |（无）| 用于错误追踪的 Sentry DSN |
 {%- endif %}
 
 {%- if cookiecutter.enable_prometheus %}
@@ -424,68 +419,68 @@ Production validation: `CORS_ORIGINS` cannot contain `"*"` in
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PROMETHEUS_METRICS_PATH` | `/metrics` | Metrics endpoint path |
-| `PROMETHEUS_INCLUDE_IN_SCHEMA` | `false` | Include metrics endpoint in OpenAPI schema |
+ | `PROMETHEUS_METRICS_PATH` | `/metrics` | 指标端点路径 |
+ | `PROMETHEUS_INCLUDE_IN_SCHEMA` | `false` | 在 OpenAPI 模式中包含指标端点 |
 {%- endif %}
 
 {%- if cookiecutter.enable_file_storage %}
 
-## File Storage (S3/MinIO)
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `S3_ENDPOINT` | (none) | S3/MinIO endpoint URL |
-| `S3_ACCESS_KEY` | (empty) | Access key |
-| `S3_SECRET_KEY` | (empty) | Secret key |
-| `S3_BUCKET` | `{{ cookiecutter.project_slug }}` | Bucket name |
-| `S3_REGION` | `us-east-1` | AWS region |
+ ## 文件存储（S3/MinIO）
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `S3_ENDPOINT` |（无）| S3/MinIO 端点 URL |
+ | `S3_ACCESS_KEY` |（空）| 访问密钥 |
+ | `S3_SECRET_KEY` |（空）| 秘密密钥 |
+ | `S3_BUCKET` | `{{ cookiecutter.project_slug }}` | Bucket 名称 |
+ | `S3_REGION` | `us-east-1` | AWS 区域 |
 {%- endif %}
 
 {%- if cookiecutter.enable_docker %}
 
-## Docker / Production
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DOMAIN` | `example.com` | Production domain (for Traefik) |
-| `ACME_EMAIL` | `admin@example.com` | Let's Encrypt email for SSL certs |
+ ## Docker / 生产环境
+ 
+ | 变量 | 默认值 | 说明 |
+ |----------|---------|-------------|
+ | `DOMAIN` | `example.com` | 生产环境域名（用于 Traefik）|
+ | `ACME_EMAIL` | `admin@example.com` | Let's Encrypt 用于 SSL 证书的邮箱 |
 {%- if cookiecutter.enable_redis %}
-| `REDIS_PASSWORD` | `change-me-in-production` | Redis password for production |
+ | `REDIS_PASSWORD` | `change-me-in-production` | 生产环境的 Redis 密码 |
 {%- endif %}
 {%- if cookiecutter.use_celery %}
-| `FLOWER_USER` | `admin` | Flower monitoring UI username |
-| `FLOWER_PASSWORD` | `change-me-in-production` | Flower monitoring UI password |
+ | `FLOWER_USER` | `admin` | Flower 监控 UI 用户名 |
+ | `FLOWER_PASSWORD` | `change-me-in-production` | Flower 监控 UI 密码 |
 {%- endif %}
 {%- endif %}
 
-## Production Checklist
-
-Before deploying to production, ensure these variables are properly set:
+ ## 生产环境检查清单
+ 
+ 部署到生产环境前，确保以下变量已正确设置：
 
 {%- if cookiecutter.use_jwt %}
-1. `SECRET_KEY` -- Generate a unique 64-character hex key: `openssl rand -hex 32`
+ 1. `SECRET_KEY` — 生成唯一的 64 字符十六进制密钥：`openssl rand -hex 32`
 {%- endif %}
 {%- if cookiecutter.use_api_key %}
-2. `API_KEY` -- Generate a unique key: `openssl rand -hex 32`
+ 2. `API_KEY` — 生成唯一密钥：`openssl rand -hex 32`
 {%- endif %}
-3. `ENVIRONMENT` -- Set to `production`
-4. `DEBUG` -- Set to `false`
-5. `POSTGRES_PASSWORD` -- Use a strong, unique password
+ 3. `ENVIRONMENT` — 设置为 `production`
+ 4. `DEBUG` — 设置为 `false`
+ 5. `POSTGRES_PASSWORD` — 使用强唯一密码
 {%- if cookiecutter.enable_cors %}
-6. `CORS_ORIGINS` -- List only your actual frontend domain(s)
+ 6. `CORS_ORIGINS` — 仅列出你实际的前端域名
 {%- endif %}
 {%- if cookiecutter.enable_redis %}
-7. `REDIS_PASSWORD` -- Set a strong password
+ 7. `REDIS_PASSWORD` — 设置强密码
 {%- endif %}
 {%- if cookiecutter.use_openai %}
-8. `OPENAI_API_KEY` -- Your production API key
+ 8. `OPENAI_API_KEY` — 你的生产环境 API 密钥
 {%- endif %}
 {%- if cookiecutter.use_anthropic %}
-8. `ANTHROPIC_API_KEY` -- Your production API key
+ 8. `ANTHROPIC_API_KEY` — 你的生产环境 API 密钥
 {%- endif %}
 {%- if cookiecutter.use_google %}
-8. `GOOGLE_API_KEY` -- Your production API key
+ 8. `GOOGLE_API_KEY` — 你的生产环境 API 密钥
 {%- endif %}
 {%- if cookiecutter.use_openrouter %}
-8. `OPENROUTER_API_KEY` -- Your production API key
+ 8. `OPENROUTER_API_KEY` — 你的生产环境 API 密钥
 {%- endif %}

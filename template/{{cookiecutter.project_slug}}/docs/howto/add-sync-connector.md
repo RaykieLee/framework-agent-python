@@ -1,5 +1,5 @@
 {%- if cookiecutter.enable_rag %}
-# How to: Add a New Sync Connector
+# 如何：添加新的同步连接器
 
 ## Architecture
 
@@ -25,12 +25,12 @@ Sync connectors are pluggable adapters that fetch files from external systems
 5. The ingestion pipeline parses, chunks, embeds, and stores each file
 6. A **SyncLog** entry records the result
 
-## Step-by-Step: Notion Connector
+### 分步指南: Notion Connector
 
 This example implements a Notion connector that fetches pages from a Notion
 workspace.
 
-### 1. Create the connector file
+### 1. 创建连接器文件
 
 ```python
 # app/services/rag/connectors/notion.py
@@ -158,7 +158,7 @@ class NotionConnector(BaseSyncConnector):
             return False, f"Cannot connect to Notion: {e}"
 ```
 
-### 2. Register in CONNECTOR_REGISTRY
+### 2. 在 CONNECTOR_REGISTRY 中注册
 
 Edit `app/services/rag/connectors/__init__.py` and add:
 
@@ -168,7 +168,7 @@ from app.services.rag.connectors.notion import NotionConnector
 CONNECTOR_REGISTRY["notion"] = NotionConnector
 ```
 
-### 3. Add dependency (if needed)
+### 3. 添加依赖（如果需要）
 
 If the connector requires a third-party package, add it to `pyproject.toml`:
 
@@ -176,7 +176,7 @@ If the connector requires a third-party package, add it to `pyproject.toml`:
 uv add notion-client
 ```
 
-### 4. Test via CLI
+### 4. 通过 CLI 测试
 
 ```bash
 # Create a sync source and trigger sync
@@ -186,7 +186,7 @@ uv run {{ cookiecutter.project_slug }} cmd rag-sync \
     --collection knowledge-base
 ```
 
-### 5. Test via API
+### 5. 通过 API 测试
 
 ```bash
 # Create sync source
@@ -213,7 +213,7 @@ curl http://localhost:{{ cookiecutter.backend_port }}/api/v1/rag/sync/logs \
     -H "Authorization: Bearer $TOKEN"
 ```
 
-## CONFIG_SCHEMA Reference
+## CONFIG_SCHEMA 参考
 
 The `CONFIG_SCHEMA` class variable defines the connector's configuration
 fields. The frontend reads this schema from the
@@ -262,7 +262,7 @@ CONFIG_SCHEMA: ClassVar[dict[str, dict[str, Any]]] = {
 }
 ```
 
-## Tips
+### 提示
 
 - Set `RemoteFile.source_path` to a unique URI (e.g., `notion://page_id`) — this is used for deduplication across syncs
 - Use `asyncio.to_thread()` to wrap blocking SDK calls so they don't block the event loop

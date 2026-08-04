@@ -1,11 +1,11 @@
 [project]
-name = "fastapi-fullstack"
+name = "framework-agent-python"
 version = "0.2.17"
-description = "Full-stack FastAPI + Next.js template generator with PydanticAI/LangChain agents, WebSocket streaming, 20+ enterprise integrations, and Logfire/LangSmith observability. Ship AI apps fast. CLI tool to generate production-ready FastAPI + Next.js projects with AI agents, auth, and observability."
+description = "Agent scaffolding framework for FastAPI + Next.js — internal AI agent project generator."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "MIT" }
-authors = [{ name = "Vstorm", email = "hr@vstorm.co" }]
+license = { text = "Proprietary" }
+authors = [{ name = "Company", email = "dev@company.com" }]
 keywords = [
     "fastapi",
     "nextjs",
@@ -78,12 +78,12 @@ docs = [
 ]
 
 [project.scripts]
-fastapi-fullstack = "fastapi_gen.cli:main"
+framework-agent-python = "fastapi_gen.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/vstorm-co/full-stack-ai-agent-template"
-Documentation = "https://github.com/vstorm-co/full-stack-ai-agent-template#readme"
-Repository = "https://github.com/vstorm-co/full-stack-ai-agent-template"
+Homepage = "https://git.company.com/framework-agent-python"
+Documentation = "https://git.company.com/framework-agent-python#readme"
+Repository = "https://git.company.com/framework-agent-python"
 
 [build-system]
 requires = ["hatchling"]

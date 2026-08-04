@@ -1,19 +1,19 @@
 ---
 name: pytest-suite
-description: Write or extend the backend test suite following this project's conventions. Use when adding tests for a new service/route/repository, when coverage is missing, or when asked to test a feature. Knows the mocked-session + httpx AsyncClient setup so tests run with no database.
+description: 编写或扩展后端测试套件 following this project's conventions. 在为新的服务/路由/仓库添加测试时使用, when coverage is missing, or when asked to test a feature. Knows the mocked-session + httpx AsyncClient setup so tests run with no database.
 ---
 
-# Backend Tests (pytest + anyio)
+# 后端测试（pytest + anyio）
 
 Tests live in `backend/tests/`, mirror the source layout (`app/services/user.py` → `tests/services/test_user.py`), and run with **no real database** — `conftest.py` overrides `get_db_session` with an `AsyncMock` via FastAPI `dependency_overrides`.
 
-## Key fixtures (`tests/conftest.py`)
+## 关键夹具 (`tests/conftest.py`)
 
 - `client` — `httpx.AsyncClient` over `ASGITransport(app=app)` (use this, **not** Starlette `TestClient`)
 - `mock_db_session` — `AsyncMock` standing in for `AsyncSession`
 - `mock_redis` (when Redis is enabled), `api_key_headers` (when API keys are enabled)
 
-## Patterns
+## 模式
 
 **Async tests** use anyio, not `@pytest.mark.asyncio`:
 ```python
@@ -39,14 +39,14 @@ async def test_create_user_returns_201(client: AsyncClient):
     assert resp.status_code == 201
 ```
 
-## Naming & rules
+## 命名与规则
 
 - `test_<action>_<scenario>_<expected_result>` (e.g. `test_create_user_with_duplicate_email_raises_already_exists_error`)
 - One behavior per test; plain `assert` (pytest rewrites it)
 - Use factory fixtures for data, not raw dicts; each test independent
 - Clear `app.dependency_overrides` after the test (the `client` fixture already does this for the DB/Redis overrides)
 
-## Run
+## 运行
 
 ```bash
 cd backend && uv run pytest                 # all

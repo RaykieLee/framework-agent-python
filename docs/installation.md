@@ -5,30 +5,30 @@
 - Python 3.11+
 - [uv](https://docs.astral.sh/uv/) (recommended) or pip
 
-## Install fastapi-fullstack
+## Install framework-agent-python
 
 === "uv (recommended)"
 
     ```bash
-    uv tool install fastapi-fullstack
+    uv tool install framework-agent-python
     ```
 
 === "pip"
 
     ```bash
-    pip install fastapi-fullstack
+    pip install framework-agent-python
     ```
 
 === "pipx"
 
     ```bash
-    pipx install fastapi-fullstack
+    pipx install framework-agent-python
     ```
 
 ## Verify Installation
 
 ```bash
-fastapi-fullstack --version
+framework-agent-python --version
 ```
 
 ## Create Your First Project
@@ -37,7 +37,7 @@ Generate the project, then bring the whole backend up with a single command:
 
 ```bash
 # 1. Generate your project — just answer the wizard's prompts
-fastapi-fullstack
+framework-agent-python
 
 # 2. Backend + PostgreSQL up, migrations applied, default admin seeded
 cd my_app
@@ -55,13 +55,13 @@ That's it — backend at <http://localhost:8000>, API docs at `/docs`, frontend 
 
 ```bash
 # Non-interactive with explicit options
-fastapi-fullstack create my_app --database postgresql --frontend nextjs
+framework-agent-python create my_app --database postgresql --frontend nextjs
 
-# Presets (run `fastapi-fullstack templates` for the full list)
-fastapi-fullstack create my_app --preset ai-agent
+# Presets (run `framework-agent-python templates` for the full list)
+framework-agent-python create my_app --preset ai-agent
 
 # Bare-bones project
-fastapi-fullstack create my_app --minimal
+framework-agent-python create my_app --minimal
 ```
 
 ## Available Presets

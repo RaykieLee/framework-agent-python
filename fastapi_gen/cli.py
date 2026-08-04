@@ -1,4 +1,4 @@
-"""CLI interface for Full-Stack AI Agent Template Generator."""
+"""?? AI Agent ?????? CLI ???"""
 
 import subprocess
 from pathlib import Path
@@ -75,36 +75,36 @@ def _preflight_check(  # noqa: C901
     if billing and not teams:
         issues.append(
             (
-                "--billing requires --teams (Stripe subscriptions are scoped to organizations)",
-                "Add --teams or remove --billing",
+                "--billing ?? --teams?Stripe ????????",
+                "?? --teams ??? --billing",
             )
         )
     if credits and not billing:
         issues.append(
             (
-                "--credits requires --billing (credits are tied to Stripe pricing)",
-                "Add --billing --teams (or drop --credits)",
+                "--credits ?? --billing???? Stripe ?????",
+                "?? --billing --teams???? --credits?",
             )
         )
     if usage_dashboard and not credits:
         issues.append(
             (
-                "--usage-dashboard requires --credits (it visualises credit consumption)",
-                "Add --credits --billing --teams",
+                "--usage-dashboard ?? --credits??????????",
+                "?? --credits --billing --teams",
             )
         )
     if anomaly_detection and not credits:
         issues.append(
             (
-                "--anomaly-detection requires --credits (it flags credit-spend anomalies)",
-                "Add --credits --billing --teams",
+                "--anomaly-detection ?? --credits???????????",
+                "?? --credits --billing --teams",
             )
         )
     if slack_alerts and not anomaly_detection:
         issues.append(
             (
-                "--slack-alerts requires --anomaly-detection (alerts ride on detected anomalies)",
-                "Add --anomaly-detection --credits --billing --teams",
+                "--slack-alerts ?? --anomaly-detection????????????",
+                "?? --anomaly-detection --credits --billing --teams",
             )
         )
 
@@ -112,8 +112,8 @@ def _preflight_check(  # noqa: C901
     if newsletter and not email:
         issues.append(
             (
-                "--newsletter requires --email (signup confirmation needs a transactional sender)",
-                "Add --email or drop --newsletter",
+                "--newsletter ?? --email???????????????",
+                "?? --email ??? --newsletter",
             )
         )
 
@@ -121,29 +121,29 @@ def _preflight_check(  # noqa: C901
     if rag and database == "none":
         issues.append(
             (
-                "--rag requires a database (RAGDocument table stores per-doc metadata)",
-                "Pick --database postgresql",
+                "--rag ??????RAGDocument ?????????",
+                "?? --database postgresql",
             )
         )
     if rag and vector_store == "pgvector" and database != "postgresql":
         issues.append(
             (
                 f"--vector-store=pgvector requires --database=postgresql, got {database}",
-                "Switch to --database postgresql or pick --vector-store milvus|qdrant|chromadb",
+                "??? --database postgresql ??? --vector-store milvus|qdrant|chromadb",
             )
         )
     if gdrive_rag and not rag:
         issues.append(
             (
-                "--gdrive-rag requires --rag (Drive sync feeds the vector store)",
-                "Add --rag",
+                "--gdrive-rag ?? --rag?Drive ?????????????",
+                "?? --rag",
             )
         )
     if s3_rag and not rag:
         issues.append(
             (
-                "--s3-rag requires --rag (S3 sync feeds the vector store)",
-                "Add --rag",
+                "--s3-rag ?? --rag?S3 ?????????????",
+                "?? --rag",
             )
         )
 
@@ -151,15 +151,15 @@ def _preflight_check(  # noqa: C901
     if marketing_site and frontend == "none":
         issues.append(
             (
-                "--marketing-site requires --frontend nextjs (landing/blog/legal pages need a UI)",
-                "Add --frontend nextjs or drop --marketing-site",
+                "--marketing-site ?? --frontend nextjs????/??/?????? UI?",
+                "?? --frontend nextjs ??? --marketing-site",
             )
         )
     if demo_export and frontend == "none":
         issues.append(
             (
-                "--demo-export requires --frontend nextjs (it bundles the real replay UI into the HTML)",
-                "Add --frontend nextjs or drop --demo-export",
+                "--demo-export ?? --frontend nextjs??????? UI ??? HTML ??",
+                "?? --frontend nextjs ??? --demo-export",
             )
         )
     if admin_panel and frontend == "none":
@@ -175,8 +175,8 @@ def _preflight_check(  # noqa: C901
     if oauth_google and frontend == "none":
         issues.append(
             (
-                "--oauth-google needs the frontend callback page",
-                "Add --frontend nextjs or drop --oauth-google",
+                "--oauth-google ?????????",
+                "?? --frontend nextjs ??? --oauth-google",
             )
         )
 
@@ -191,8 +191,8 @@ def _preflight_check(  # noqa: C901
     if caching and not redis:
         issues.append(
             (
-                "--caching requires --redis (cache backend)",
-                "Add --redis or drop --caching",
+                "--caching ?? --redis??????",
+                "?? --redis ??? --caching",
             )
         )
 
@@ -202,7 +202,7 @@ def _preflight_check(  # noqa: C901
         click.echo(
             click.style(
                 "⚠ --llm-provider=all is most useful with the chat UI provider switcher; "
-                "without --frontend you'll need to pick the model server-side per-request.",
+                "?? --frontend ??'ll need to pick the model server-side per-request.",
                 fg="yellow",
             ),
             err=True,
@@ -221,11 +221,11 @@ def _preflight_check(  # noqa: C901
     ]
     for i, (problem, fix) in enumerate(issues, 1):
         msg_lines.append(click.style(f"  {i}. {problem}", fg="red"))
-        msg_lines.append(click.style(f"     Quick fix: {fix}", fg="yellow"))
+        msg_lines.append(click.style(f"     ????? {fix}", fg="yellow"))
         msg_lines.append("")
     msg_lines.append(
         click.style(
-            "Run `fastapi-fullstack templates` to see preset shortcuts for common scenarios.",
+            "?? `fastapi-fullstack templates` ??????????????",
             fg="cyan",
         )
     )
@@ -236,10 +236,10 @@ def _preflight_check(  # noqa: C901
 @click.version_option(version=__version__, prog_name="fastapi-fullstack")
 @click.pass_context
 def cli(ctx: click.Context) -> None:
-    """Full-Stack AI Agent Template Generator.
+    """?? AI Agent ??????
 
-    Generate production-ready FastAPI + Next.js projects with AI agents,
-    WebSocket streaming, 20+ enterprise integrations, and observability.
+    ??????? FastAPI + Next.js ????? AI Agent?
+    WebSocket ?????20+ ???????????
     """
     if ctx.invoked_subcommand is None:
         ctx.invoke(new)
@@ -251,15 +251,15 @@ def cli(ctx: click.Context) -> None:
     "--output",
     type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
     default=None,
-    help="Output directory for the generated project",
+    help="?????????",
 )
 @click.option(
     "--no-input",
     is_flag=True,
     default=False,
-    help="Use default values without prompts",
+    help="??????????",
 )
-@click.option("--name", type=str, help="Project name (for --no-input mode)")
+@click.option("--name", type=str, help="??????? --no-input ???")
 @click.option(
     "--minimal",
     is_flag=True,
@@ -267,7 +267,7 @@ def cli(ctx: click.Context) -> None:
     help="Skip wizard — ask only for project name and use minimal defaults (PostgreSQL, no Docker/Redis/CI)",
 )
 def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) -> None:
-    """Create a new FastAPI project interactively."""
+    """??????? FastAPI ???"""
     try:
         if no_input or minimal:
             if not name:
@@ -276,10 +276,10 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
 
                     name = questionary.text(
                         "Project name:",
-                        validate=lambda v: bool(v) or "Name cannot be empty",
+                        validate=lambda v: bool(v) or "名称不能为空",
                     ).ask()
                     if not name:
-                        console.print("\n[yellow]Cancelled.[/]")
+                        console.print("\n[yellow]????[/]")
                         return
                 else:
                     console.print("[red]Error:[/] --name is required when using --no-input")
@@ -300,8 +300,8 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
                     background_tasks=BackgroundTaskType.NONE,
                     ci_type=CIType.NONE,
                 )
-                console.print(f"[cyan]Creating minimal project:[/] {name}")
-                console.print("[dim]PostgreSQL · no Docker · no Redis · no CI[/]")
+                console.print(f"[cyan]??????????[/] {name}")
+                console.print("[dim]PostgreSQL · ? Docker · ? Redis · ? CI[/]")
                 console.print()
             else:
                 config = ProjectConfig(project_name=name, background_tasks=BackgroundTaskType.NONE)
@@ -310,14 +310,14 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
             show_summary(config)
 
             if not confirm_generation():
-                console.print("[yellow]Project generation cancelled.[/]")
+                console.print("[yellow]????????[/]")
                 return
 
         project_path = generate_project(config, output)
         post_generation_tasks(project_path, config)
 
     except KeyboardInterrupt:
-        console.print("\n[yellow]Cancelled.[/]")
+        console.print("\n[yellow]????[/]")
         raise SystemExit(0) from None
     except Exception as e:
         console.print(f"[red]Error:[/] {e}")
@@ -331,41 +331,41 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
     "--output",
     type=click.Path(exists=True, file_okay=False, dir_okay=True, path_type=Path),
     default=None,
-    help="Output directory",
+    help="????",
 )
 @click.option(
     "--database",
     type=click.Choice(["postgresql"]),
     default="postgresql",
-    help="Database type",
+    help="?????",
 )
 @click.option(
     "--orm",
     type=click.Choice(["sqlalchemy", "sqlmodel"]),
     default="sqlalchemy",
-    help="ORM library (sqlalchemy or sqlmodel)",
+    help="ORM ??sqlalchemy ? sqlmodel?",
 )
-@click.option("--no-logfire", is_flag=True, help="Disable Logfire integration")
-@click.option("--no-docker", is_flag=True, help="Disable Docker files")
-@click.option("--no-env", is_flag=True, help="Skip .env file generation")
-@click.option("--minimal", is_flag=True, help="Create minimal project (no extras)")
+@click.option("--no-logfire", is_flag=True, help="?? Logfire ??")
+@click.option("--no-docker", is_flag=True, help="?? Docker ??")
+@click.option("--no-env", is_flag=True, help="?? .env ????")
+@click.option("--minimal", is_flag=True, help="??????????????")
 @click.option(
     "--frontend",
     type=click.Choice(["none", "nextjs"]),
     default="none",
-    help="Frontend framework",
+    help="????",
 )
 @click.option(
     "--backend-port",
     type=int,
     default=8000,
-    help="Backend server port (default: 8000)",
+    help="???????????8000?",
 )
 @click.option(
     "--frontend-port",
     type=int,
     default=3000,
-    help="Frontend server port (default: 3000)",
+    help="???????????3000?",
 )
 @click.option(
     "--timezone",
@@ -377,13 +377,13 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
     "--db-pool-size",
     type=int,
     default=5,
-    help="Database connection pool size (default: 5)",
+    help="????????????5?",
 )
 @click.option(
     "--db-max-overflow",
     type=int,
     default=10,
-    help="Database max overflow connections (default: 10)",
+    help="??????????????10?",
 )
 @click.option(
     "--ai-framework",
@@ -391,7 +391,7 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
         ["none", "pydantic_ai", "langchain", "langgraph", "deepagents", "pydantic_deep"]
     ),
     default="pydantic_ai",
-    help="AI framework (default: pydantic_ai). Use 'none' for plain SaaS without AI/chat.",
+    help="AI ??????pydantic_ai???? none ??? SaaS?? AI/???",
 )
 @click.option(
     "--llm-provider",
@@ -402,10 +402,10 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
         "pick the model at runtime. openrouter requires pydantic_ai."
     ),
 )
-@click.option("--redis", is_flag=True, help="Enable Redis")
-@click.option("--caching", is_flag=True, help="Enable caching (requires --redis)")
-@click.option("--rate-limiting", is_flag=True, help="Enable rate limiting")
-@click.option("--admin-panel", is_flag=True, help="Enable admin panel (SQLAdmin)")
+@click.option("--redis", is_flag=True, help="?? Redis")
+@click.option("--caching", is_flag=True, help="??????? --redis?")
+@click.option("--rate-limiting", is_flag=True, help="????")
+@click.option("--admin-panel", is_flag=True, help="???????SQLAdmin?")
 @click.option(
     "--admin-features",
     type=str,
@@ -420,9 +420,9 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
     "--task-queue",
     type=click.Choice(["none", "celery", "taskiq", "arq"]),
     default="none",
-    help="Background task queue",
+    help="??????",
 )
-@click.option("--oauth-google", is_flag=True, help="Enable Google OAuth")
+@click.option("--oauth-google", is_flag=True, help="?? Google OAuth")
 @click.option(
     "--auth-mode",
     type=click.Choice(["local", "delegated"]),
@@ -457,75 +457,75 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
     "--websockets",
     is_flag=True,
     default=False,
-    help="Enable WebSocket support (required for real-time AI chat)",
+    help="?? WebSocket ????? AI ?????",
 )
 @click.option(
     "--web-search",
     is_flag=True,
     default=False,
-    help="Enable web search tool for AI agents (Tavily)",
+    help="?? AI Agent ? Web ?????Tavily?",
 )
 @click.option(
-    "--web-fetch", is_flag=True, default=False, help="Enable web fetch/scraping tool for AI agents"
+    "--web-fetch", is_flag=True, default=False, help="?? AI Agent ? Web ????"
 )
 @click.option(
     "--charts",
     is_flag=True,
     default=False,
-    help="Enable the chart-generation tool for AI agents (line/bar/pie/area/scatter)",
+    help="?? AI Agent ???????????/???/??/???/????",
 )
 @click.option(
     "--code-execution",
     is_flag=True,
     default=False,
-    help="Enable the run_python code-execution tool backed by the Monty sandbox (PydanticAI only)",
+    help="???? Monty ??? run_python ???????? PydanticAI?",
 )
 @click.option(
     "--skills",
     is_flag=True,
     default=False,
-    help="Enable the skills system (SkillsToolset loads SKILL.md files from backend/skills/, PydanticAI only)",
+    help="???????SkillsToolset ? backend/skills/ ?? SKILL.md ???? PydanticAI?",
 )
 @click.option(
     "--deep-research",
     is_flag=True,
     default=False,
-    help="Enable the deep research agent (TODO planner + subagents + context manager, PydanticAI only)",
+    help="?????? Agent?TODO ??? + ? Agent + ???????? PydanticAI?",
 )
 @click.option(
     "--mcp-client",
     is_flag=True,
     default=False,
-    help="Enable the MCP client — connect external MCP servers as agent tools (PydanticAI only)",
+    help="?? MCP ????????? MCP ????? Agent ???? PydanticAI?",
 )
-@click.option("--session-management", is_flag=True, help="Enable session management")
+@click.option("--session-management", is_flag=True, help="??????")
 @click.option(
     "--reverse-proxy",
     type=click.Choice(["none", "nginx", "traefik"]),
     default="nginx",
-    help="Reverse proxy configuration (default: nginx — external nginx, config template only)",
+    help="??????????nginx???? nginx???????",
 )
-@click.option("--kubernetes", is_flag=True, help="Generate Kubernetes manifests")
+@click.option("--kubernetes", is_flag=True, help="?? Kubernetes ??")
 @click.option(
     "--ci",
     type=click.Choice(["github", "gitlab", "none"]),
     default="github",
-    help="CI/CD system",
+    help="CI/CD ??",
 )
-@click.option("--sentry", is_flag=True, help="Enable Sentry error tracking")
-@click.option("--prometheus", is_flag=True, help="Enable Prometheus metrics")
-@click.option("--file-storage", is_flag=True, help="Enable S3/MinIO file storage")
-@click.option("--webhooks", is_flag=True, help="Enable webhooks support")
+@click.option("--sentry", is_flag=True, help="?? Sentry ????")
+@click.option("--prometheus", is_flag=True, help="?? Prometheus ??")
+@click.option("--file-storage", is_flag=True, help="?? S3/MinIO ????")
+@click.option("--webhooks", is_flag=True, help="?? Webhooks ??")
 @click.option(
     "--langsmith",
     is_flag=True,
-    help="Enable LangSmith observability (LangChain/LangGraph/DeepAgents)",
+    help="?? LangSmith ?????LangChain/LangGraph/DeepAgents?",
 )
 @click.option(
     "--python-version",
     type=click.Choice(["3.11", "3.12", "3.13"]),
     default="3.12",
-    help="Python version",
+    help="Python ??",
 )
 @click.option(
     "--preset",
@@ -543,115 +543,115 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
         ]
     ),
     default=None,
-    help=("Apply configuration preset. Run `fastapi-fullstack templates` for full descriptions."),
+    help=("????????? `fastapi-fullstack templates` ???????"),
 )
 @click.option(
     "--rag",
     is_flag=True,
     default=False,
-    help="Enable RAG feature.",
+    help="?? RAG ???",
 )
 @click.option(
     "--vector-store",
     type=click.Choice(["milvus", "qdrant", "chromadb", "pgvector"]),
     default="milvus",
-    help="Vector store backend (default: milvus)",
+    help="???????????milvus?",
 )
 @click.option(
     "--gdrive-rag",
     is_flag=True,
     default=False,
-    help="Use Google Drive for document ingestion",
+    help="?? Google Drive ??????",
 )
 @click.option(
     "--s3-rag",
     is_flag=True,
     default=False,
-    help="Use S3/MinIO for document ingestion",
+    help="?? S3/MinIO ??????",
 )
 @click.option(
     "--reranker",
     type=click.Choice(["none", "cohere", "cross_encoder"]),
     default="none",
-    help="Choose reranking logic.",
+    help="????????",
 )
 @click.option(
     "--pdf-parser",
     type=click.Choice(["pymupdf", "liteparse", "llamaparse", "all"]),
     default="pymupdf",
-    help="PDF parser (pymupdf=local, liteparse=local AI, llamaparse=cloud, all=runtime selection)",
+    help="PDF ????pymupdf=???liteparse=?? AI?llamaparse=???all=??????",
 )
-@click.option("--telegram", is_flag=True, default=False, help="Enable Telegram notifications")
-@click.option("--slack", is_flag=True, default=False, help="Enable Slack notifications")
-@click.option("--teams", is_flag=True, default=False, help="Enable Teams/organizations feature")
+@click.option("--telegram", is_flag=True, default=False, help="?? Telegram ??")
+@click.option("--slack", is_flag=True, default=False, help="?? Slack ??")
+@click.option("--teams", is_flag=True, default=False, help="????/????")
 @click.option(
-    "--billing", is_flag=True, default=False, help="Enable Stripe billing (requires --teams)"
+    "--billing", is_flag=True, default=False, help="?? Stripe ????? --teams?"
 )
 @click.option(
     "--credits",
     is_flag=True,
     default=False,
-    help="Enable credits system (requires --billing)",
+    help="????????? --billing?",
 )
 @click.option(
     "--usage-dashboard",
     is_flag=True,
     default=False,
-    help="Enable usage dashboard (requires --credits)",
+    help="?????????? --credits?",
 )
 @click.option(
     "--anomaly-detection",
     is_flag=True,
     default=False,
-    help="Enable usage anomaly detection (requires --credits)",
+    help="??????????? --credits?",
 )
 @click.option(
     "--slack-alerts",
     is_flag=True,
     default=False,
-    help="Enable Slack alerts for anomalies (requires --anomaly-detection)",
+    help="?? Slack ??????? --anomaly-detection?",
 )
 @click.option(
     "--billing-currency",
     type=str,
     default="usd",
-    help="Default billing currency (default: usd)",
+    help="??????????usd?",
 )
 @click.option(
     "--trial-days",
     type=int,
     default=14,
-    help="Free trial length in days (default: 14)",
+    help="??????????14?",
 )
 @click.option(
     "--trial-requires-card/--no-trial-requires-card",
     default=True,
-    help="Require a payment card to start a trial (default: yes; pass --no-trial-requires-card to allow card-free trials)",
+    help="??????????????????? --no-trial-requires-card ???????",
 )
-@click.option("--email", is_flag=True, default=False, help="Enable transactional email")
+@click.option("--email", is_flag=True, default=False, help="??????")
 @click.option(
     "--email-provider",
     type=click.Choice(["resend", "smtp", "log"]),
     default="log",
-    help="Email provider (default: log — prints to console)",
+    help="?????????log?????????",
 )
 @click.option(
     "--newsletter",
     is_flag=True,
     default=False,
-    help="Enable newsletter signup (requires --email)",
+    help="??????????? --email?",
 )
 @click.option(
     "--marketing-site",
     is_flag=True,
     default=False,
-    help="Generate marketing/landing pages",
+    help="????/????",
 )
 @click.option(
     "--demo-export",
     is_flag=True,
     default=False,
-    help="Self-contained HTML demo export (Vite bundle + exporter script; requires --frontend)",
+    help="??? HTML ?????Vite ?? + ??????? --frontend?",
 )
 @click.option(
     "--i18n/--no-i18n",
@@ -670,17 +670,17 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
         "Requires --database postgresql."
     ),
 )
-@click.option("--changelog", is_flag=True, default=False, help="Generate changelog page")
-@click.option("--testimonials", is_flag=True, default=False, help="Generate testimonials section")
+@click.option("--changelog", is_flag=True, default=False, help="????????")
+@click.option("--testimonials", is_flag=True, default=False, help="????????")
 @click.option(
     "--comparison-pages",
     is_flag=True,
     default=False,
-    help="Generate competitor comparison pages",
+    help="????????",
 )
-@click.option("--affiliate", is_flag=True, default=False, help="Generate affiliate program pages")
+@click.option("--affiliate", is_flag=True, default=False, help="????????")
 @click.option(
-    "--status-badge", is_flag=True, default=False, help="Add status/uptime badge to frontend"
+    "--status-badge", is_flag=True, default=False, help="???????/??????"
 )
 @click.option(
     "--allowed-email-domains",
@@ -695,7 +695,7 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
     "--seed-admin-email",
     type=str,
     default="",
-    help="Email to auto-promote to app-admin on first startup (written to .env as FIRST_ADMIN_EMAIL).",
+    help="????????????????????? .env ?? FIRST_ADMIN_EMAIL??",
 )
 @click.option(
     "--embed-allowed-origins",
@@ -710,43 +710,43 @@ def new(output: Path | None, no_input: bool, name: str | None, minimal: bool) ->
     "--brand-from-config",
     is_flag=True,
     default=False,
-    help="Load brand color/logo from BRAND_COLOR/BRAND_LOGO_URL env vars at runtime (white-label).",
+    help="???? BRAND_COLOR/BRAND_LOGO_URL ??????????/???????",
 )
 @click.option(
     "--newsletter-provider",
     type=click.Choice(["resend", "mailchimp", "convertkit"]),
     default="resend",
-    help="Newsletter/audience provider when --newsletter is set (default: resend).",
+    help="?? --newsletter ?????????????resend??",
 )
 @click.option(
     "--tenancy",
     type=click.Choice(["single", "multi_org", "platform"]),
     default="single",
-    help="Tenancy architecture: single (default), multi_org (requires --teams), platform.",
+    help="??????single?????multi_org??? --teams??platform?",
 )
 @click.option(
     "--per-org-quotas",
     is_flag=True,
     default=False,
-    help="Enable per-organisation usage quotas (requires --teams).",
+    help="???????????? --teams??",
 )
 @click.option(
     "--payment-provider",
     type=click.Choice(["stripe", "paddle", "lemonsqueezy", "polar"]),
     default="stripe",
-    help="Payment processor (default: stripe — only Stripe is fully implemented).",
+    help="?????????stripe??? Stripe ??????",
 )
 @click.option(
     "--billing-model",
     type=click.Choice(["subscription", "usage", "hybrid", "one_time"]),
     default="subscription",
-    help="Billing model (default: subscription — hybrid = base plan + credits).",
+    help="????????subscription??hybrid = ???? + ????",
 )
 @click.option(
     "--storybook",
     is_flag=True,
     default=False,
-    help="Generate Storybook setup for frontend components.",
+    help="??????? Storybook ???",
 )
 def create(
     name: str,
@@ -835,7 +835,7 @@ def create(
     billing_model: str,
     storybook: bool,
 ) -> None:
-    """Create a new FastAPI project with specified options.
+    """?????????? FastAPI ???
 
     NAME is the project name (e.g., my_project)
     """
@@ -1259,10 +1259,10 @@ def create(
                 enable_storybook=storybook,
             )
 
-        console.print(f"[cyan]Creating project:[/] {name}")
+        console.print(f"[cyan]???????[/] {name}")
         if preset:
-            console.print(f"[dim]Preset: {preset}[/]")
-        console.print(f"[dim]Database: {config.database.value}[/]")
+            console.print(f"[dim]??? {preset}[/]")
+        console.print(f"[dim]???? {config.database.value}[/]")
         console.print("[dim]Auth: JWT + API Key[/]")
         if config.frontend != FrontendType.NONE:
             console.print(f"[dim]Frontend: {config.frontend.value}[/]")
@@ -1280,7 +1280,7 @@ def create(
         post_generation_tasks(project_path, config)
 
     except ValueError as e:
-        console.print(f"[red]Invalid configuration:[/] {e}")
+        console.print(f"[red]?????[/] {e}")
         raise SystemExit(1) from None
     except Exception as e:
         console.print(f"[red]Error:[/] {e}")
@@ -1289,188 +1289,188 @@ def create(
 
 @cli.command()
 def templates() -> None:
-    """List available template options."""
-    console.print("[bold cyan]Full-Stack AI Agent Template — Available Options[/]")
+    """??????????"""
+    console.print("[bold cyan]?? AI Agent ????????[/]")
     console.print()
 
     console.print("[bold]Presets:[/]")
-    console.print("  --preset production       Full production setup (Redis, Sentry, K8s, etc.)")
+    console.print("  --preset production       ?????????Redis?Sentry?K8s ??")
     console.print(
-        "  --preset ai-agent         AI agent with WebSocket streaming + conversation persistence"
+        "  --preset ai-agent         AI Agent + WebSocket ???? + ?????"
     )
     console.print(
-        "  --preset production-saas  Full SaaS: Stripe billing + credits + teams + admin + email + Sentry + K8s"
+        "  --preset production-saas  ?? SaaS?Stripe ?? + ?? + ?? + ?? + ?? + Sentry + K8s"
     )
     console.print(
-        "  --preset b2b-multi-tenant Workspaces + billing + credits + usage dashboard (no marketing pages)"
+        "  --preset b2b-multi-tenant  ???? + ?? + ?? + ????????????"
     )
     console.print(
-        "  --preset internal-tool    Staff dashboard: Google SSO + teams + admin, no billing/marketing"
+        "  --preset internal-tool     ??????Google SSO + ?? + ??????/??"
     )
     console.print(
-        "  --preset embedded-chatbot Chat widget for embed in client's site (no marketing/teams/billing)"
+        "  --preset embedded-chatbot ??????????????'s site (no marketing/teams/billing)"
     )
     console.print(
-        "  --preset blog-saas        Content-first SaaS: marketing + blog + changelog + newsletter (minimal AI)"
+        "  --preset blog-saas         ???? SaaS??? + ?? + ???? + ???????? AI?"
     )
-    console.print("  --preset consumer-app     B2C app: OAuth + marketing + billing + credits")
+    console.print("  --preset consumer-app      B2C ???OAuth + ?? + ?? + ??")
     console.print(
-        "  --preset dev-playground   Local AI prototyping: PostgreSQL + no Docker/K8s, fast iteration"
+        "  --preset dev-playground    ?? AI ?????PostgreSQL + ? Docker/K8s?????"
     )
     console.print(
-        "  --minimal                 Minimal project (PostgreSQL, no Docker/K8s/CI, no Redis)"
+        "  --minimal                  ??????PostgreSQL?? Docker/K8s/CI?? Redis?"
     )
     console.print()
 
-    console.print("[bold]Database:[/]")
-    console.print("  --database postgresql  PostgreSQL with asyncpg (async, default)")
-    console.print("  --orm sqlalchemy       SQLAlchemy (default)")
+    console.print("[bold]????[/]")
+    console.print("  --database postgresql  ?? asyncpg ? PostgreSQL???????")
+    console.print("  --orm sqlalchemy       SQLAlchemy????")
     console.print("  --orm sqlmodel         SQLModel")
     console.print()
 
     console.print("[bold]Authentication (always included):[/]")
-    console.print("  JWT + User Management (email/password, roles, profiles)")
-    console.print("  API Key utility (X-API-Key header, available for custom use)")
-    console.print("  --oauth-google                 Enable Google OAuth")
-    console.print("  --session-management           Enable session management")
+    console.print("  JWT + ???????/???????????")
+    console.print("  API Key ???X-API-Key ???????????")
+    console.print("  --oauth-google                 ?? Google OAuth")
+    console.print("  --session-management           ??????")
     console.print(
-        "  --auth-mode local              Default: backend handles email/password + OAuth"
+        "  --auth-mode local              ?????????/?? + OAuth"
     )
     console.print(
-        "  --auth-mode delegated          Trust JWTs from external IdP (Auth0/Clerk/Cognito/Keycloak)"
+        "  --auth-mode delegated          ???? IdP ??? JWT?Auth0/Clerk/Cognito/Keycloak?"
     )
     console.print(
-        "  --shared-secret-jwt            With delegated: use HMAC shared secret instead of JWKS"
+        "  --shared-secret-jwt            ? delegated ?????? HMAC ?????? JWKS"
     )
     console.print(
-        "  --external-user-id             With delegated: store IdP sub on Conversation rows"
+        "  --external-user-id             ? delegated ????? Conversation ???? IdP sub"
     )
     console.print()
 
     console.print("[bold]AI Agent:[/]")
     console.print(
-        "  --ai-framework none             No AI — plain SaaS (removes agents/chat/conversations)"
+        "  --ai-framework none             ? AI??? SaaS??? agents/chat/conversations?"
     )
-    console.print("  --ai-framework pydantic_ai      PydanticAI (recommended)")
+    console.print("  --ai-framework pydantic_ai      PydanticAI????")
     console.print("  --ai-framework langchain        LangChain")
-    console.print("  --ai-framework langgraph        LangGraph (ReAct agent)")
-    console.print("  --ai-framework deepagents       DeepAgents (agentic coding, HITL)")
+    console.print("  --ai-framework langgraph        LangGraph?ReAct Agent?")
+    console.print("  --ai-framework deepagents       DeepAgents??? Agent??????")
     console.print(
-        "  --ai-framework pydantic_deep    PydanticDeep (deep agentic coding, Docker sandbox)"
+        "  --ai-framework pydantic_deep    PydanticDeep????? Agent?Docker ???"
     )
-    console.print("  --llm-provider openai           OpenAI (gpt-5.5)")
-    console.print("  --llm-provider anthropic        Anthropic (claude-opus-4-7)")
-    console.print("  --llm-provider google           Google Gemini (gemini-2.5-flash)")
-    console.print("  --llm-provider openrouter       OpenRouter (pydantic_ai only)")
+    console.print("  --llm-provider openai           OpenAI")
+    console.print("  --llm-provider anthropic        Anthropic")
+    console.print("  --llm-provider google           Google Gemini")
+    console.print("  --llm-provider openrouter       OpenRouter?? pydantic_ai?")
     console.print(
-        "  --websockets                    Enable WebSocket support (real-time chat streaming)"
+        "  --websockets                    ?? WebSocket ????????????"
     )
-    console.print("  --web-search                    Enable web search tool for AI agents (Tavily)")
-    console.print("  --web-fetch                     Enable web fetch/scraping tool for AI agents")
+    console.print("  --web-search                    ?? AI Agent ? Web ?????Tavily?")
+    console.print("  --web-fetch                     ?? AI Agent ? Web ????")
     console.print()
 
     console.print("[bold]Background Tasks:[/]")
-    console.print("  --task-queue none      FastAPI BackgroundTasks only")
-    console.print("  --task-queue celery    Celery (classic)")
-    console.print("  --task-queue taskiq    Taskiq (async-native)")
-    console.print("  --task-queue arq       ARQ (lightweight)")
+    console.print("  --task-queue none      ? FastAPI BackgroundTasks")
+    console.print("  --task-queue celery    Celery????")
+    console.print("  --task-queue taskiq    Taskiq??????")
+    console.print("  --task-queue arq       ARQ?????")
     console.print()
 
     console.print("[bold]Frontend:[/]")
-    console.print("  --frontend none        API only (no frontend)")
-    console.print("  --frontend nextjs      Next.js 15 (App Router, TypeScript, Bun, i18n)")
+    console.print("  --frontend none        ? API?????")
+    console.print("  --frontend nextjs      Next.js 15?App Router?TypeScript?Bun?????")
     console.print(
-        "  --no-i18n              Single-language English-only frontend (no locale switcher)"
+        "  --no-i18n              ????????????????"
     )
     console.print(
-        "  --marketing-site       Generate marketing/landing pages (blog, pricing, legal)"
+        "  --marketing-site       ????/???? (blog, pricing, legal)"
     )
-    console.print("  --changelog            Generate changelog page")
+    console.print("  --changelog            ????????")
     console.print()
 
     console.print("[bold]RAG (Retrieval Augmented Generation):[/]")
-    console.print("  --rag                               Enable RAG")
-    console.print("  --vector-store milvus|qdrant|chromadb|pgvector  Vector store backend")
-    console.print("  --gdrive-rag                        Enable Google Drive ingestion")
-    console.print("  --s3-rag                            Enable S3/MinIO ingestion")
-    console.print("  --reranker none|cohere|cross_encoder Reranker logic")
-    console.print("  --pdf-parser pymupdf|liteparse|llamaparse  PDF parser")
+    console.print("  --rag                               ?? RAG")
+    console.print("  --vector-store milvus|qdrant|chromadb|pgvector  ???????")
+    console.print("  --gdrive-rag                        ?? Google Drive ????")
+    console.print("  --s3-rag                            ?? S3/MinIO ????")
+    console.print("  --reranker none|cohere|cross_encoder  ?????")
+    console.print("  --pdf-parser pymupdf|liteparse|llamaparse  PDF ???")
     console.print()
 
     console.print("[bold]Integrations:[/]")
-    console.print("  --redis            Enable Redis")
-    console.print("  --caching          Enable caching (requires --redis)")
-    console.print("  --rate-limiting    Enable rate limiting")
-    console.print("  --admin-panel      Enable admin panel (SQLAdmin)")
+    console.print("  --redis            ?? Redis")
+    console.print("  --caching          ??????? --redis?")
+    console.print("  --rate-limiting    ????")
+    console.print("  --admin-panel      ???????SQLAdmin?")
     console.print("  --admin-features users,orgs,subs,usage,events,audit,health")
-    console.print("                     Select which admin panel sections to enable (default: all)")
-    console.print("  --file-storage     Enable S3/MinIO file storage")
-    console.print("  --webhooks         Enable webhooks support")
-    console.print("  --telegram         Enable Telegram bot integration")
-    console.print("  --slack            Enable Slack app integration")
+    console.print("                     ???????????????????")
+    console.print("  --file-storage     ?? S3/MinIO ????")
+    console.print("  --webhooks         ?? Webhooks ??")
+    console.print("  --telegram         ?? Telegram ?????")
+    console.print("  --slack            ?? Slack ????")
     console.print()
 
     console.print("[bold]Authentication:[/]")
     console.print("  --allowed-email-domains example.com,acme.com")
-    console.print("                     Restrict OAuth registration to specific email domains")
+    console.print("                     ?? OAuth ?????????")
     console.print("  --seed-admin-email admin@example.com")
-    console.print("                     Auto-promote this address to app-admin on first startup")
+    console.print("                     ??????????????????")
     console.print()
 
     console.print("[bold]Teams & Billing:[/]")
-    console.print("  --teams            Enable multi-tenant organizations")
-    console.print("  --tenancy single|multi_org|platform  Tenancy architecture (default: single)")
-    console.print("  --billing          Enable billing (requires --teams)")
-    console.print("  --payment-provider stripe|paddle|lemonsqueezy|polar  (default: stripe)")
-    console.print("  --billing-model subscription|usage|hybrid|one_time  (default: subscription)")
-    console.print("  --credits          Enable credits system (requires --billing)")
-    console.print("  --per-org-quotas   Enable per-organisation usage quotas (requires --teams)")
-    console.print("  --usage-dashboard  Enable usage dashboard (requires --credits)")
-    console.print("  --email            Enable transactional email")
-    console.print("  --email-provider resend|smtp|log  Email provider (default: log)")
-    console.print("  --newsletter       Enable newsletter signup (requires --email)")
-    console.print("  --newsletter-provider resend|mailchimp|convertkit  (default: resend)")
+    console.print("  --teams            ???????")
+    console.print("  --tenancy single|multi_org|platform  ?????????single?")
+    console.print("  --billing          ??????? --teams?")
+    console.print("  --payment-provider stripe|paddle|lemonsqueezy|polar????stripe?")
+    console.print("  --billing-model subscription|usage|hybrid|one_time????subscription?")
+    console.print("  --credits          ????????? --billing?")
+    console.print("  --per-org-quotas   ???????????? --teams?")
+    console.print("  --usage-dashboard  ?????????? --credits?")
+    console.print("  --email            ??????")
+    console.print("  --email-provider resend|smtp|log  ?????????log?")
+    console.print("  --newsletter       ??????????? --email?")
+    console.print("  --newsletter-provider resend|mailchimp|convertkit????resend?")
     console.print()
 
     console.print("[bold]Embedding & White-label:[/]")
     console.print("  --embed-allowed-origins https://app.example.com")
-    console.print("                     Allow iframe embedding from these origins (CSP + CORS)")
+    console.print("                     ????????? iframe ???CSP + CORS?")
     console.print("  --brand-from-config")
     console.print(
-        "                     Load brand color/logo from env vars at runtime (white-label)"
+        "                     ??????????????/??????"
     )
-    console.print("  --storybook        Generate Storybook for frontend components")
+    console.print("  --storybook        ??????? Storybook ??")
     console.print()
 
     console.print("[bold]Observability:[/]")
-    console.print("  --no-logfire       Disable Logfire integration (PydanticAI)")
-    console.print("  --langsmith        Enable LangSmith (LangChain/LangGraph/DeepAgents)")
-    console.print("  --sentry           Enable Sentry error tracking")
-    console.print("  --prometheus       Enable Prometheus metrics")
+    console.print("  --no-logfire       ?? Logfire ?? (PydanticAI)")
+    console.print("  --langsmith        ?? LangSmith?LangChain/LangGraph/DeepAgents?")
+    console.print("  --sentry           ?? Sentry ????")
+    console.print("  --prometheus       ?? Prometheus ??")
     console.print()
 
     console.print("[bold]DevOps:[/]")
-    console.print("  --no-docker                  Disable Docker files")
-    console.print("  --kubernetes                 Generate Kubernetes manifests")
-    console.print("  --reverse-proxy none         No reverse proxy, expose ports directly")
-    console.print("  --reverse-proxy nginx        External Nginx config template (default)")
-    console.print("  --reverse-proxy traefik      External Traefik labels only")
-    console.print("  --ci github                  GitHub Actions (default)")
+    console.print("  --no-docker                  ?? Docker ??")
+    console.print("  --kubernetes                 ?? Kubernetes ??")
+    console.print("  --reverse-proxy none         ????????????")
+    console.print("  --reverse-proxy nginx        ?? Nginx ????????")
+    console.print("  --reverse-proxy traefik      ??? Traefik ??")
+    console.print("  --ci github                  GitHub Actions????")
     console.print("  --ci gitlab                  GitLab CI")
-    console.print("  --ci none                    No CI/CD")
+    console.print("  --ci none                    ? CI/CD")
     console.print()
 
     console.print("[bold]Scaffold:[/]")
-    console.print("  --example-resource    Generate example Item CRUD scaffold")
-    console.print("                        (model → repo → service → route → migration)")
-    console.print("                        Requires --database postgresql")
+    console.print("  --example-resource    ???? Item CRUD ???")
+    console.print("                        ??? → ?? → ?? → ?? → ???")
+    console.print("                        ?? --database postgresql")
     console.print()
 
     console.print("[bold]Other:[/]")
-    console.print("  --python-version 3.11|3.12|3.13  Python version")
-    console.print("  --no-env           Skip .env file generation")
-    console.print("  --backend-port N   Backend port (default: 8000)")
-    console.print("  --frontend-port N  Frontend port (default: 3000)")
+    console.print("  --python-version 3.11|3.12|3.13  Python ??")
+    console.print("  --no-env           ?? .env ????")
+    console.print("  --backend-port N   ????????8000?")
+    console.print("  --frontend-port N  ????????3000?")
 
 
 _PATH_OPTION = click.option(
@@ -1478,7 +1478,7 @@ _PATH_OPTION = click.option(
     "project_path",
     default=".",
     type=click.Path(exists=True, file_okay=False, dir_okay=True, resolve_path=True, path_type=Path),
-    help="Project directory (default: current directory).",
+    help="??????????????",
 )
 
 
@@ -1502,17 +1502,17 @@ def _git_error_message(exc: subprocess.CalledProcessError) -> str:
 
 @cli.group(invoke_without_command=True)
 @_PATH_OPTION
-@click.option("--to", "to_version", default=None, help="Target version (default: latest).")
-@click.option("--dry-run", is_flag=True, help="Preview the upgrade without changing anything.")
+@click.option("--to", "to_version", default=None, help="????????????")
+@click.option("--dry-run", is_flag=True, help="?????????????")
 @click.option(
     "--with-new-features",
     is_flag=True,
-    help="Prompt to adopt optional features introduced since your version.",
+    help="????????????????????",
 )
 @click.option(
     "--force",
     is_flag=True,
-    help="Recreate the upgrade branch if it exists, and overwrite colliding untracked files.",
+    help="???????????????????????????",
 )
 @click.pass_context
 def upgrade(
@@ -1523,10 +1523,9 @@ def upgrade(
     with_new_features: bool,
     force: bool,
 ) -> None:
-    """Pull the latest template improvements into an existing project.
+    """?????????????????
 
-    Run from inside a generated project. With no subcommand this performs the
-    upgrade; ``upgrade finalize`` bumps the manifest once conflicts are resolved.
+    ?????????????????????``upgrade finalize`` ???????????
     """
     if ctx.invoked_subcommand is not None:
         # --path has a default, so "was it typed?" needs click's parameter source
@@ -1580,7 +1579,7 @@ def upgrade(
 @upgrade.command("finalize")
 @_PATH_OPTION
 def upgrade_finalize(project_path: Path) -> None:
-    """Bump the manifest to the new version after resolving conflicts."""
+    """??????????????"""
     from .upgrade.runner import UpgradeError, run_finalize
 
     try:
@@ -1594,7 +1593,7 @@ def upgrade_finalize(project_path: Path) -> None:
 @upgrade.command("recover")
 @_PATH_OPTION
 def upgrade_recover(project_path: Path) -> None:
-    """Reconstruct a candidate manifest for a project generated before manifests."""
+    """????????????????????"""
     from .upgrade.runner import run_recover
 
     try:

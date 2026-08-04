@@ -1,12 +1,12 @@
-# How to: Add a New Agent Tool
+# 如何：添加新的 Agent 工具
 
-## Overview
+### 概述
 
 Agent tools let your AI agent perform actions — search the web, query databases, send emails, etc. Each tool is a Python function that the agent can call.
 
-## Step-by-Step
+### 分步指南
 
-### 1. Create the tool file
+### 1. 创建工具文件
 
 ```python
 # app/agents/tools/weather.py
@@ -38,13 +38,13 @@ def get_weather(city: str) -> str:
 {%- endif %}
 ```
 
-### 2. Export from `app/agents/tools/__init__.py`
+### 2. 在 `app/agents/tools/__init__.py`
 
 ```python
 from app.agents.tools.weather import get_weather
 ```
 
-### 3. Register in your agent
+### 3. 在 Agent 中注册
 
 {%- if cookiecutter.use_pydantic_ai %}
 
@@ -68,13 +68,13 @@ tools = [get_current_datetime, get_weather]  # Add your tool here
 ```
 {%- endif %}
 
-### 4. Test it
+### 4. 测试
 
-Start the server and ask the agent: "What's the weather in Warsaw?"
+启动服务器并询问 Agent： "What's the weather in Warsaw?"
 
-## Tips
+### 提示
 
-- Keep tools focused — one tool, one job
-- Write clear docstrings — the agent uses them to decide when to call your tool
-- Handle errors gracefully — return error messages as strings, don't raise exceptions
-- For expensive operations, consider adding caching
+- 保持工具专注 — one tool, one job
+- 编写清晰的文档字符串 — the agent uses them to decide when to call your tool
+- 优雅地处理错误 — return error messages as strings, don't raise exceptions
+- 对于耗时的操作，考虑添加缓存

@@ -17,11 +17,11 @@
 在项目创建时选择你的框架：
 
 ```bash
-fastapi-fullstack create my_project --ai-framework pydantic_ai   # default
-fastapi-fullstack create my_project --ai-framework pydantic_deep
-fastapi-fullstack create my_project --ai-framework langchain
-fastapi-fullstack create my_project --ai-framework langgraph
-fastapi-fullstack create my_project --ai-framework deepagents
+framework-agent-python create my_project --ai-framework pydantic_ai   # default
+framework-agent-python create my_project --ai-framework pydantic_deep
+framework-agent-python create my_project --ai-framework langchain
+framework-agent-python create my_project --ai-framework langgraph
+framework-agent-python create my_project --ai-framework deepagents
 ```
 
 ---
@@ -302,7 +302,7 @@ def _register_tools(self, agent: Agent[Deps, str]) -> None:
 ### 同时启用 RAG 与 AI 智能体
 
 ```bash
-fastapi-fullstack create my_project --enable-rag --enable-ai-agent
+framework-agent-python create my_project --enable-rag --enable-ai-agent
 ```
 
 ### 使用 RAG 工具

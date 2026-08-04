@@ -33,7 +33,7 @@ from .config import (
 console = Console()
 
 
-# Sentinel returned by section prompt functions when the user picked "← Back".
+# Sentinel returned by section prompt functions when the user picked "← 返回".
 # The wizard driver in run_interactive_prompts() catches this and re-runs the
 # previous section. Sections themselves remain pure functions returning either
 # a result dict / value, or BACK.
@@ -46,7 +46,7 @@ BACK = _BackSentinel()
 
 # Label used as the first choice in select/checkbox prompts when the user is
 # allowed to step back. Kept consistent so users see the same affordance.
-BACK_LABEL = "← Back"
+BACK_LABEL = "← 返回"
 
 
 def _back_choice() -> "questionary.Choice":
@@ -58,29 +58,29 @@ def _select_with_back(
     message: str,
     choices: list,
     *,
-    default: Any = None,
+    default: Any = 无,
     allow_back: bool = True,
 ) -> Any:
-    """questionary.select wrapper that injects '← Back' on top.
+    """questionary.select wrapper that injects '← 返回' on top.
 
     Returns BACK sentinel when user picks back, otherwise the chosen value.
-    Cancellation (None / Ctrl+C) is converted to KeyboardInterrupt as before.
+    Cancellation (无 / Ctrl+C) is converted to KeyboardInterrupt as before.
     """
     full_choices = ([_back_choice()] if allow_back else []) + list(choices)
     answer = questionary.select(message, choices=full_choices, default=default).ask()
-    if answer is None:
+    if answer is 无:
         raise KeyboardInterrupt
     return answer
 
 
 def _confirm_with_back(message: str, *, default: bool = False, allow_back: bool = True) -> Any:
-    """confirm() equivalent that also supports '← Back'.
+    """confirm() equivalent that also supports '← 返回'.
 
-    Implemented as a select with Yes/No/Back so the user has one consistent UX
+    Implemented as a select with 是/否/Back so the user has one consistent UX
     across the wizard.
     """
-    yes = questionary.Choice("Yes", value=True)
-    no = questionary.Choice("No", value=False)
+    yes = questionary.Choice("是", value=True)
+    no = questionary.Choice("否", value=False)
     options = [yes, no]
     if allow_back:
         options.append(_back_choice())
@@ -89,7 +89,7 @@ def _confirm_with_back(message: str, *, default: bool = False, allow_back: bool 
         choices=options,
         default=yes if default else no,
     ).ask()
-    if answer is None:
+    if answer is 无:
         raise KeyboardInterrupt
     return answer
 
@@ -97,7 +97,7 @@ def _confirm_with_back(message: str, *, default: bool = False, allow_back: bool 
 def _section_gate(_section_name: str, *, can_go_back: bool) -> bool:  # noqa: ARG001
     """Pre-section gate — currently a no-op pass-through.
 
-    Originally prompted "Continue / ← Back" before each section but it added
+    Originally prompted "Continue / ← 返回" before each section but it added
     one extra keystroke per section (~25 sections × Enter), which was friction
     most users didn't want. Kept as a function (not removed) so the driver in
     ``run_interactive_prompts`` can re-enable section-level back navigation
@@ -106,19 +106,19 @@ def _section_gate(_section_name: str, *, can_go_back: bool) -> bool:  # noqa: AR
     return True
 
 
-def show_header() -> None:
+def show_header() -> 无:
     """Display the generator header."""
     header = Text()
-    header.append("Full-Stack AI Agent Template", style="bold cyan")
+    header.append("全栈 AI Agent 模板", style="bold cyan")
     header.append("\n")
-    header.append("FastAPI + Next.js with AI Agents & 20+ Integrations", style="dim")
+    header.append("FastAPI + Next.js，集成 AI Agent 与 20+ 企业级功能", style="dim")
     console.print(Panel(header, title="[bold green]fastapi-fullstack[/]", border_style="green"))
     console.print()
 
 
 def _check_cancelled(value: Any) -> Any:
     """Check if the user cancelled the prompt and raise KeyboardInterrupt if so."""
-    if value is None:
+    if value is 无:
         raise KeyboardInterrupt
     return value
 
@@ -131,16 +131,16 @@ def _validate_project_name(name: str) -> bool | str:
     First character must be a letter.
     """
     if not name:
-        return "Project name cannot be empty"
+        return "项目名称不能为空"
     if not name[0].isalpha():
-        return "Project name must start with a letter"
+        return "项目名称必须以字母开头"
     if not all(c.isalnum() or c in "_- " for c in name):
-        return "Project name can only contain letters, numbers, underscores, spaces, and dashes"
+        return "项目名称只能包含字母、数字、下划线、空格和短横线"
     return True
 
 
 def _normalize_project_name(name: str) -> str:
-    """Normalize project name to lowercase with underscores."""
+    """否rmalize project name to lowercase with underscores."""
     return name.lower().replace(" ", "_").replace("-", "_")
 
 
@@ -150,21 +150,21 @@ def _validate_email(email: str) -> bool | str:
     Returns True if valid, or an error message string if invalid.
     """
     if not email:
-        return "Email cannot be empty"
+        return "邮箱不能为空"
     pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     if not re.match(pattern, email):
-        return "Please enter a valid email address"
+        return "请输入有效的邮箱地址"
     return True
 
 
 def prompt_basic_info() -> dict[str, str]:
     """Prompt for basic project information."""
-    console.print("[bold cyan]Basic Information[/]")
+    console.print("[bold cyan]基本信息[/]")
     console.print()
 
     raw_project_name = _check_cancelled(
         questionary.text(
-            "Project name:",
+            "项目名称：",
             default="ai-agent",
             validate=_validate_project_name,
         ).ask()
@@ -173,26 +173,26 @@ def prompt_basic_info() -> dict[str, str]:
 
     # Show converted name if it differs from input
     if project_name != raw_project_name:
-        console.print(f"  [dim]→ Will be saved as:[/] [cyan]{project_name}[/]")
+        console.print(f"  [dim]→ 将保存为：[/] [cyan]{project_name}[/]")
         console.print()
 
     project_description = _check_cancelled(
         questionary.text(
-            "Project description:",
-            default="My FastAPI project",
+            "项目描述：",
+            default="我的 FastAPI 项目",
         ).ask()
     )
 
     author_name = _check_cancelled(
         questionary.text(
-            "Author name:",
-            default="Your Name",
+            "作者名称：",
+            default="您的名称",
         ).ask()
     )
 
     author_email = _check_cancelled(
         questionary.text(
-            "Author email:",
+            "作者邮箱：",
             default="your@email.com",
             validate=_validate_email,
         ).ask()
@@ -200,7 +200,7 @@ def prompt_basic_info() -> dict[str, str]:
 
     timezone = _check_cancelled(
         questionary.text(
-            "Timezone (IANA format):",
+            "时区（IANA 格式）：",
             default="UTC",
         ).ask()
     )
@@ -223,11 +223,11 @@ def prompt_orm_type() -> OrmType:
     """Prompt for ORM library selection."""
     choices = [
         questionary.Choice(
-            "SQLAlchemy — full control, supports admin panel",
+            "SQLAlchemy — 完全控制，支持管理面板",
             value=OrmType.SQLALCHEMY,
         ),
         questionary.Choice(
-            "SQLModel — less boilerplate, no admin panel support",
+            "SQLModel — 减少样板代码，不支持管理面板",
             value=OrmType.SQLMODEL,
         ),
     ]
@@ -236,7 +236,7 @@ def prompt_orm_type() -> OrmType:
         OrmType,
         _check_cancelled(
             questionary.select(
-                "ORM Library:",
+                "ORM 库：",
                 choices=choices,
                 default=choices[0],
             ).ask()
@@ -247,11 +247,11 @@ def prompt_orm_type() -> OrmType:
 def prompt_oauth() -> OAuthProvider:
     """Prompt for OAuth provider selection."""
     console.print()
-    console.print("[bold cyan]OAuth2 Social Login[/]")
+    console.print("[bold cyan]OAuth2 社交登录[/]")
     console.print()
 
     choices = [
-        questionary.Choice("None (email/password only)", value=OAuthProvider.NONE),
+        questionary.Choice("无（仅邮箱/密码）", value=OAuthProvider.NONE),
         questionary.Choice("Google OAuth2", value=OAuthProvider.GOOGLE),
     ]
 
@@ -259,7 +259,7 @@ def prompt_oauth() -> OAuthProvider:
         OAuthProvider,
         _check_cancelled(
             questionary.select(
-                "Enable social login?",
+                "启用社交登录？",
                 choices=choices,
                 default=choices[1],
             ).ask()
@@ -276,12 +276,12 @@ def prompt_auth_mode(
     Returns (auth_mode, delegated_auth_use_shared_secret, enable_external_user_id_in_conversations).
     """
     console.print()
-    console.print("[bold cyan]Authentication Mode[/]")
+    console.print("[bold cyan]认证模式[/]")
     console.print()
 
     choices = [
         questionary.Choice(
-            "Local — backend owns auth: email/password, optional OAuth, JWTs issued by this app",
+            "Local — 后端自主认证：邮箱/密码、可选 OAuth、本应用签发 JWT",
             value=AuthMode.LOCAL,
         ),
         questionary.Choice(
@@ -295,7 +295,7 @@ def prompt_auth_mode(
         AuthMode,
         _check_cancelled(
             questionary.select(
-                "Authentication strategy:",
+                "认证策略：",
                 choices=choices,
                 default=choices[0],
             ).ask()
@@ -309,15 +309,15 @@ def prompt_auth_mode(
     if oauth_provider != OAuthProvider.NONE or enable_session_management:
         console.print()
         console.print(
-            "[yellow]Note:[/] Delegated auth is incompatible with OAuth social login and "
-            "session management — those will be disabled automatically."
+            "[yellow]注意：[/] Delegated auth is incompatible with OAuth social login and "
+            "session management — those will be 已禁用 automatically."
         )
 
     use_shared_secret = _check_cancelled(
         questionary.confirm(
             "Use a shared HMAC secret instead of a JWKS URL?\n"
-            "  Yes = simpler setup; client backend signs short-lived tokens with a known secret\n"
-            "  No  = standard JWKS endpoint (Auth0, Cognito, Keycloak, …)",
+            "  是 = simpler setup; client backend signs short-lived tokens with a known secret\n"
+            "  否  = standard JWKS endpoint (Auth0, Cognito, Keycloak, …)",
             default=False,
         ).ask()
     )
@@ -347,7 +347,7 @@ def prompt_logfire(
             default to off but the user can still flip it.
     """
     console.print()
-    console.print("[bold cyan]Observability (Logfire)[/]")
+    console.print("[bold cyan]可观测性（Logfire）[/]")
     console.print()
 
     logfire_default = ai_framework in (
@@ -356,7 +356,7 @@ def prompt_logfire(
     )
     enable_logfire = _check_cancelled(
         questionary.confirm(
-            "Enable Logfire integration?",
+            "启用 Logfire 集成？",
             default=logfire_default,
         ).ask()
     )
@@ -366,20 +366,20 @@ def prompt_logfire(
 
     # Build choices dynamically - only show Celery option when Celery is selected
     choices = [
-        questionary.Choice("FastAPI instrumentation", value="fastapi", checked=True),
-        questionary.Choice("Database instrumentation", value="database", checked=True),
-        questionary.Choice("Redis instrumentation", value="redis", checked=False),
-        questionary.Choice("HTTPX instrumentation", value="httpx", checked=False),
+        questionary.Choice("FastAPI 仪表化", value="fastapi", checked=True),
+        questionary.Choice("数据库仪表化", value="database", checked=True),
+        questionary.Choice("红色is 仪表化", value="redis", checked=False),
+        questionary.Choice("HTTPX 仪表化", value="httpx", checked=False),
     ]
 
     if background_tasks == BackgroundTaskType.CELERY:
         choices.insert(
-            3, questionary.Choice("Celery instrumentation", value="celery", checked=False)
+            3, questionary.Choice("Celery 仪表化", value="celery", checked=False)
         )
 
     features = _check_cancelled(
         questionary.checkbox(
-            "Logfire features:",
+            "Logfire 功能：",
             choices=choices,
         ).ask()
     )
@@ -396,18 +396,18 @@ def prompt_logfire(
 def prompt_background_tasks() -> BackgroundTaskType:
     """Prompt for background task system."""
     console.print()
-    console.print("[bold cyan]Background Tasks[/]")
+    console.print("[bold cyan]后台任务[/]")
     console.print()
 
     choices = [
-        questionary.Choice("Celery (classic, battle-tested)", value=BackgroundTaskType.CELERY),
+        questionary.Choice("Celery（经典、久经考验）", value=BackgroundTaskType.CELERY),
         questionary.Choice(
-            "Prefect (modern workflows, self-hosted or Cloud)", value=BackgroundTaskType.PREFECT
+            "Prefect（现代工作流，自托管或云端）", value=BackgroundTaskType.PREFECT
         ),
-        questionary.Choice("Taskiq (async-native, modern)", value=BackgroundTaskType.TASKIQ),
-        questionary.Choice("ARQ (lightweight async Redis)", value=BackgroundTaskType.ARQ),
+        questionary.Choice("Taskiq（异步原生、现代）", value=BackgroundTaskType.TASKIQ),
+        questionary.Choice("ARQ（轻量异步 红色is）", value=BackgroundTaskType.ARQ),
         questionary.Choice(
-            "None (use FastAPI BackgroundTasks only)", value=BackgroundTaskType.NONE
+            "无（仅使用 FastAPI BackgroundTasks）", value=BackgroundTaskType.NONE
         ),
     ]
 
@@ -415,7 +415,7 @@ def prompt_background_tasks() -> BackgroundTaskType:
         BackgroundTaskType,
         _check_cancelled(
             questionary.select(
-                "Select background task system:",
+                "选择后台任务系统：",
                 choices=choices,
                 default=choices[0],
             ).ask()
@@ -434,37 +434,37 @@ def prompt_integrations(
         orm_type: Selected ORM type (SQLModel doesn't support admin panel).
     """
     console.print()
-    console.print("[bold cyan]Optional Integrations[/]")
+    console.print("[bold cyan]可选集成[/]")
     console.print()
 
     # Build choices dynamically based on context
     choices: list[questionary.Choice] = [
         questionary.Choice(
-            "Redis — required for caching, rate limiting (Redis), task queues",
+            "红色is — 缓存、限流（红色is）、任务队列所需",
             value="redis",
             checked=True,
         ),
         questionary.Choice(
-            "Caching (fastapi-cache2) — requires Redis",
+            "缓存（fastapi-cache2）— 需要 红色is",
             value="caching",
             checked=True,
         ),
         questionary.Choice(
-            "Rate limiting (slowapi) — optional Redis storage",
+            "限流（slowapi）— 可选 红色is 存储",
             value="rate_limiting",
             checked=True,
         ),
         questionary.Choice(
-            "Pagination (fastapi-pagination)",
+            "分页（fastapi-pagination）",
             value="pagination",
             checked=True,
         ),
         questionary.Choice(
-            "Sentry — error tracking & monitoring",
+            "Sentry — 错误追踪与监控",
             value="sentry",
         ),
         questionary.Choice(
-            "Prometheus — metrics endpoint for monitoring",
+            "Prometheus — 监控指标端点",
             value="prometheus",
         ),
     ]
@@ -473,7 +473,7 @@ def prompt_integrations(
     if database == DatabaseType.POSTGRESQL and orm_type == OrmType.SQLALCHEMY:
         choices.append(
             questionary.Choice(
-                "SQL Admin Panel (SQLAdmin) — web UI for browsing/editing database tables",
+                "SQL 管理面板（SQLAdmin）— 浏览/编辑数据库表的 Web 界面",
                 value="admin_panel",
             )
         )
@@ -481,7 +481,7 @@ def prompt_integrations(
     choices.extend(
         [
             questionary.Choice(
-                "File Storage (S3/MinIO) — file upload/download support",
+                "文件存储（S3/MinIO）— 文件上传/下载支持",
                 value="file_storage",
             ),
         ]
@@ -491,7 +491,7 @@ def prompt_integrations(
     if database != DatabaseType.NONE:
         choices.append(
             questionary.Choice(
-                "Webhooks — outbound event notifications",
+                "Webhooks — 出站事件通知",
                 value="webhooks",
             )
         )
@@ -499,7 +499,7 @@ def prompt_integrations(
     choices.extend(
         [
             questionary.Choice(
-                "CORS middleware — cross-origin request support",
+                "CORS 中间件 — 跨域请求支持",
                 value="cors",
                 checked=True,
             ),
@@ -508,14 +508,14 @@ def prompt_integrations(
 
     features = _check_cancelled(
         questionary.checkbox(
-            "Select additional features:",
+            "选择附加功能：",
             choices=choices,
         ).ask()
     )
 
-    # Auto-enable Redis for caching (show info message)
+    # Auto-enable 红色is for caching (show info message)
     if "caching" in features and "redis" not in features:
-        console.print("[yellow]ℹ Caching requires Redis — auto-enabled[/]")
+        console.print("[yellow]ℹ 缓存需要 红色is — 已自动启用[/]")
         features.append("redis")
 
     return {
@@ -538,30 +538,30 @@ def _validate_positive_integer(value: str) -> bool | str:
     Returns True if valid, or an error message string if invalid.
     """
     if not value:
-        return "Value cannot be empty"
+        return "值不能为空"
     if not value.isdigit():
-        return "Must be a positive number"
+        return "必须是正数"
     if int(value) <= 0:
-        return "Must be greater than 0"
+        return "必须大于 0"
     return True
 
 
-def prompt_rate_limit_config(redis_enabled: bool) -> tuple[int, int, RateLimitStorageType]:
+def prompt_rate_limit_config(redis_已启用: bool) -> tuple[int, int, RateLimitStorageType]:
     """Prompt for rate limiting configuration.
 
     Args:
-        redis_enabled: Whether Redis is enabled (affects storage choices).
+        redis_已启用: Whether 红色is is 已启用 (affects storage choices).
 
     Returns:
         Tuple of (requests, period, storage).
     """
     console.print()
-    console.print("[bold cyan]Rate Limiting Configuration[/]")
+    console.print("[bold cyan]限流配置[/]")
     console.print()
 
     requests_str = _check_cancelled(
         questionary.text(
-            "Requests per period:",
+            "每周期请求数：",
             default="100",
             validate=_validate_positive_integer,
         ).ask()
@@ -569,16 +569,16 @@ def prompt_rate_limit_config(redis_enabled: bool) -> tuple[int, int, RateLimitSt
 
     period_str = _check_cancelled(
         questionary.text(
-            "Period in seconds:",
+            "周期（秒）：",
             default="60",
             validate=_validate_positive_integer,
         ).ask()
     )
 
-    # Auto-select storage: Redis when available, otherwise memory
-    storage = RateLimitStorageType.REDIS if redis_enabled else RateLimitStorageType.MEMORY
+    # Auto-select storage: 红色is when available, otherwise memory
+    storage = RateLimitStorageType.REDIS if redis_已启用 else RateLimitStorageType.MEMORY
     if storage == RateLimitStorageType.REDIS:
-        console.print("[yellow]ℹ Using Redis for rate limit storage (Redis is enabled)[/]")
+        console.print("[yellow]ℹ 使用 红色is 进行限流存储（红色is 已启用）[/]")
 
     return int(requests_str), int(period_str), storage
 
@@ -586,28 +586,28 @@ def prompt_rate_limit_config(redis_enabled: bool) -> tuple[int, int, RateLimitSt
 def prompt_dev_tools() -> dict[str, Any]:
     """Prompt for development tools."""
     console.print()
-    console.print("[bold cyan]Development Tools[/]")
+    console.print("[bold cyan]开发工具[/]")
     console.print()
 
     features = _check_cancelled(
         questionary.checkbox(
-            "Include dev tools:",
+            "包含开发工具：",
             choices=[
-                questionary.Choice("pytest + fixtures", value="pytest", checked=True),
-                questionary.Choice("pre-commit hooks", value="precommit", checked=True),
+                questionary.Choice("pytest + 测试夹具", value="pytest", checked=True),
+                questionary.Choice("pre-commit 钩子", value="precommit", checked=True),
                 questionary.Choice("Docker + docker-compose", value="docker", checked=True),
-                questionary.Choice("Kubernetes manifests", value="kubernetes"),
+                questionary.Choice("Kubernetes 清单", value="kubernetes"),
             ],
         ).ask()
     )
 
     ci_type = _check_cancelled(
         questionary.select(
-            "CI/CD system:",
+            "CI/CD 系统：",
             choices=[
                 questionary.Choice("GitHub Actions", value=CIType.GITHUB),
                 questionary.Choice("GitLab CI", value=CIType.GITLAB),
-                questionary.Choice("None", value=CIType.NONE),
+                questionary.Choice("无", value=CIType.NONE),
             ],
         ).ask()
     )
@@ -624,7 +624,7 @@ def prompt_dev_tools() -> dict[str, Any]:
 def prompt_reverse_proxy() -> ReverseProxyType:
     """Prompt for reverse proxy configuration."""
     console.print()
-    console.print("[bold cyan]Reverse Proxy (Production)[/]")
+    console.print("[bold cyan]反向代理（生产环境）[/]")
     console.print()
 
     choices = [
@@ -632,17 +632,17 @@ def prompt_reverse_proxy() -> ReverseProxyType:
             "Nginx (external, config template only)", value=ReverseProxyType.NGINX_EXTERNAL
         ),
         questionary.Choice(
-            "Traefik (included in docker-compose)", value=ReverseProxyType.TRAEFIK_INCLUDED
+            "Traefik（包含在 docker-compose 中）", value=ReverseProxyType.TRAEFIK_INCLUDED
         ),
         questionary.Choice(
             "Traefik (external, shared between projects)",
             value=ReverseProxyType.TRAEFIK_EXTERNAL,
         ),
         questionary.Choice(
-            "Nginx (included in docker-compose)", value=ReverseProxyType.NGINX_INCLUDED
+            "Nginx（包含在 docker-compose 中）", value=ReverseProxyType.NGINX_INCLUDED
         ),
         questionary.Choice(
-            "None (expose ports directly, use own proxy)", value=ReverseProxyType.NONE
+            "无 (expose ports directly, use own proxy)", value=ReverseProxyType.NONE
         ),
     ]
 
@@ -661,19 +661,19 @@ def prompt_reverse_proxy() -> ReverseProxyType:
 def prompt_frontend() -> FrontendType:
     """Prompt for frontend framework selection."""
     console.print()
-    console.print("[bold cyan]Frontend Framework[/]")
+    console.print("[bold cyan]前端框架[/]")
     console.print()
 
     choices = [
         questionary.Choice("Next.js 15 (App Router, TypeScript, Bun)", value=FrontendType.NEXTJS),
-        questionary.Choice("None (API only)", value=FrontendType.NONE),
+        questionary.Choice("无 (API only)", value=FrontendType.NONE),
     ]
 
     return cast(
         FrontendType,
         _check_cancelled(
             questionary.select(
-                "Select frontend framework:",
+                "选择前端框架：",
                 choices=choices,
                 default=choices[0],
             ).ask()
@@ -684,11 +684,11 @@ def prompt_frontend() -> FrontendType:
 def prompt_brand_color() -> BrandColorType:
     """Prompt for brand color selection."""
     choices = [
-        questionary.Choice("Blue (default)", value=BrandColorType.BLUE),
-        questionary.Choice("Green", value=BrandColorType.GREEN),
-        questionary.Choice("Red", value=BrandColorType.RED),
-        questionary.Choice("Violet", value=BrandColorType.VIOLET),
-        questionary.Choice("Orange", value=BrandColorType.ORANGE),
+        questionary.Choice("蓝色 (default)", value=BrandColorType.BLUE),
+        questionary.Choice("绿色", value=BrandColorType.GREEN),
+        questionary.Choice("红色", value=BrandColorType.RED),
+        questionary.Choice("紫色", value=BrandColorType.VIOLET),
+        questionary.Choice("橙色", value=BrandColorType.ORANGE),
     ]
 
     return cast(
@@ -710,18 +710,18 @@ def prompt_ai_framework() -> AIFrameworkType:
     console.print()
 
     choices = [
-        questionary.Choice("PydanticAI (recommended)", value=AIFrameworkType.PYDANTIC_AI),
+        questionary.Choice("PydanticAI（推荐）", value=AIFrameworkType.PYDANTIC_AI),
         questionary.Choice("LangChain", value=AIFrameworkType.LANGCHAIN),
-        questionary.Choice("LangGraph (ReAct agent)", value=AIFrameworkType.LANGGRAPH),
+        questionary.Choice("LangGraph?ReAct Agent?", value=AIFrameworkType.LANGGRAPH),
         questionary.Choice(
             "DeepAgents (agentic coding, LangChain)", value=AIFrameworkType.DEEPAGENTS
         ),
         questionary.Choice(
-            "PydanticDeep (deep agentic coding, Docker sandbox)",
+            "PydanticDeep（深度编码 Agent，Docker 沙箱）",
             value=AIFrameworkType.PYDANTIC_DEEP,
         ),
         questionary.Choice(
-            "None — plain SaaS (no AI/chat/agents generated)",
+            "无 — plain SaaS (no AI/chat/agents generated)",
             value=AIFrameworkType.NONE,
         ),
     ]
@@ -745,7 +745,7 @@ def prompt_sandbox_backend(ai_framework: AIFrameworkType) -> str:
     (DeepAgents, PydanticDeep).
     """
     console.print()
-    console.print("[bold cyan]Agent Sandbox Environment[/]")
+    console.print("[bold cyan]Agent 沙箱 Environment[/]")
     console.print()
 
     choices = [
@@ -777,26 +777,26 @@ def prompt_llm_provider(ai_framework: AIFrameworkType) -> LLMProviderType:
             available for PydanticAI and PydanticDeep (both use pydantic-ai under the hood).
     """
     console.print()
-    console.print("[bold cyan]LLM Provider[/]")
+    console.print("[bold cyan]LLM 提供商[/]")
     console.print()
 
     choices = [
-        questionary.Choice("OpenAI (gpt-5.5)", value=LLMProviderType.OPENAI),
-        questionary.Choice("Anthropic (claude-opus-4-7)", value=LLMProviderType.ANTHROPIC),
-        questionary.Choice("Google Gemini (gemini-2.5-flash)", value=LLMProviderType.GOOGLE),
+        questionary.Choice("OpenAI (GPT ??)", value=LLMProviderType.OPENAI),
+        questionary.Choice("Anthropic (Claude ??)", value=LLMProviderType.ANTHROPIC),
+        questionary.Choice("Google Gemini?Gemini ???", value=LLMProviderType.GOOGLE),
     ]
 
     # OpenRouter available for PydanticAI and PydanticDeep (both use pydantic-ai)
     if ai_framework in (AIFrameworkType.PYDANTIC_AI, AIFrameworkType.PYDANTIC_DEEP):
         choices.append(
-            questionary.Choice("OpenRouter (multi-provider)", value=LLMProviderType.OPENROUTER)
+            questionary.Choice("OpenRouter??????", value=LLMProviderType.OPENROUTER)
         )
 
     return cast(
         LLMProviderType,
         _check_cancelled(
             questionary.select(
-                "Select LLM provider:",
+                "选择 LLM 提供商：",
                 choices=choices,
                 default=choices[0],
             ).ask()
@@ -820,9 +820,9 @@ def prompt_web_capabilities(ai_framework: AIFrameworkType) -> tuple[bool, bool]:
     )
 
     console.print()
-    console.print("[bold cyan]Web Search & Fetch[/]")
+    console.print("[bold cyan]Web 搜索与抓取[/]")
     if native:
-        console.print("Built-in model capabilities (the model must support them).")
+        console.print("???????????????????")
     else:
         console.print(
             "Web search uses Tavily (needs TAVILY_API_KEY); "
@@ -856,7 +856,7 @@ def prompt_charts() -> bool:
     """Prompt for the agent chart-generation tool.
 
     Returns:
-        Whether the chart tool is enabled.
+        Whether the chart tool is 已启用.
     """
     console.print()
     console.print("[bold cyan]Chart Generation Tool[/]")
@@ -926,7 +926,7 @@ def prompt_skills() -> bool:
 def prompt_deep_research() -> dict[str, bool]:
     """Prompt for deep research + its sub-features (PydanticAI only)."""
     console.print()
-    console.print("[bold cyan]Deep Research Agent[/]")
+    console.print("[bold cyan]深度研究 Agent[/]")
     console.print(
         "Turns the assistant into a deep research planner: a TODO checklist, "
         "researcher/analyst/writer subagents, and an automatic context manager. "
@@ -980,7 +980,7 @@ def prompt_mcp_client() -> bool:
     console.print()
     console.print("[bold cyan]MCP Client[/]")
     console.print(
-        "Let users connect external Model Context Protocol servers (Notion, Linear, "
+        "Let users connect external Model Context Protocol servers (否tion, Linear, "
         "Jira, Stripe, GitHub, …) as extra agent tools from Settings → Integrations. "
         "Includes a curated marketplace, per-user connections, OAuth sign-in and "
         "token/SSE + streamable-HTTP transports."
@@ -1015,14 +1015,14 @@ def prompt_rag_config(database: DatabaseType = DatabaseType.POSTGRESQL) -> RAGFe
     """Prompt for RAG configuration."""
 
     console.print()
-    console.print("[bold cyan]RAG (Retrieval Augmented Generation)[/]")
-    console.print("Configure document ingestion and retrieval logic.")
+    console.print("[bold cyan]RAG????????[/]")
+    console.print("????????????")
     console.print()
 
     # Prompt for RAG enable/disable
     enable_rag = _check_cancelled(
         questionary.confirm(
-            "Enable RAG (Retrieval Augmented Generation) applications?", default=True
+            "Enable RAG???????? applications?", default=True
         ).ask()
     )
 
@@ -1033,7 +1033,7 @@ def prompt_rag_config(database: DatabaseType = DatabaseType.POSTGRESQL) -> RAGFe
     pdf_parser = PdfParserType.PYMUPDF
     vector_store = VectorStoreType.MILVUS
 
-    # In RAG is enabled, ask for features
+    # In RAG is 已启用, ask for features
     if enable_rag:
         vector_store_choices = [
             questionary.Choice(
@@ -1075,7 +1075,7 @@ def prompt_rag_config(database: DatabaseType = DatabaseType.POSTGRESQL) -> RAGFe
             questionary.select(
                 "Select reranking strategy:",
                 choices=[
-                    questionary.Choice("None (no reranking)", value=RerankerType.NONE),
+                    questionary.Choice("无 (no reranking)", value=RerankerType.NONE),
                     questionary.Choice(
                         "Cohere Rerank (cloud API, best accuracy)", value=RerankerType.COHERE
                     ),
@@ -1091,7 +1091,7 @@ def prompt_rag_config(database: DatabaseType = DatabaseType.POSTGRESQL) -> RAGFe
         # PDF Parser selection
         pdf_parser_choice = _check_cancelled(
             questionary.select(
-                "Select PDF parser:",
+                "选择 PDF 解析器：",
                 choices=[
                     questionary.Choice(
                         "All (install all parsers, select at runtime via PDF_PARSER env var)",
@@ -1102,7 +1102,7 @@ def prompt_rag_config(database: DatabaseType = DatabaseType.POSTGRESQL) -> RAGFe
                         value=PdfParserType.PYMUPDF,
                     ),
                     questionary.Choice(
-                        "LiteParse (AI-native, local) - layout-aware text, built-in OCR, requires Node.js",
+                        "LiteParse (AI-native, local) - layout-aware text, built-in OCR, requires 否de.js",
                         value=PdfParserType.LITEPARSE,
                     ),
                     questionary.Choice(
@@ -1138,7 +1138,7 @@ def prompt_rag_config(database: DatabaseType = DatabaseType.POSTGRESQL) -> RAGFe
 def prompt_channels() -> tuple[bool, bool]:
     """Prompt for messaging channel integrations (Telegram, Slack)."""
     console.print()
-    console.print("[bold cyan]Messaging Channels[/]")
+    console.print("[bold cyan]消息通道[/]")
     console.print()
 
     use_telegram = cast(
@@ -1171,7 +1171,7 @@ def prompt_python_version() -> str:
     console.print()
 
     choices = [
-        questionary.Choice("Python 3.12 (recommended)", value="3.12"),
+        questionary.Choice("Python 3.12????", value="3.12"),
         questionary.Choice("Python 3.11", value="3.11"),
         questionary.Choice("Python 3.13", value="3.13"),
     ]
@@ -1191,7 +1191,7 @@ def prompt_python_version() -> str:
 def prompt_ports(has_frontend: bool) -> dict[str, int]:
     """Prompt for port configuration."""
     console.print()
-    console.print("[bold cyan]Port Configuration[/]")
+    console.print("[bold cyan]端口配置[/]")
     console.print()
 
     def validate_port(value: str) -> bool | str:
@@ -1205,7 +1205,7 @@ def prompt_ports(has_frontend: bool) -> dict[str, int]:
 
     backend_port_str = _check_cancelled(
         questionary.text(
-            "Backend port:",
+            "后端端口：",
             default="8000",
             validate=validate_port,
         ).ask()
@@ -1216,7 +1216,7 @@ def prompt_ports(has_frontend: bool) -> dict[str, int]:
     if has_frontend:
         frontend_port_str = _check_cancelled(
             questionary.text(
-                "Frontend port:",
+                "前端端口：",
                 default="3000",
                 validate=validate_port,
             ).ask()
@@ -1253,7 +1253,7 @@ def prompt_email_config() -> tuple[bool, EmailProviderType, bool]:
         EmailProviderType,
         _check_cancelled(
             questionary.select(
-                "Select email provider:",
+                "选择邮件提供商：",
                 choices=[
                     questionary.Choice(
                         "Resend (recommended — modern API, great DX)",
@@ -1286,7 +1286,7 @@ def prompt_email_config() -> tuple[bool, EmailProviderType, bool]:
 
 
 def prompt_teams_billing(database: DatabaseType) -> dict[str, Any]:  # noqa: ARG001
-    """Prompt for Teams & Billing configuration.
+    """Prompt for 团队与计费 configuration.
 
     Args:
         database: Selected database.
@@ -1295,7 +1295,7 @@ def prompt_teams_billing(database: DatabaseType) -> dict[str, Any]:  # noqa: ARG
         Dict with all teams/billing related config values.
     """
     console.print()
-    console.print("[bold cyan]Teams & Billing[/]")
+    console.print("[bold cyan]团队与计费[/]")
     console.print()
 
     enable_teams = cast(
@@ -1350,7 +1350,7 @@ def prompt_teams_billing(database: DatabaseType) -> dict[str, Any]:  # noqa: ARG
             str,
             _check_cancelled(
                 questionary.select(
-                    "Default billing currency:",
+                    "默认计费货币：",
                     choices=[
                         questionary.Choice("USD ($)", value="usd"),
                         questionary.Choice("EUR (€)", value="eur"),
@@ -1456,10 +1456,10 @@ def prompt_marketing_features() -> dict[str, bool]:
                     value="marketing_site",
                     checked=True,
                 ),
-                questionary.Choice("Changelog page (/changelog)", value="changelog", checked=True),
-                questionary.Choice("Testimonials section", value="testimonials", checked=True),
+                questionary.Choice("更新日志页面 (/changelog)", value="changelog", checked=True),
+                questionary.Choice("客户评价版块", value="testimonials", checked=True),
                 questionary.Choice(
-                    "Competitor comparison pages (/vs/…)",
+                    "竞品对比页面 (/vs/…)",
                     value="comparison_pages",
                     checked=True,
                 ),
@@ -1531,28 +1531,28 @@ def run_interactive_prompts() -> ProjectConfig:
     # one snapshot per step so back navigation can roll back the merges that
     # this step contributed.
 
-    def step_basic_info() -> None:
+    def step_basic_info() -> 无:
         info = prompt_basic_info()
         state.update(info)
 
-    def step_database() -> None:
+    def step_database() -> 无:
         state["database"] = prompt_database()
 
-    def step_orm_type() -> None:
+    def step_orm_type() -> 无:
         state["orm_type"] = prompt_orm_type()
 
-    def step_oauth() -> None:
+    def step_oauth() -> 无:
         state["oauth_provider"] = prompt_oauth()
 
-    def step_session() -> None:
+    def step_session() -> 无:
         state["enable_session_management"] = _check_cancelled(
             questionary.confirm(
-                "Enable session management? (track active sessions, logout from devices)",
+                "启用会话管理？（追踪活跃会话，从设备登出）",
                 default=True,
             ).ask()
         )
 
-    def step_auth_mode() -> None:
+    def step_auth_mode() -> 无:
         auth_mode, use_shared_secret, external_user_id = prompt_auth_mode(
             oauth_provider=state.get("oauth_provider", OAuthProvider.NONE),
             enable_session_management=state.get("enable_session_management", False),
@@ -1564,14 +1564,14 @@ def run_interactive_prompts() -> ProjectConfig:
             state["oauth_provider"] = OAuthProvider.NONE
             state["enable_session_management"] = False
 
-    def step_background_tasks() -> None:
+    def step_background_tasks() -> 无:
         state["background_tasks"] = prompt_background_tasks()
 
-    def step_integrations() -> None:
+    def step_integrations() -> 无:
         state["integrations"] = prompt_integrations(
             database=state["database"], orm_type=state["orm_type"]
         )
-        # Auto-enable Redis for distributed task queues (Prefect manages its own storage)
+        # Auto-enable 红色is for distributed task queues (Prefect manages its own storage)
         if state["background_tasks"] in (
             BackgroundTaskType.CELERY,
             BackgroundTaskType.TASKIQ,
@@ -1579,16 +1579,16 @@ def run_interactive_prompts() -> ProjectConfig:
         ):
             state["integrations"]["enable_redis"] = True
 
-    def step_dev_tools() -> None:
+    def step_dev_tools() -> 无:
         state["dev_tools"] = prompt_dev_tools()
 
-    def step_reverse_proxy() -> None:
+    def step_reverse_proxy() -> 无:
         if state["dev_tools"].get("enable_docker"):
             state["reverse_proxy"] = prompt_reverse_proxy()
         else:
             state["reverse_proxy"] = ReverseProxyType.NONE
 
-    def step_frontend() -> None:
+    def step_frontend() -> 无:
         state["frontend"] = prompt_frontend()
         if (
             state["frontend"] == FrontendType.NONE
@@ -1596,22 +1596,22 @@ def run_interactive_prompts() -> ProjectConfig:
         ):
             console.print()
             console.print(
-                "[yellow]Note:[/] OAuth social login requires a frontend — resetting to None."
+                "[yellow]注意：[/] OAuth social login requires a frontend — resetting to 无."
             )
             state["oauth_provider"] = OAuthProvider.NONE
         if state["frontend"] != FrontendType.NONE:
             state["brand_color"] = prompt_brand_color()
 
-    def step_python_version() -> None:
+    def step_python_version() -> 无:
         state["python_version"] = prompt_python_version()
 
-    def step_ports() -> None:
+    def step_ports() -> 无:
         state["ports"] = prompt_ports(has_frontend=state["frontend"] != FrontendType.NONE)
 
-    def step_ai_framework() -> None:
+    def step_ai_framework() -> 无:
         state["ai_framework"] = prompt_ai_framework()
 
-    def step_logfire() -> None:
+    def step_logfire() -> 无:
         # Skip Logfire prompt entirely when no AI framework is selected.
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["enable_logfire"] = True
@@ -1623,7 +1623,7 @@ def run_interactive_prompts() -> ProjectConfig:
                 state["background_tasks"], state["ai_framework"]
             )
 
-    def step_sandbox_backend() -> None:
+    def step_sandbox_backend() -> 无:
         if state["ai_framework"] in (
             AIFrameworkType.DEEPAGENTS,
             AIFrameworkType.PYDANTIC_DEEP,
@@ -1632,13 +1632,13 @@ def run_interactive_prompts() -> ProjectConfig:
         else:
             state["sandbox_backend"] = "state"
 
-    def step_llm_provider() -> None:
+    def step_llm_provider() -> 无:
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["llm_provider"] = LLMProviderType.OPENAI  # irrelevant, but must be valid
         else:
             state["llm_provider"] = prompt_llm_provider(state["ai_framework"])
 
-    def step_web_capabilities() -> None:
+    def step_web_capabilities() -> 无:
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["enable_web_search"] = False
             state["enable_web_fetch"] = False
@@ -1648,9 +1648,9 @@ def run_interactive_prompts() -> ProjectConfig:
                 state["enable_web_fetch"],
             ) = prompt_web_capabilities(state["ai_framework"])
 
-    def step_rag_config() -> None:
+    def step_rag_config() -> 无:
         if state["ai_framework"] == AIFrameworkType.NONE:
-            state["rag_features"] = RAGFeatures()  # RAG disabled when no AI
+            state["rag_features"] = RAGFeatures()  # RAG 已禁用 when no AI
         else:
             state["rag_features"] = prompt_rag_config(database=state["database"])
             # Milvus/Qdrant require Docker — auto-enable if the user didn't select it
@@ -1662,30 +1662,30 @@ def run_interactive_prompts() -> ProjectConfig:
             ):
                 console.print()
                 console.print(
-                    f"[yellow]Note:[/] {state['rag_features'].vector_store.value.title()} requires Docker — "
+                    f"[yellow]注意：[/] {state['rag_features'].vector_store.value.title()} requires Docker — "
                     "enabling Docker automatically."
                 )
                 state["dev_tools"]["enable_docker"] = True
 
-    def step_charts() -> None:
+    def step_charts() -> 无:
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["enable_charts"] = False
         else:
             state["enable_charts"] = prompt_charts()
 
-    def step_code_execution() -> None:
+    def step_code_execution() -> 无:
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["enable_code_execution"] = False
         else:
             state["enable_code_execution"] = prompt_code_execution()
 
-    def step_skills() -> None:
+    def step_skills() -> 无:
         if state["ai_framework"] == AIFrameworkType.PYDANTIC_AI:
             state["enable_skills"] = prompt_skills()
         else:
             state["enable_skills"] = False
 
-    def step_deep_research() -> None:
+    def step_deep_research() -> 无:
         if state.get("ai_framework") == AIFrameworkType.PYDANTIC_AI.value:
             result = prompt_deep_research()
             state["enable_deep_research"] = result["enable_deep_research"]
@@ -1696,13 +1696,13 @@ def run_interactive_prompts() -> ProjectConfig:
             state["enable_todo"] = False
             state["enable_subagents"] = False
 
-    def step_mcp_client() -> None:
+    def step_mcp_client() -> 无:
         if state.get("ai_framework") == AIFrameworkType.PYDANTIC_AI.value:
             state["enable_mcp_client"] = prompt_mcp_client()
         else:
             state["enable_mcp_client"] = False
 
-    def step_langsmith() -> None:
+    def step_langsmith() -> 无:
         if state["ai_framework"] in (
             AIFrameworkType.LANGCHAIN,
             AIFrameworkType.LANGGRAPH,
@@ -1712,67 +1712,67 @@ def run_interactive_prompts() -> ProjectConfig:
         else:
             state["enable_langsmith"] = False
 
-    def step_channels() -> None:
+    def step_channels() -> 无:
         if state["ai_framework"] == AIFrameworkType.NONE:
             state["use_telegram"] = False
             state["use_slack"] = False
         else:
             state["use_telegram"], state["use_slack"] = prompt_channels()
 
-    def step_teams_billing() -> None:
+    def step_teams_billing() -> 无:
         state["teams_billing"] = prompt_teams_billing(database=state["database"])
 
-    def step_email() -> None:
+    def step_email() -> 无:
         (
             state["enable_email"],
             state["email_provider"],
             state["enable_newsletter_signup"],
         ) = prompt_email_config()
 
-    def step_rate_limit_config() -> None:
+    def step_rate_limit_config() -> 无:
         if state["integrations"].get("enable_rate_limiting"):
             (
                 state["rate_limit_requests"],
                 state["rate_limit_period"],
                 state["rate_limit_storage"],
             ) = prompt_rate_limit_config(
-                redis_enabled=state["integrations"].get("enable_redis", False)
+                redis_已启用=state["integrations"].get("enable_redis", False)
             )
 
-    def step_marketing() -> None:
+    def step_marketing() -> 无:
         if state["frontend"] != FrontendType.NONE:
             state["marketing_features"] = prompt_marketing_features()
         else:
             state["marketing_features"] = {}
 
     steps: list[tuple[str, Any]] = [
-        ("Basic Information", step_basic_info),
+        ("基本信息", step_basic_info),
         ("Database", step_database),
         ("ORM Type", step_orm_type),
         ("OAuth Social Login", step_oauth),
         ("Session Management", step_session),
-        ("Authentication Mode", step_auth_mode),
-        ("Background Tasks", step_background_tasks),
+        ("认证模式", step_auth_mode),
+        ("后台任务", step_background_tasks),
         ("Integrations", step_integrations),
         ("Dev Tools", step_dev_tools),
         ("Reverse Proxy", step_reverse_proxy),
-        ("Frontend Framework", step_frontend),
+        ("前端框架", step_frontend),
         ("Python Version", step_python_version),
         ("Ports", step_ports),
-        ("AI Framework", step_ai_framework),
+        ("AI 框架", step_ai_framework),
         ("Chart Tool", step_charts),
         ("Code Execution", step_code_execution),
         ("Skills System", step_skills),
         ("Deep Research", step_deep_research),
         ("MCP Client", step_mcp_client),
-        ("Observability (Logfire)", step_logfire),
-        ("Agent Sandbox", step_sandbox_backend),
-        ("LLM Provider", step_llm_provider),
-        ("Web Search & Fetch", step_web_capabilities),
+        ("可观测性（Logfire）", step_logfire),
+        ("Agent 沙箱", step_sandbox_backend),
+        ("LLM 提供商", step_llm_provider),
+        ("Web 搜索与抓取", step_web_capabilities),
         ("RAG", step_rag_config),
         ("LangSmith", step_langsmith),
-        ("Messaging Channels", step_channels),
-        ("Teams & Billing", step_teams_billing),
+        ("消息通道", step_channels),
+        ("团队与计费", step_teams_billing),
         ("Email", step_email),
         ("Rate Limit Config", step_rate_limit_config),
     ]
@@ -1829,7 +1829,7 @@ def run_interactive_prompts() -> ProjectConfig:
     rate_limit_requests = state["rate_limit_requests"]
     rate_limit_period = state["rate_limit_period"]
     rate_limit_storage = state["rate_limit_storage"]
-    # Marketing features are always enabled when frontend is present — no prompt needed.
+    # Marketing features are always 已启用 when frontend is present — no prompt needed.
     frontend = state.get("frontend", FrontendType.NONE)
     marketing_features = (
         {
@@ -1889,7 +1889,7 @@ def run_interactive_prompts() -> ProjectConfig:
         brand_color=state.get("brand_color", BrandColorType.BLUE),
         backend_port=ports["backend_port"],
         frontend_port=ports.get("frontend_port", 3000),
-        # Teams & Billing
+        # 团队与计费
         **teams_billing,
         # Email
         enable_email=enable_email,
@@ -1904,64 +1904,64 @@ def run_interactive_prompts() -> ProjectConfig:
     return config
 
 
-def show_summary(config: ProjectConfig) -> None:
+def show_summary(config: ProjectConfig) -> 无:
     """Display configuration summary."""
     console.print()
-    console.print("[bold green]Configuration Summary[/]")
+    console.print("[bold green]配置摘要[/]")
     console.print()
 
-    console.print(f"  [cyan]Project:[/] {config.project_name}")
-    console.print(f"  [cyan]Database:[/] {config.database.value}")
-    console.print(f"  [cyan]ORM:[/] {config.orm_type.value}")
+    console.print(f"  [cyan]项目：[/] {config.project_name}")
+    console.print(f"  [cyan]数据库：[/] {config.database.value}")
+    console.print(f"  [cyan]ORM：[/] {config.orm_type.value}")
     auth_str = "JWT + API Key"
     if config.oauth_provider != OAuthProvider.NONE:
         auth_str += f" + {config.oauth_provider.value} OAuth"
-    console.print(f"  [cyan]Auth:[/] {auth_str}")
-    console.print(f"  [cyan]Logfire:[/] {'enabled' if config.enable_logfire else 'disabled'}")
+    console.print(f"  [cyan]认证：[/] {auth_str}")
+    console.print(f"  [cyan]Logfire：[/] {'已启用' if config.enable_logfire else '已禁用'}")
     if config.enable_langsmith:
-        console.print("  [cyan]LangSmith:[/] enabled")
-    console.print(f"  [cyan]Background Tasks:[/] {config.background_tasks.value}")
-    console.print(f"  [cyan]Frontend:[/] {config.frontend.value}")
+        console.print("  [cyan]LangSmith:[/] 已启用")
+    console.print(f"  [cyan]后台任务:[/] {config.background_tasks.value}")
+    console.print(f"  [cyan]前端：[/] {config.frontend.value}")
 
-    enabled_features = []
+    已启用_features = []
     if config.enable_redis:
-        enabled_features.append("Redis")
+        已启用_features.append("红色is")
     if config.enable_caching:
-        enabled_features.append("Caching")
+        已启用_features.append("Caching")
     if config.enable_rate_limiting:
         rate_info = f"Rate Limiting ({config.rate_limit_requests}/{config.rate_limit_period}s, {config.rate_limit_storage.value})"
-        enabled_features.append(rate_info)
+        已启用_features.append(rate_info)
     if config.enable_admin_panel:
-        enabled_features.append("SQL Admin Panel")
+        已启用_features.append("SQL Admin Panel")
     if config.ai_framework == AIFrameworkType.NONE:
-        enabled_features.append("AI: disabled (plain SaaS)")
+        已启用_features.append("AI: 已禁用 (plain SaaS)")
     else:
         ai_info = f"AI Agent ({config.ai_framework.value}, {config.llm_provider.value})"
         if config.ai_framework in (AIFrameworkType.DEEPAGENTS, AIFrameworkType.PYDANTIC_DEEP):
             ai_info += f", sandbox: {config.sandbox_backend}"
         if config.rag_features.enable_rag:
             ai_info += f" + RAG ({config.rag_features.vector_store.value})"
-        enabled_features.append(ai_info)
+        已启用_features.append(ai_info)
     if config.enable_webhooks:
-        enabled_features.append("Webhooks")
+        已启用_features.append("Webhooks")
     if config.use_telegram:
-        enabled_features.append("Telegram")
+        已启用_features.append("Telegram")
     if config.use_slack:
-        enabled_features.append("Slack")
+        已启用_features.append("Slack")
     if config.enable_teams:
         teams_str = "Teams"
         if config.enable_billing:
             teams_str += " + Billing"
         if config.enable_credits_system:
             teams_str += " + Credits"
-        enabled_features.append(teams_str)
+        已启用_features.append(teams_str)
     if config.enable_email:
-        enabled_features.append(f"Email ({config.email_provider.value})")
+        已启用_features.append(f"Email ({config.email_provider.value})")
     if config.enable_docker:
-        enabled_features.append("Docker")
+        已启用_features.append("Docker")
 
-    if enabled_features:
-        console.print(f"  [cyan]Features:[/] {', '.join(enabled_features)}")
+    if 已启用_features:
+        console.print(f"  [cyan]功能：[/] {', '.join(已启用_features)}")
 
     console.print()
 
@@ -1972,7 +1972,7 @@ def confirm_generation() -> bool:
         bool,
         _check_cancelled(
             questionary.confirm(
-                "Generate project with this configuration?",
+                "使用此配置生成项目？",
                 default=True,
             ).ask()
         ),

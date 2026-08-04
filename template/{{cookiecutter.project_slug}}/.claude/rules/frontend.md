@@ -3,23 +3,23 @@ description: Frontend conventions for Next.js
 globs: ["frontend/**/*.ts", "frontend/**/*.tsx", "frontend/**/*.css"]
 ---
 
-# Frontend Conventions
+# 前端约定
 
-## Stack
+## 技术栈
 
 - Next.js 15 with App Router
 - TypeScript strict mode
 - Tailwind CSS for styling
 - i18n support built-in
 
-## Structure
+## 结构
 
 - Pages in `frontend/src/app/` following Next.js App Router conventions
 - Reusable components in `frontend/src/components/`
 - API client functions in `frontend/src/lib/`
 - Types in `frontend/src/types/`
 
-## Conventions
+## 约定
 
 - Use `"use client"` directive only when component needs client-side interactivity
 - Prefer Server Components by default
