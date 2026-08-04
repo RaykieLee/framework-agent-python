@@ -75,7 +75,9 @@ dependencies = [
     "aiosmtplib>=3.0.0",
 {%- endif %}
 {%- if cookiecutter.enable_pagination %}
-    "fastapi-pagination>=0.12.31",
+    # 0.13+ assumes FastAPI's 0.140.5 private body-field API. Keep the
+    # generated app compatible with the supported FastAPI 0.135/0.136 line.
+    "fastapi-pagination>=0.12.31,<0.13",
 {%- endif %}
 {%- if cookiecutter.enable_sentry %}
     "sentry-sdk[fastapi]>=2.53.0",

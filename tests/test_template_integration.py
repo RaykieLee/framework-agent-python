@@ -410,6 +410,7 @@ class TestGeneratedAgentScopeBaseline:
 
         assert "agentscope[storage-redis,storage-sql,vdb-qdrant,memory-mem0]" in backend_pyproject
         assert "agentscope[service]" in backend_pyproject
+        assert 'fastapi-pagination>=0.12.31,<0.13' in backend_pyproject
         assert "qdrant/qdrant" in compose
         assert "qdrant_data:/qdrant/storage" in compose
         assert "redis:7-alpine" in compose
