@@ -56,6 +56,7 @@ REQUIRED_BACKEND_SEAMS = (
     "app/services/agentscope_team_run.py",  # 11
     "app/services/agentscope_member_exit.py",  # 12
     "app/services/agentscope_tenant_purge.py",  # 13
+    "app/services/agentscope_runtime.py",  # generated control-plane wiring
     "tests/test_agentscope_evaluation.py",  # 03 deterministic/live contract
 )
 
@@ -210,6 +211,31 @@ def verify_generated_project(project: Path) -> list[GateResult]:
             "all required runtime, control-plane, billing, cleanup, and purge seams rendered"
             if not missing
             else f"missing: {', '.join(missing)}",
+        )
+    )
+
+    wiring = (backend / "app/services/agentscope_runtime.py").read_text(encoding="utf-8") if (backend / "app/services/agentscope_runtime.py").exists() else ""
+    route = (backend / "app/api/routes/v1/agent.py").read_text(encoding="utf-8") if (backend / "app/api/routes/v1/agent.py").exists() else ""
+    deps = (backend / "app/api/deps.py").read_text(encoding="utf-8") if (backend / "app/api/deps.py").exists() else ""
+    wiring_ok = all(
+        token in wiring for token in (
+            "resolve_tenant_context",
+            "AgentScopeRuntimeWiring",
+            "InMemoryDurableSessionStore",
+            "validate_conversation_tenant",
+            "team_frame",
+            "TenantBoundResource",
+            "memory_middleware",
+            "team_run_coordinator",
+            "_default_resource_factory",
+        )
+    ) and all(token in route for token in ("resolve_tenant_context", "get_agentscope_runtime", "tenant_context")) and "member_exit_cleanup=get_agentscope_runtime()" in deps
+    results.append(
+        GateResult(
+            "generated.control_plane_runtime_wiring",
+            "pass" if wiring_ok else "fail",
+            "WebSocket tenant resolution, durable factory, and member cleanup are wired through generated seams"
+            if wiring_ok else "generated AgentScope route/dependency wiring is incomplete",
         )
     )
 

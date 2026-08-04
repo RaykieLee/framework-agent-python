@@ -10,12 +10,18 @@ import secrets
 from uuid import UUID
 {%- endif %}
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect{%- if cookiecutter.websocket_auth_api_key %}, Query{%- endif %}
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect{%- if cookiecutter.use_agentscope and cookiecutter.use_jwt %}, Header{%- endif %}{%- if cookiecutter.websocket_auth_api_key %}, Query{%- endif %}
 
 from app.core.config import settings
 from app.schemas.base import AgentModelsResponse
 from app.services.agent import AgentConnectionManager, send_event
 from app.services.agent_session import AgentSession
+{%- if cookiecutter.use_agentscope and cookiecutter.use_jwt %}
+from app.db.session import get_db_context
+from app.core.exceptions import AuthorizationError, NotFoundError
+from app.services.agentscope_runtime import AgentScopeRuntimeUnavailable
+from app.services.agentscope_runtime import get_agentscope_runtime, resolve_tenant_context
+{%- endif %}
 {%- if cookiecutter.websocket_auth_jwt %}
 from app.api.deps import CurrentUserWS
 {%- endif %}
@@ -68,6 +74,7 @@ async def agent_websocket(
     websocket: WebSocket,
 {%- if cookiecutter.websocket_auth_jwt %}
     user: CurrentUserWS,
+    organization_id: str | None = Header(None, alias="X-Organization-Id"),
 {%- elif cookiecutter.websocket_auth_api_key %}
     api_key: str = Query(..., alias="api_key"),
 {%- endif %}
@@ -82,12 +89,31 @@ async def agent_websocket(
         return
 {%- endif %}
 
+    {%- if cookiecutter.use_agentscope and cookiecutter.use_jwt %}
+    # Resolve membership and role once at the handshake. Frames may not select
+    # another tenant by sending ``active_tenant_*`` fields.
+    try:
+        async with get_db_context() as db:
+            tenant_context = await resolve_tenant_context(db, user, organization_id)
+        runtime_wiring = get_agentscope_runtime()
+    except (AuthorizationError, NotFoundError) as exc:
+        await websocket.close(code=4003, reason=str(exc))
+        return
+    except AgentScopeRuntimeUnavailable as exc:
+        await websocket.close(code=1013, reason=str(exc))
+        return
+    {%- endif %}
+
     await manager.connect(websocket)
     session = AgentSession(
         websocket,
 {%- if cookiecutter.websocket_auth_jwt %}
         user,
 {%- endif %}
+        {%- if cookiecutter.use_agentscope and cookiecutter.use_jwt %}
+        tenant_context=tenant_context,
+        runtime_wiring=runtime_wiring,
+        {%- endif %}
     )
 
     try:

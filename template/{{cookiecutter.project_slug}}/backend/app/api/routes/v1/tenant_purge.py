@@ -9,7 +9,7 @@ Redis, vector, memory, workspace, connection, audit, and queue adapters.
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, HTTPException, status
 
 from app.api.deps import CurrentUser, OrganizationSvc
 from app.core.exceptions import AuthorizationError, BadRequestError, NotFoundError
@@ -17,6 +17,7 @@ from app.db.models.organization import OrgRole
 from app.schemas.agentscope_tenant_purge import TenantPurgeCreate, TenantPurgeStatus
 from app.services.agentscope_tenant_purge import (
     TenantPurgeNotFound,
+    TenantPurgeIntegrationNotConfigured,
     TenantPurgeRequest,
     TenantPurgeService,
     get_configured_tenant_purge_service,
@@ -26,7 +27,10 @@ router = APIRouter()
 
 
 def _service() -> TenantPurgeService:
-    return get_configured_tenant_purge_service()
+    try:
+        return get_configured_tenant_purge_service()
+    except TenantPurgeIntegrationNotConfigured as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
 
 
 async def _require_owner_or_admin(

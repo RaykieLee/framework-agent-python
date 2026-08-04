@@ -38,12 +38,13 @@ def _build_model(model_name: str) -> OpenAIChatModel:
     )
 
 
-def _build_native_agent(model_name: str) -> Agent:
+def _build_native_agent(model_name: str, *, middlewares: list[Any] | None = None) -> Agent:
     """Construct one native AgentScope agent for a WebSocket conversation."""
     return Agent(
         name="assistant",
         system_prompt=DEFAULT_SYSTEM_PROMPT,
         model=_build_model(model_name),
+        middlewares=middlewares,
     )
 
 
@@ -55,9 +56,10 @@ class AgentScopeAssistant:
         *,
         model_name: str | None = None,
         agent_factory: AgentFactory | None = None,
+        middlewares: list[Any] | None = None,
     ) -> None:
         self.model_name = model_name or settings.AI_MODEL
-        self._agent = (agent_factory or (lambda: _build_native_agent(self.model_name)))()
+        self._agent = (agent_factory or (lambda: _build_native_agent(self.model_name, middlewares=middlewares)))()
 
     @property
     def agent(self) -> Agent:
@@ -93,9 +95,10 @@ def get_agent(
     *,
     model_name: str | None = None,
     agent_factory: AgentFactory | None = None,
+    middlewares: list[Any] | None = None,
 ) -> AgentScopeAssistant:
     """Build an injectable AgentScope assistant for one conversation."""
-    return AgentScopeAssistant(model_name=model_name, agent_factory=agent_factory)
+    return AgentScopeAssistant(model_name=model_name, agent_factory=agent_factory, middlewares=middlewares)
 {%- else %}
 """AgentScope is not selected."""
 {%- endif %}

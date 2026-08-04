@@ -97,6 +97,16 @@ class AgentSession:
         new turn as a cancellable background task.
         """
         msg_type = data.get("type")
+        if msg_type in {"team_start", "team_stop", "team_cancel"}:
+            if self.runtime_wiring is None or self.tenant_context is None:
+                return
+            try:
+                result = await self.runtime_wiring.team_frame(self.tenant_context, data)
+            except Exception as exc:
+                await send_event(self.websocket, "error", {"message": str(exc)})
+            else:
+                await send_event(self.websocket, "team_run", result)
+            return
 
         if msg_type == "stop":
             await self._cancel_turn()
@@ -2782,8 +2792,22 @@ from app.services.agentscope_durable_session import (
     AgentScopeDurableSession,
     RequestResult,
 )
+{%- if cookiecutter.enable_teams and cookiecutter.use_jwt %}
+from app.services.agentscope_runtime import (
+    AgentScopeRuntimeWiring,
+    AgentScopeTenantContext,
+    validate_conversation_tenant,
+)
+{%- else %}
+AgentScopeRuntimeWiring = Any
+AgentScopeTenantContext = Any
+
+async def validate_conversation_tenant(*_args: Any, **_kwargs: Any) -> None:
+    return None
+{%- endif %}
 {%- if cookiecutter.use_database %}
 from app.services.agent import persist_assistant_turn, persist_user_turn
+from app.db.session import get_db_context
 {%- endif %}
 
 
@@ -2900,11 +2924,15 @@ class AgentSession:
         *,
         assistant: AgentScopeAssistant | None = None,
         durable_session: AgentScopeDurableSession | None = None,
+        tenant_context: AgentScopeTenantContext | None = None,
+        runtime_wiring: AgentScopeRuntimeWiring | None = None,
     ) -> None:
         self.websocket = websocket
         self.user = user
         self.assistant = assistant
         self.durable_session = durable_session
+        self.tenant_context = tenant_context
+        self.runtime_wiring = runtime_wiring
         self.current_conversation_id: str | None = None
         self._turn_task: asyncio.Task[None] | None = None
         self._pending_human_event: RequireUserConfirmEvent | None = None
@@ -2967,6 +2995,19 @@ class AgentSession:
         the result before a reconnect can retry it.
         """
         request_id = str(data.get("request_id") or "")
+        # A reconnect that names an existing conversation can open the durable
+        # mapping before executing. Tenant identity comes from the route's
+        # authenticated context, never from this frame.
+        if (
+            not continuation
+            and self.durable_session is None
+            and self.runtime_wiring is not None
+            and self.tenant_context is not None
+            and data.get("conversation_id")
+        ):
+            self.durable_session = self.runtime_wiring.durable_session(
+                self.tenant_context, str(data["conversation_id"])
+            )
         if not continuation and self.durable_session is not None and request_id:
             existing = await self.durable_session.result(request_id)
             if existing is not None:
@@ -2994,12 +3035,14 @@ class AgentSession:
         self, data: dict[str, Any], *, continuation: bool = False
     ) -> str:
         """Run one turn once; callers provide idempotency at the public seam."""
-        role = data.get("active_tenant_role") or getattr(self.user, "active_tenant_role", None)
+        role = self.tenant_context.role if self.tenant_context is not None else (
+            data.get("active_tenant_role") or getattr(self.user, "active_tenant_role", None)
+        )
         try:
             authorize_execution(
                 active_tenant_role=role,
-                active_tenant_id=data.get("active_tenant_id"),
-                conversation_tenant_id=data.get("conversation_tenant_id"),
+                active_tenant_id=(self.tenant_context.tenant_id if self.tenant_context else data.get("active_tenant_id")),
+                conversation_tenant_id=None if self.tenant_context else data.get("conversation_tenant_id"),
             )
         except ActiveTenantError as exc:
             await send_event(self.websocket, "error", {"message": str(exc)})
@@ -3015,6 +3058,13 @@ class AgentSession:
 {%- if cookiecutter.use_database %}
         organization_id: str | None = None
         if not continuation:
+            if self.runtime_wiring is not None and self.tenant_context is not None and data.get("conversation_id"):
+                try:
+                    async with get_db_context() as db:
+                        await validate_conversation_tenant(db, self.tenant_context, str(data["conversation_id"]))
+                except Exception as exc:
+                    await send_event(self.websocket, "error", {"message": str(exc)})
+                    return ""
             self.current_conversation_id, created, organization_id = await persist_user_turn(
 {%- if cookiecutter.websocket_auth_jwt %}
                 self.user,
@@ -3024,6 +3074,10 @@ class AgentSession:
                 requested_conversation_id=data.get("conversation_id"),
                 current_conversation_id=self.current_conversation_id,
             )
+            if self.tenant_context is not None and organization_id is not None and str(organization_id) != self.tenant_context.tenant_id:
+                raise ActiveTenantError("Conversation does not belong to the active tenant")
+            if self.durable_session is None and self.runtime_wiring is not None and self.tenant_context is not None and self.current_conversation_id:
+                self.durable_session = self.runtime_wiring.durable_session(self.tenant_context, self.current_conversation_id)
             if created and self.current_conversation_id:
                 await send_event(
                     self.websocket,
@@ -3035,7 +3089,11 @@ class AgentSession:
             await send_event(self.websocket, "user_prompt", {"content": user_message})
 
         if self.assistant is None:
-            self.assistant = get_agent(model_name=data.get("model"))
+            middlewares: list[Any] = []
+            if self.runtime_wiring is not None and self.tenant_context is not None:
+                resources = await self.runtime_wiring.execution_resources(self.tenant_context)
+                middlewares.extend(resources.middlewares)
+            self.assistant = get_agent(model_name=data.get("model"), middlewares=middlewares)
         pending_tools: list[dict[str, Any]] = []
         final_message: Msg | None = None
         continuation_event: Any | None = None

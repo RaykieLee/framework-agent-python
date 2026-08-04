@@ -222,6 +222,7 @@ from app.services.member import MemberService
 from app.services.invitation import InvitationService
 {%- if cookiecutter.use_agentscope and cookiecutter.use_jwt %}
 from app.services.agentscope_agent_definition import AgentDefinitionService
+from app.services.agentscope_runtime import get_agentscope_runtime
 {%- endif %}
 
 
@@ -232,7 +233,14 @@ def get_organization_service(db: DBSession) -> OrganizationService:
 
 def get_member_service(db: DBSession) -> MemberService:
     """Create MemberService instance with database session."""
+{%- if cookiecutter.use_agentscope and cookiecutter.use_jwt %}
+    # Cleanup is an explicit runtime dependency. A production deployment that
+    # omitted its configured adapters fails closed instead of silently skipping
+    # personal connections, memory, sessions, teams, and workspaces.
+    return MemberService(db, member_exit_cleanup=get_agentscope_runtime().member_exit_cleanup)
+{%- else %}
     return MemberService(db)
+{%- endif %}
 
 
 def get_invitation_service(db: DBSession) -> InvitationService:

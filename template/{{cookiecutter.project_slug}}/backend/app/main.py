@@ -44,6 +44,10 @@ from app.core.logfire_setup import instrument_pydantic_ai
 {%- endif %}
 from app.core.logging import setup_logging
 from app.core.middleware import RequestIDMiddleware
+{%- if cookiecutter.use_agentscope and cookiecutter.enable_teams and cookiecutter.use_jwt %}
+from app.services.agentscope_runtime import get_agentscope_runtime
+from app.services.agentscope_tenant_purge import configure_tenant_purge_service
+{%- endif %}
 
 {%- if cookiecutter.enable_deep_research %}
 from app.db.todo_pool import close_todo_pool, init_todo_pool
@@ -256,6 +260,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[{% if cookiecutter.enable_red
                     logger.info("Auto-promoted %s to app-admin (FIRST_ADMIN_EMAIL)", _first_admin)
         except Exception as _e:
             logger.warning("FIRST_ADMIN_EMAIL promotion failed: %s", _e)
+{%- endif %}
+
+{%- if cookiecutter.use_agentscope and cookiecutter.enable_teams and cookiecutter.use_jwt %}
+    # Queue-backed purge is injected by deployment code before startup. Keep
+    # the service hook explicit so a missing production adapter is observable.
+    _agentscope_runtime = get_agentscope_runtime()
+    if _agentscope_runtime.tenant_purge_service is not None:
+        configure_tenant_purge_service(_agentscope_runtime.tenant_purge_service)
 {%- endif %}
 
 {%- if cookiecutter.enable_redis or cookiecutter.enable_rag or cookiecutter.use_telegram or cookiecutter.use_slack %}

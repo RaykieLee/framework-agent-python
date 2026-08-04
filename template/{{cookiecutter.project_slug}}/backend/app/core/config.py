@@ -57,6 +57,11 @@ class Settings(BaseSettings):
     )
 
     PROJECT_NAME: str = "{{ cookiecutter.project_name }}"
+{% if cookiecutter.use_agentscope %}
+    # In-process state is useful for local/tests only; production requires the
+    # configured PostgreSQL + Redis runtime factory.
+    AGENTSCOPE_ALLOW_IN_PROCESS_FALLBACK: bool = False
+{% endif %}
     API_V1_STR: str = "/api/v1"
     DEBUG: bool = False
     DB_ECHO: bool = False  # Set DB_ECHO=true to log SQL queries (latency + log-noise drain by default)
