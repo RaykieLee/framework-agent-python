@@ -74,7 +74,9 @@ async def agent_websocket(
     websocket: WebSocket,
 {%- if cookiecutter.websocket_auth_jwt %}
     user: CurrentUserWS,
+{%- if cookiecutter.use_agentscope and cookiecutter.use_jwt %}
     organization_id: str | None = Header(None, alias="X-Organization-Id"),
+{%- endif %}
 {%- elif cookiecutter.websocket_auth_api_key %}
     api_key: str = Query(..., alias="api_key"),
 {%- endif %}

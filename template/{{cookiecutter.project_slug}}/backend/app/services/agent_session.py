@@ -97,17 +97,6 @@ class AgentSession:
         new turn as a cancellable background task.
         """
         msg_type = data.get("type")
-        if msg_type in {"team_start", "team_stop", "team_cancel"}:
-            if self.runtime_wiring is None or self.tenant_context is None:
-                return
-            try:
-                result = await self.runtime_wiring.team_frame(self.tenant_context, data)
-            except Exception as exc:
-                await send_event(self.websocket, "error", {"message": str(exc)})
-            else:
-                await send_event(self.websocket, "team_run", result)
-            return
-
         if msg_type == "stop":
             await self._cancel_turn()
             return

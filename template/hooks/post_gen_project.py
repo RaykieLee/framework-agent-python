@@ -476,15 +476,18 @@ if not enable_docker:
     ):
         remove_file(os.path.join(project_root, compose_file))
 
-# Scan all .py files under backend/app — catches any template that rendered to
-# a stub docstring because its feature gate was disabled.
-for root, _dirs, files in os.walk(backend_app):
-    for fname in files:
-        if not fname.endswith(".py"):
-            continue
-        filepath = os.path.join(root, fname)
-        if is_stub_file(filepath):
-            remove_file(filepath)
+# Scan all .py files under backend/app and backend/tests — catches any
+# template that rendered to a stub docstring because its feature gate was
+# disabled. Tests are included because feature-gated contract files otherwise
+# leave empty Python files in generated projects.
+for scan_root in (backend_app, backend_tests):
+    for root, _dirs, files in os.walk(scan_root):
+        for fname in files:
+            if not fname.endswith(".py"):
+                continue
+            filepath = os.path.join(root, fname)
+            if is_stub_file(filepath):
+                remove_file(filepath)
 
 # Same idea for docs and frontend modules: a file whose whole body sits behind
 # a feature-gate conditional renders to an empty file (not a missing one) when
