@@ -445,6 +445,27 @@ def run_docker_journey(project: Path) -> GateResult:
         return GateResult(
             "docker.postgres_redis_qdrant", "skip", "Docker daemon unavailable (docker info failed)"
         )
+    compose_plugin = next(
+        (
+            candidate
+            for candidate in (
+                os.getenv("AGENTSCOPE_DOCKER_COMPOSE_BIN"),
+                str(Path.home() / ".docker/cli-plugins/docker-compose"),
+                "/usr/local/lib/docker/cli-plugins/docker-compose",
+                "/usr/libexec/docker/cli-plugins/docker-compose",
+            )
+            if candidate and Path(candidate).is_file()
+        ),
+        None,
+    )
+    compose = [compose_plugin] if compose_plugin else [docker, "compose"]
+    previous_docker_config = os.environ.get("DOCKER_CONFIG")
+    anonymous_docker_config = tempfile.TemporaryDirectory(prefix="agentscope-docker-config-")
+    # The Docker Desktop credential helper can hang while pulling public
+    # images.  Calling the compose plugin directly lets this gate use an
+    # empty config and anonymous pulls without reading or changing credentials.
+    if compose_plugin:
+        os.environ["DOCKER_CONFIG"] = anonymous_docker_config.name
     try:
         # The template intentionally ships only ``backend/.env.example`` so
         # credentials are never silently committed.  Compose's ``env_file``
@@ -458,7 +479,6 @@ def run_docker_journey(project: Path) -> GateResult:
         env_example = project / "backend" / ".env.example"
         if not env_file.exists() and env_example.is_file():
             shutil.copyfile(env_example, env_file)
-        compose = [docker, "compose"]
         config = _run([*compose, "config", "--quiet"], cwd=project, timeout=30)
         if config.returncode != 0:
             return GateResult(
@@ -489,7 +509,13 @@ def run_docker_journey(project: Path) -> GateResult:
         # The project lives in a temporary directory; do not remove volumes or
         # touch unrelated user containers.  A best-effort stop is sufficient.
         with suppress(OSError, subprocess.TimeoutExpired):
-            _run([docker, "compose", "down", "--remove-orphans"], cwd=project, timeout=30)
+            _run([*compose, "down", "--remove-orphans"], cwd=project, timeout=30)
+        if compose_plugin:
+            if previous_docker_config is None:
+                os.environ.pop("DOCKER_CONFIG", None)
+            else:
+                os.environ["DOCKER_CONFIG"] = previous_docker_config
+        anonymous_docker_config.cleanup()
 
 
 def run_glm_evaluation(project: Path) -> GateResult:
