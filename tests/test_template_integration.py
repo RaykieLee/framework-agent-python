@@ -517,6 +517,37 @@ class TestGeneratedAgentScopeExecutionTeam:
         assert "def reconnect" in content
 
 
+@pytest.fixture(scope="module")
+def generated_agentscope_delegation_project(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Generate the AgentScope tenant/team configuration for Ticket 10."""
+    config = ProjectConfig(
+        project_name="test_agentscope_delegation",
+        database=DatabaseType.POSTGRESQL,
+        ai_framework=AIFrameworkType.AGENTSCOPE,
+        enable_redis=True,
+        enable_docker=True,
+        enable_teams=True,
+        background_tasks=BackgroundTaskType.NONE,
+        rag_features=RAGFeatures(enable_rag=True, vector_store=VectorStoreType.QDRANT),
+    )
+    return generate_project(config, tmp_path_factory.mktemp("agentscope_delegation"))
+
+
+class TestGeneratedAgentScopeDelegation:
+    def test_delegation_policy_and_contract_are_generated(
+        self, generated_agentscope_delegation_project: Path
+    ) -> None:
+        root = generated_agentscope_delegation_project / "backend"
+        service = root / "app" / "services" / "agentscope_delegation.py"
+        contract = root / "tests" / "test_agentscope_delegation.py"
+        assert service.exists()
+        assert contract.exists()
+        content = service.read_text()
+        assert "SubAgentTemplate" in content
+        assert "CrossTenantConnection" in content
+        assert "worker_can_create_team" in content
+
+
 # ---------------------------------------------------------------------------
 # AntV charts / Leaflet maps — generated-content checks
 # ---------------------------------------------------------------------------
