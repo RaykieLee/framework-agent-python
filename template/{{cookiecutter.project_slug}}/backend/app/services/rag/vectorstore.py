@@ -74,6 +74,7 @@ class BaseVectorStore(ABC):
         # `document.metadata.model_dump()` is spread last so it can override per-chunk
         # defaults. `getattr` with defaults is used for optional image fields that may
         # not be present on all chunk types.
+        additional = document.metadata.additional_info or {}
         meta = {
             "page_num": chunk.page_num,
             "chunk_num": chunk.chunk_num,
@@ -83,6 +84,13 @@ class BaseVectorStore(ABC):
 {%- endif %}
             **document.metadata.model_dump(),
         }
+        # Tenant and KB identity are duplicated at the vector payload boundary
+        # so every backend can enforce the same defense-in-depth filter without
+        # understanding the control-plane document schema.
+        for key in ("tenant_id", "knowledge_base_id"):
+            value = additional.get(key)
+            if value is not None:
+                meta[key] = str(value)
         return meta
 
     def _sanitize_id(self, document_id: str) -> str:
@@ -288,10 +296,16 @@ class QdrantVectorStore(BaseVectorStore):
     async def search(self, collection_name: str, query: str, limit: int = 4, filter_expr: str = "") -> list[SearchResult]:
         query_vector = self.embedder.embed_query(query)
         qdrant_filter = None
-        if filter_expr and "parent_doc_id" in filter_expr:
-            m = re.search(r'parent_doc_id\s*==\s*"([^"]+)"', filter_expr)
-            if m:
-                qdrant_filter = Filter(must=[FieldCondition(key="parent_doc_id", match=MatchValue(value=m.group(1)))])
+        if filter_expr:
+            conditions: list[FieldCondition] = []
+            for field in ("parent_doc_id", "metadata.tenant_id", "metadata.knowledge_base_id"):
+                m = re.search(rf'{re.escape(field)}\s*==\s*"([^"]+)"', filter_expr)
+                if m:
+                    conditions.append(
+                        FieldCondition(key=field, match=MatchValue(value=m.group(1)))
+                    )
+            if conditions:
+                qdrant_filter = Filter(must=conditions)
         results = await self.client.search(
             collection_name=collection_name,
             query_vector=query_vector,

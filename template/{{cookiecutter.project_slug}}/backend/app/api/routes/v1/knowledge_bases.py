@@ -167,6 +167,7 @@ async def upload_kb_document(
         vector_store=vector_store,
         organization_id=active_org.id,
         knowledge_base_id=kb.id,
+        knowledge_base_scope=kb.scope,
     )
 
 

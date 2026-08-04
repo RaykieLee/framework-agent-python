@@ -423,6 +423,37 @@ class TestGeneratedAgentScopeBaseline:
         assert "AgentScope" in (root / "agents" / "agentscope_assistant.py").read_text()
 
 
+@pytest.fixture(scope="module")
+def generated_agentscope_kb_project(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Generate AgentScope with the Control Plane KB boundary enabled."""
+    config = ProjectConfig(
+        project_name="test_agentscope_kb",
+        database=DatabaseType.POSTGRESQL,
+        ai_framework=AIFrameworkType.AGENTSCOPE,
+        enable_redis=True,
+        enable_docker=True,
+        enable_teams=True,
+        background_tasks=BackgroundTaskType.NONE,
+        rag_features=RAGFeatures(enable_rag=True, vector_store=VectorStoreType.QDRANT),
+    )
+    return generate_project(config, tmp_path_factory.mktemp("agentscope_kb"))
+
+
+class TestGeneratedAgentScopeKnowledgeAdapter:
+    """Verify the AgentScope KB adapter stays inside the generated app."""
+
+    def test_adapter_and_contract_tests_are_generated(self, generated_agentscope_kb_project: Path) -> None:
+        root = generated_agentscope_kb_project / "backend"
+        adapter = root / "app" / "services" / "agentscope_knowledge.py"
+        contract_tests = root / "tests" / "test_agentscope_knowledge.py"
+        assert adapter.exists()
+        assert contract_tests.exists()
+        content = adapter.read_text()
+        assert "Control Plane" in content
+        assert "ReadOnlyKnowledgeBaseError" in content
+        assert "metadata.tenant_id" in content
+
+
 # ---------------------------------------------------------------------------
 # AntV charts / Leaflet maps — generated-content checks
 # ---------------------------------------------------------------------------

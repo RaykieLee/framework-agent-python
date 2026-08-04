@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Mapping
 from pathlib import Path
 
 from app.core.config import settings
@@ -92,6 +92,7 @@ class IngestionService:
         collection_name: str,
         replace: bool = True,
         source_path: str = "",
+        metadata: Mapping[str, str] | None = None,
     ) -> IngestionResult:
         """`source_path` accepts URI schemes like gdrive://id or s3://bucket/key."""
         try:
@@ -100,6 +101,11 @@ class IngestionService:
             if source_path:
                 document.metadata.source_path = source_path
                 document.metadata.filename = Path(source_path).name
+            if metadata:
+                document.metadata.additional_info = {
+                    **(document.metadata.additional_info or {}),
+                    **{str(key): str(value) for key, value in metadata.items()},
+                }
 
             existing_id = None
             if replace:

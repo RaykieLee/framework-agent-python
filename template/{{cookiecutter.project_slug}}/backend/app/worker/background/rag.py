@@ -24,6 +24,7 @@ async def ingest_document_in_background(
     filepath: str,
     source_path: str,
     replace: bool,
+    metadata: dict[str, str] | None = None,
 ) -> None:
     """Ingest a single document into the vector store and update its DB record."""
     from app.services.rag_document import RAGDocumentService
@@ -34,6 +35,7 @@ async def ingest_document_in_background(
             collection_name=collection_name,
             replace=replace,
             source_path=source_path,
+            metadata=metadata,
         )
         async with get_db_context() as db:
             await RAGDocumentService(db).complete_ingestion(

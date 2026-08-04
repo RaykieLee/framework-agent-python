@@ -53,11 +53,11 @@ def _build_ingestion_service() -> IngestionService:
 
 
 @shared_task(bind=True, max_retries=2, soft_time_limit=300, time_limit=360)  # type: ignore
-def ingest_document_task(self: Any, rag_document_id: str, collection_name: str, filepath: str, source_path: str, replace: bool = False) -> dict[str, Any]:
+def ingest_document_task(self: Any, rag_document_id: str, collection_name: str, filepath: str, source_path: str, replace: bool = False, metadata: dict[str, str] | None = None) -> dict[str, Any]:
     """Process a document: parse, chunk, embed, store in vector DB."""
     logger.info("Starting ingestion: %s -> %s", source_path, collection_name)
     try:
-        return asyncio.run(_run_ingestion(rag_document_id, collection_name, filepath, source_path, replace))
+        return asyncio.run(_run_ingestion(rag_document_id, collection_name, filepath, source_path, replace, metadata))
     except Exception as exc:
         logger.error("Ingestion failed: %s", exc)
         asyncio.run(_update_status(rag_document_id, "error", error_message=str(exc)))
@@ -78,11 +78,11 @@ def sync_collection_task(self: Any, sync_log_id: str, source: str, collection_na
 
 
 @broker.task
-async def ingest_document_task(rag_document_id: str, collection_name: str, filepath: str, source_path: str, replace: bool = False) -> dict[str, Any]:
+async def ingest_document_task(rag_document_id: str, collection_name: str, filepath: str, source_path: str, replace: bool = False, metadata: dict[str, str] | None = None) -> dict[str, Any]:
     """Process a document: parse, chunk, embed, store in vector DB."""
     logger.info("Starting ingestion: %s -> %s", source_path, collection_name)
     try:
-        return await _run_ingestion(rag_document_id, collection_name, filepath, source_path, replace)
+        return await _run_ingestion(rag_document_id, collection_name, filepath, source_path, replace, metadata)
     except Exception as exc:
         logger.error("Ingestion failed: %s", exc)
         await _update_status(rag_document_id, "error", error_message=str(exc))
@@ -102,11 +102,11 @@ async def sync_collection_task(sync_log_id: str, source: str, collection_name: s
 {%- elif cookiecutter.use_arq %}
 
 
-async def ingest_document_task(ctx: dict, rag_document_id: str, collection_name: str, filepath: str, source_path: str, replace: bool = False) -> dict[str, Any]:
+async def ingest_document_task(ctx: dict, rag_document_id: str, collection_name: str, filepath: str, source_path: str, replace: bool = False, metadata: dict[str, str] | None = None) -> dict[str, Any]:
     """Process a document: parse, chunk, embed, store in vector DB."""
     logger.info("Starting ingestion: %s -> %s", source_path, collection_name)
     try:
-        return await _run_ingestion(rag_document_id, collection_name, filepath, source_path, replace)
+        return await _run_ingestion(rag_document_id, collection_name, filepath, source_path, replace, metadata)
     except Exception as exc:
         logger.error("Ingestion failed: %s", exc)
         await _update_status(rag_document_id, "error", error_message=str(exc))
@@ -191,11 +191,11 @@ async def check_scheduled_syncs(ctx: dict) -> None:
 
 
 @flow(name="ingest-document", log_prints=True)
-async def ingest_document_flow(rag_document_id: str, collection_name: str, filepath: str, source_path: str, replace: bool = False) -> dict[str, Any]:
+async def ingest_document_flow(rag_document_id: str, collection_name: str, filepath: str, source_path: str, replace: bool = False, metadata: dict[str, str] | None = None) -> dict[str, Any]:
     """Process a document: parse, chunk, embed, store in vector DB."""
     logger.info("Starting ingestion: %s -> %s", source_path, collection_name)
     try:
-        return await _run_ingestion(rag_document_id, collection_name, filepath, source_path, replace)
+        return await _run_ingestion(rag_document_id, collection_name, filepath, source_path, replace, metadata)
     except Exception as exc:
         logger.error("Ingestion failed: %s", exc)
         await _update_status(rag_document_id, "error", error_message=str(exc))
@@ -236,13 +236,13 @@ async def check_scheduled_syncs_flow() -> None:
 
 
 
-async def _run_ingestion(rag_document_id: str, collection_name: str, filepath: str, source_path: str, replace: bool) -> dict[str, Any]:
+async def _run_ingestion(rag_document_id: str, collection_name: str, filepath: str, source_path: str, replace: bool, metadata: dict[str, str] | None = None) -> dict[str, Any]:
     from app.services.rag_document import RAGDocumentService
     ingestion_service = _build_ingestion_service()
 
     file_path = Path(filepath)
     try:
-        result = await ingestion_service.ingest_file(filepath=file_path, collection_name=collection_name, replace=replace, source_path=source_path)
+        result = await ingestion_service.ingest_file(filepath=file_path, collection_name=collection_name, replace=replace, source_path=source_path, metadata=metadata)
         async with get_worker_db_context() as db:
             await RAGDocumentService(db).complete_ingestion(rag_document_id, vector_document_id=result.document_id)
         await _notify_ws(rag_document_id, "done", source_path)

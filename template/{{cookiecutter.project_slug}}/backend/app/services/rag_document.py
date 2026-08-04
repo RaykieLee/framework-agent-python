@@ -137,6 +137,7 @@ class RAGDocumentService:
 {%- endif %}
 {%- if cookiecutter.enable_teams and cookiecutter.use_jwt %}
         knowledge_base_id: UUID | None = None,
+        knowledge_base_scope: str | None = None,
 {%- endif %}
     ) -> RAGIngestResponse:
         """Validate, persist, and queue an uploaded file for ingestion.
@@ -180,6 +181,19 @@ class RAGDocumentService:
 {%- endif %}
         )
         doc_id = rag_doc.id
+        ingestion_metadata: dict[str, str] = {}
+{%- if cookiecutter.enable_teams %}
+        if organization_id is not None:
+            ingestion_metadata["tenant_id"] = (
+                "platform"
+                if knowledge_base_scope == "app"
+                else str(organization_id)
+            )
+{%- endif %}
+{%- if cookiecutter.enable_teams and cookiecutter.use_jwt %}
+        if knowledge_base_id is not None:
+            ingestion_metadata["knowledge_base_id"] = str(knowledge_base_id)
+{%- endif %}
 
         await vector_store.create_collection(collection_name)
 
@@ -197,6 +211,7 @@ class RAGDocumentService:
             filepath=tmp_path,
             source_path=filename,
             replace=replace,
+            metadata=ingestion_metadata,
         )
 {%- elif cookiecutter.use_arq %}
         pool = await get_arq_pool()
@@ -207,6 +222,7 @@ class RAGDocumentService:
             tmp_path,
             filename,
             replace,
+            ingestion_metadata,
         )
 {%- elif cookiecutter.use_prefect %}
         import asyncio
@@ -217,6 +233,7 @@ class RAGDocumentService:
             filepath=tmp_path,
             source_path=filename,
             replace=replace,
+            metadata=ingestion_metadata,
         ))
 {%- else %}
         fire_and_forget(
@@ -226,6 +243,7 @@ class RAGDocumentService:
                 filepath=tmp_path,
                 source_path=filename,
                 replace=replace,
+                metadata=ingestion_metadata,
             ),
             label="rag.ingest_document",
         )
