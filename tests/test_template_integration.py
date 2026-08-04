@@ -548,6 +548,40 @@ class TestGeneratedAgentScopeDelegation:
         assert "worker_can_create_team" in content
 
 
+@pytest.fixture(scope="module")
+def generated_agentscope_team_run_project(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Generate AgentScope + Teams + Credits for Ticket 11 accounting."""
+    config = ProjectConfig(
+        project_name="test_agentscope_team_run",
+        database=DatabaseType.POSTGRESQL,
+        ai_framework=AIFrameworkType.AGENTSCOPE,
+        enable_redis=True,
+        enable_docker=True,
+        enable_teams=True,
+        enable_billing=True,
+        enable_credits_system=True,
+        background_tasks=BackgroundTaskType.NONE,
+        rag_features=RAGFeatures(enable_rag=True, vector_store=VectorStoreType.QDRANT),
+    )
+    return generate_project(config, tmp_path_factory.mktemp("agentscope_team_run"))
+
+
+class TestGeneratedAgentScopeTeamRun:
+    def test_team_run_accounting_and_contract_are_generated(
+        self, generated_agentscope_team_run_project: Path
+    ) -> None:
+        root = generated_agentscope_team_run_project / "backend"
+        service = root / "app" / "services" / "agentscope_team_run.py"
+        contract = root / "tests" / "test_agentscope_team_run.py"
+        assert service.exists()
+        assert contract.exists()
+        content = service.read_text()
+        assert "class AgentScopeTeamRunService" in content
+        assert "RedisPostgresTeamRunStore" in content
+        assert 'SECURITY = "security"' in content
+        assert "accepted_usage_events" in content
+
+
 # ---------------------------------------------------------------------------
 # AntV charts / Leaflet maps — generated-content checks
 # ---------------------------------------------------------------------------
