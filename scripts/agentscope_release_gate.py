@@ -264,6 +264,17 @@ def verify_generated_project(project: Path) -> list[GateResult]:
         )
     )
 
+    pagination_compatibility = '"fastapi-pagination>=0.12.31,<0.13"' in pyproject
+    results.append(
+        GateResult(
+            "generated.framework_dependency_compatibility",
+            "pass" if pagination_compatibility else "fail",
+            "FastAPI and fastapi-pagination versions are pinned to a compatible API line"
+            if pagination_compatibility
+            else "fastapi-pagination must remain below 0.13 for the supported FastAPI line",
+        )
+    )
+
     route_violations = _check_no_native_routes(project)
     results.append(
         GateResult(
@@ -435,6 +446,18 @@ def run_docker_journey(project: Path) -> GateResult:
             "docker.postgres_redis_qdrant", "skip", "Docker daemon unavailable (docker info failed)"
         )
     try:
+        # The template intentionally ships only ``backend/.env.example`` so
+        # credentials are never silently committed.  Compose's ``env_file``
+        # entries are deliberately strict, however, and therefore require a
+        # local copy before even ``docker compose config`` can validate the
+        # generated project.  The release gate runs against an ephemeral
+        # project, so make that safe development copy here rather than
+        # weakening the generated compose contract or writing into the source
+        # repository.
+        env_file = project / "backend" / ".env"
+        env_example = project / "backend" / ".env.example"
+        if not env_file.exists() and env_example.is_file():
+            shutil.copyfile(env_example, env_file)
         compose = [docker, "compose"]
         config = _run([*compose, "config", "--quiet"], cwd=project, timeout=30)
         if config.returncode != 0:

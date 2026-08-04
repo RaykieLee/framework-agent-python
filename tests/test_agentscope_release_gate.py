@@ -1,5 +1,6 @@
 """Contract tests for the generated AgentScope release gate."""
 
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -60,3 +61,31 @@ def test_docker_gate_skips_when_daemon_is_not_installed(
 
     assert result.status == "skip"
     assert "not installed" in result.detail
+
+
+def test_docker_gate_materializes_ephemeral_env_before_compose(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Compose validation must work from the secret-free generated template."""
+
+    backend = tmp_path / "backend"
+    backend.mkdir()
+    (backend / ".env.example").write_text("POSTGRES_USER=postgres\n", encoding="utf-8")
+    commands: list[list[str]] = []
+
+    monkeypatch.setattr("scripts.agentscope_release_gate.shutil.which", lambda _: "/usr/bin/docker")
+
+    def fake_run(
+        command: list[str], *, cwd: Path, timeout: int = 300
+    ) -> subprocess.CompletedProcess[str]:
+        del cwd, timeout
+        commands.append(command)
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    monkeypatch.setattr("scripts.agentscope_release_gate._run", fake_run)
+
+    result = run_docker_journey(tmp_path)
+
+    assert result.status == "pass"
+    assert (backend / ".env").read_text(encoding="utf-8") == "POSTGRES_USER=postgres\n"
+    assert any(command[-2:] == ["config", "--quiet"] for command in commands)
