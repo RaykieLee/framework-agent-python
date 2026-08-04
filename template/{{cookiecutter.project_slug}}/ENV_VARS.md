@@ -53,6 +53,16 @@
 {%- if cookiecutter.use_openrouter %}
  | `OPENROUTER_API_KEY` | **必需** | — | 来自 openrouter.ai |
 {%- endif %}
+{%- if cookiecutter.use_agentscope %}
+ | `AGENTSCOPE_EVAL_ENABLED` | 可选 | `false` | 明确设置为 `true` 才启用 GLM-5.2 运行时评测 |
+ | `AGENTSCOPE_EVAL_BASE_URL` | 可选 | `https://open.bigmodel.cn/api/paas/v4` | OpenAI 兼容的 GLM API 基址 |
+ | `AGENTSCOPE_EVAL_MODEL` | 可选 | `glm-5.2` | 评测模型名称 |
+ | `AGENTSCOPE_EVAL_API_KEY` | 启用评测时必需 | — | 仅从环境读取；不会写入评测报告或日志 |
+ | `AGENTSCOPE_EVAL_TIMEOUT_SECONDS` | 可选 | `30` | 单次请求超时 |
+ | `AGENTSCOPE_EVAL_MAX_RETRIES` | 可选 | `2` | 网络错误、429 和 5xx 的最大重试次数 |
+ | `AGENTSCOPE_EVAL_BACKOFF_SECONDS` | 可选 | `0.25` | 指数退避基数 |
+ | `AGENTSCOPE_EVAL_MIN_INTERVAL_SECONDS` | 可选 | `0` | 请求间最小间隔（限速） |
+{%- endif %}
 {%- if cookiecutter.enable_logfire %}
  | `LOGFIRE_TOKEN` | 可选 | — | 设置后，将追踪数据发送到 Logfire（logfire.pydantic.dev） |
 {%- endif %}
