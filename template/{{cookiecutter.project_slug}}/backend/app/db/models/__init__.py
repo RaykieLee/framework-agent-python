@@ -54,6 +54,10 @@ from app.db.models.audit_log import AppAdminAuditLog
 {%- set _ = models.append("KnowledgeBase") %}
 from app.db.models.knowledge_base import KnowledgeBase
 {%- endif %}
+{%- if cookiecutter.use_agentscope and cookiecutter.enable_teams and cookiecutter.use_jwt %}
+{%- set _ = models.extend(["AgentDefinition", "TenantAgentDefinition"]) %}
+from app.db.models.agentscope_agent_definition import AgentDefinition, TenantAgentDefinition
+{%- endif %}
 {%- if cookiecutter.use_auth and cookiecutter.use_ai %}
 {%- set _ = models.append("UserSlashCommand") %}
 from app.db.models.user_slash_command import UserSlashCommand

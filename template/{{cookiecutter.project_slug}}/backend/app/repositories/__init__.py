@@ -51,6 +51,10 @@ from app.repositories import invitation as invitation_repo
 from app.repositories import member as member_repo
 from app.repositories import organization as organization_repo
 {%- endif %}
+{%- if cookiecutter.use_agentscope and cookiecutter.enable_teams and cookiecutter.use_jwt %}
+
+from app.repositories import agentscope_agent_definition as agentscope_agent_definition_repo
+{%- endif %}
 {%- if cookiecutter.use_auth and cookiecutter.use_ai %}
 
 from app.repositories import user_slash_command as user_slash_command_repo
@@ -100,6 +104,9 @@ __all__ = [
     "organization_repo",
     "member_repo",
     "invitation_repo",
+{%- endif %}
+{%- if cookiecutter.use_agentscope and cookiecutter.enable_teams and cookiecutter.use_jwt %}
+    "agentscope_agent_definition_repo",
 {%- endif %}
 {%- if cookiecutter.use_auth and cookiecutter.use_ai %}
     "user_slash_command_repo",

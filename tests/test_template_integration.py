@@ -454,6 +454,36 @@ class TestGeneratedAgentScopeKnowledgeAdapter:
         assert "metadata.tenant_id" in content
 
 
+@pytest.fixture(scope="module")
+def generated_agentscope_definitions_project(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Generate AgentScope with tenant Agent Definition control-plane seams."""
+    config = ProjectConfig(
+        project_name="test_agentscope_definitions",
+        database=DatabaseType.POSTGRESQL,
+        ai_framework=AIFrameworkType.AGENTSCOPE,
+        enable_redis=True,
+        enable_docker=True,
+        enable_teams=True,
+        background_tasks=BackgroundTaskType.NONE,
+        rag_features=RAGFeatures(enable_rag=True, vector_store=VectorStoreType.QDRANT),
+    )
+    return generate_project(config, tmp_path_factory.mktemp("agentscope_definitions"))
+
+
+class TestGeneratedAgentScopeAgentDefinitions:
+    def test_control_plane_seam_and_contract_tests_are_generated(
+        self, generated_agentscope_definitions_project: Path
+    ) -> None:
+        root = generated_agentscope_definitions_project / "backend"
+        assert (root / "app" / "db" / "models" / "agentscope_agent_definition.py").exists()
+        assert (root / "app" / "services" / "agentscope_agent_definition.py").exists()
+        assert (root / "app" / "api" / "routes" / "v1" / "agent_definitions.py").exists()
+        contract = (root / "tests" / "test_agentscope_agent_definitions.py").read_text()
+        assert "test_private_fields_are_redacted" in contract
+        route = (root / "app" / "api" / "routes" / "v1" / "agent_definitions.py").read_text()
+        assert "AgentScope" not in route
+
+
 # ---------------------------------------------------------------------------
 # AntV charts / Leaflet maps — generated-content checks
 # ---------------------------------------------------------------------------

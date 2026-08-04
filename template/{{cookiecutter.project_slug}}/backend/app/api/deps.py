@@ -220,6 +220,9 @@ from app.repositories import member_repo, organization_repo
 from app.services.organization import OrganizationService
 from app.services.member import MemberService
 from app.services.invitation import InvitationService
+{%- if cookiecutter.use_agentscope and cookiecutter.use_jwt %}
+from app.services.agentscope_agent_definition import AgentDefinitionService
+{%- endif %}
 
 
 def get_organization_service(db: DBSession) -> OrganizationService:
@@ -240,6 +243,16 @@ def get_invitation_service(db: DBSession) -> InvitationService:
 OrganizationSvc = Annotated[OrganizationService, Depends(get_organization_service)]
 MemberSvc = Annotated[MemberService, Depends(get_member_service)]
 InvitationSvc = Annotated[InvitationService, Depends(get_invitation_service)]
+{%- if cookiecutter.use_agentscope and cookiecutter.use_jwt %}
+
+
+def get_agent_definition_service(db: DBSession) -> AgentDefinitionService:
+    """Create the Agent Definition control-plane service."""
+    return AgentDefinitionService(db)
+
+
+AgentDefinitionSvc = Annotated[AgentDefinitionService, Depends(get_agent_definition_service)]
+{%- endif %}
 {%- if cookiecutter.enable_billing %}
 from app.services.billing import BillingService
 

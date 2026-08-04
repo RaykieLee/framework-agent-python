@@ -55,6 +55,9 @@ from app.api.routes.v1 import slack_webhook
 from app.api.routes.v1 import members, organizations
 from app.api.routes.v1.invitations import org_router as invitations_org_router, token_router as invitations_token_router
 {%- endif %}
+{%- if cookiecutter.use_agentscope and cookiecutter.enable_teams and cookiecutter.use_jwt %}
+from app.api.routes.v1 import agent_definitions
+{%- endif %}
 {%- if cookiecutter.enable_teams and cookiecutter.enable_rag and cookiecutter.use_jwt %}
 from app.api.routes.v1 import knowledge_bases
 {%- endif %}
@@ -172,6 +175,9 @@ v1_router.include_router(organizations.router, prefix="/orgs", tags=["organizati
 v1_router.include_router(members.router, prefix="/orgs", tags=["members"])
 v1_router.include_router(invitations_org_router, prefix="/orgs", tags=["invitations"])
 v1_router.include_router(invitations_token_router, tags=["invitations"])
+{%- endif %}
+{%- if cookiecutter.use_agentscope and cookiecutter.enable_teams and cookiecutter.use_jwt %}
+v1_router.include_router(agent_definitions.router, prefix="/orgs", tags=["agent-definitions"])
 {%- endif %}
 {%- if cookiecutter.enable_teams and cookiecutter.enable_rag and cookiecutter.use_jwt %}
 

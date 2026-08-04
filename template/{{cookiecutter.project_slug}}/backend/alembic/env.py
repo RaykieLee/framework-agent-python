@@ -42,6 +42,9 @@ from app.db.models.audit_log import AppAdminAuditLog  # noqa: F401
 {%- if cookiecutter.enable_teams and cookiecutter.enable_rag and cookiecutter.use_jwt %}
 from app.db.models.knowledge_base import KnowledgeBase  # noqa: F401
 {%- endif %}
+{%- if cookiecutter.use_agentscope and cookiecutter.enable_teams and cookiecutter.use_jwt %}
+from app.db.models.agentscope_agent_definition import AgentDefinition, TenantAgentDefinition  # noqa: F401
+{%- endif %}
 
 config = context.config
 
