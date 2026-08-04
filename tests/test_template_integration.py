@@ -582,6 +582,43 @@ class TestGeneratedAgentScopeTeamRun:
         assert "accepted_usage_events" in content
 
 
+@pytest.fixture(scope="module")
+def generated_agentscope_tenant_purge_project(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Generate AgentScope + Teams project for the Tenant Purge boundary."""
+    config = ProjectConfig(
+        project_name="test_agentscope_tenant_purge",
+        database=DatabaseType.POSTGRESQL,
+        ai_framework=AIFrameworkType.AGENTSCOPE,
+        enable_redis=True,
+        enable_docker=True,
+        enable_teams=True,
+        background_tasks=BackgroundTaskType.NONE,
+        rag_features=RAGFeatures(enable_rag=True, vector_store=VectorStoreType.QDRANT),
+    )
+    return generate_project(config, tmp_path_factory.mktemp("agentscope_tenant_purge"))
+
+
+class TestGeneratedAgentScopeTenantPurge:
+    def test_purge_service_api_and_contract_are_generated(
+        self, generated_agentscope_tenant_purge_project: Path
+    ) -> None:
+        root = generated_agentscope_tenant_purge_project / "backend"
+        service = root / "app" / "services" / "agentscope_tenant_purge.py"
+        route = root / "app" / "api" / "routes" / "v1" / "tenant_purge.py"
+        contract = root / "tests" / "test_agentscope_tenant_purge.py"
+        assert service.exists()
+        assert route.exists()
+        assert contract.exists()
+        content = service.read_text()
+        assert "class TenantPurgeService" in content
+        assert "preserve_audit=True" in content
+        assert "class PurgeStatus" in content
+        route_content = route.read_text()
+        assert "HTTP_202_ACCEPTED" in route_content
+        assert "configure_tenant_purge_service" in route_content
+        assert ".run(" not in route_content
+
+
 # ---------------------------------------------------------------------------
 # AntV charts / Leaflet maps — generated-content checks
 # ---------------------------------------------------------------------------

@@ -57,6 +57,7 @@ from app.api.routes.v1.invitations import org_router as invitations_org_router, 
 {%- endif %}
 {%- if cookiecutter.use_agentscope and cookiecutter.enable_teams and cookiecutter.use_jwt %}
 from app.api.routes.v1 import agent_definitions
+from app.api.routes.v1 import tenant_purge
 {%- endif %}
 {%- if cookiecutter.enable_teams and cookiecutter.enable_rag and cookiecutter.use_jwt %}
 from app.api.routes.v1 import knowledge_bases
@@ -178,6 +179,7 @@ v1_router.include_router(invitations_token_router, tags=["invitations"])
 {%- endif %}
 {%- if cookiecutter.use_agentscope and cookiecutter.enable_teams and cookiecutter.use_jwt %}
 v1_router.include_router(agent_definitions.router, prefix="/orgs", tags=["agent-definitions"])
+v1_router.include_router(tenant_purge.router, prefix="/orgs", tags=["tenant-purge"])
 {%- endif %}
 {%- if cookiecutter.enable_teams and cookiecutter.enable_rag and cookiecutter.use_jwt %}
 
