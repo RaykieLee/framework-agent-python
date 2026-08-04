@@ -12,12 +12,16 @@ from fastapi import APIRouter, HTTPException, status
 
 from app.agents.mcp_oauth import OAuthError
 from app.api.deps import CurrentUser, McpConnectionSvc
+{%- if cookiecutter.enable_teams %}
+from app.api.deps import ActiveOrg
+{%- endif %}
 from app.core.config import settings
 from app.core.exceptions import NotFoundError
 from app.schemas.mcp_connection import (
     McpConnectionCreate,
     McpConnectionList,
     McpConnectionRead,
+    McpConnectionRotate,
     McpConnectionTestResult,
     McpConnectionUpdate,
     McpOAuthCallback,
@@ -43,9 +47,20 @@ async def list_workspace_mcp_servers(user: CurrentUser) -> Any:
 
 
 @router.get("", response_model=McpConnectionList)
-async def list_mcp_connections(service: McpConnectionSvc, user: CurrentUser) -> Any:
+async def list_mcp_connections(
+    service: McpConnectionSvc,
+    user: CurrentUser,
+{%- if cookiecutter.enable_teams %}
+    org: ActiveOrg,
+{%- endif %}
+) -> Any:
     """List the current user's MCP server connections."""
-    items, total = await service.list_for_user(user_id=user.id)
+    items, total = await service.list_for_user(
+        user_id=user.id,
+{%- if cookiecutter.enable_teams %}
+        organization_id=org.id,
+{%- endif %}
+    )
     return McpConnectionList(
         items=[McpConnectionRead.from_model(c) for c in items],
         total=total,
@@ -57,9 +72,18 @@ async def create_mcp_connection(
     data: McpConnectionCreate,
     service: McpConnectionSvc,
     user: CurrentUser,
+{%- if cookiecutter.enable_teams %}
+    org: ActiveOrg,
+{%- endif %}
 ) -> Any:
     """Add an MCP server connection. The URL is SSRF-validated."""
-    db_connection = await service.create(user_id=user.id, data=data)
+    db_connection = await service.create(
+        user_id=user.id,
+{%- if cookiecutter.enable_teams %}
+        organization_id=org.id,
+{%- endif %}
+        data=data,
+    )
     return McpConnectionRead.from_model(db_connection)
 
 
@@ -69,9 +93,19 @@ async def update_mcp_connection(
     data: McpConnectionUpdate,
     service: McpConnectionSvc,
     user: CurrentUser,
+{%- if cookiecutter.enable_teams %}
+    org: ActiveOrg,
+{%- endif %}
 ) -> Any:
     """Patch a connection. ``auth_token: ""`` clears the stored token."""
-    db_connection = await service.update(user_id=user.id, connection_id=connection_id, data=data)
+    db_connection = await service.update(
+        user_id=user.id,
+{%- if cookiecutter.enable_teams %}
+        organization_id=org.id,
+{%- endif %}
+        connection_id=connection_id,
+        data=data,
+    )
     return McpConnectionRead.from_model(db_connection)
 
 
@@ -80,10 +114,61 @@ async def delete_mcp_connection(
     connection_id: UUID,
     service: McpConnectionSvc,
     user: CurrentUser,
+{%- if cookiecutter.enable_teams %}
+    org: ActiveOrg,
+{%- endif %}
 ) -> Any:
     """Remove a connection."""
-    await service.delete(user_id=user.id, connection_id=connection_id)
+    await service.delete(
+        user_id=user.id,
+{%- if cookiecutter.enable_teams %}
+        organization_id=org.id,
+{%- endif %}
+        connection_id=connection_id,
+    )
     return None
+
+
+@router.post("/{connection_id}/rotate", response_model=McpConnectionRead)
+async def rotate_mcp_connection(
+    connection_id: UUID,
+    data: McpConnectionRotate,
+    service: McpConnectionSvc,
+    user: CurrentUser,
+{%- if cookiecutter.enable_teams %}
+    org: ActiveOrg,
+{%- endif %}
+) -> Any:
+    """Replace a bearer token without exposing the stored ciphertext."""
+    connection = await service.rotate(
+        user_id=user.id,
+{%- if cookiecutter.enable_teams %}
+        organization_id=org.id,
+{%- endif %}
+        connection_id=connection_id,
+        auth_token=data.auth_token,
+    )
+    return McpConnectionRead.from_model(connection)
+
+
+@router.post("/{connection_id}/revoke", response_model=McpConnectionRead)
+async def revoke_mcp_connection(
+    connection_id: UUID,
+    service: McpConnectionSvc,
+    user: CurrentUser,
+{%- if cookiecutter.enable_teams %}
+    org: ActiveOrg,
+{%- endif %}
+) -> Any:
+    """Clear all bearer/OAuth material while retaining the connection row."""
+    connection = await service.revoke(
+        user_id=user.id,
+{%- if cookiecutter.enable_teams %}
+        organization_id=org.id,
+{%- endif %}
+        connection_id=connection_id,
+    )
+    return McpConnectionRead.from_model(connection)
 
 
 @router.post("/oauth/start", response_model=McpOAuthStartResult)
@@ -91,11 +176,19 @@ async def start_mcp_oauth(
     data: McpOAuthStart,
     service: McpConnectionSvc,
     user: CurrentUser,
+{%- if cookiecutter.enable_teams %}
+    org: ActiveOrg,
+{%- endif %}
 ) -> Any:
     """Begin the OAuth flow; returns the provider consent URL to redirect to."""
     try:
         authorization_url = await service.oauth_start(
-            user_id=user.id, name=data.name, url=data.url
+            user_id=user.id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=org.id,
+{%- endif %}
+            name=data.name,
+            url=data.url,
         )
     except OAuthError as exc:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
@@ -121,9 +214,18 @@ async def test_mcp_connection(
     connection_id: UUID,
     service: McpConnectionSvc,
     user: CurrentUser,
+{%- if cookiecutter.enable_teams %}
+    org: ActiveOrg,
+{%- endif %}
 ) -> Any:
     """Probe the server and return its tool list; persists last_status."""
-    _connection, tools, error = await service.test(user_id=user.id, connection_id=connection_id)
+    _connection, tools, error = await service.test(
+        user_id=user.id,
+{%- if cookiecutter.enable_teams %}
+        organization_id=org.id,
+{%- endif %}
+        connection_id=connection_id,
+    )
     return McpConnectionTestResult(
         ok=error is None,
         error=error,

@@ -173,12 +173,40 @@ class McpConnectionService:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    async def list_for_user(self, *, user_id: UUID) -> tuple[list[McpConnection], int]:
-        return await mcp_connection_repo.list_for_user(self.db, user_id=user_id)
+    async def list_for_user(
+        self,
+        *,
+        user_id: UUID,
+{%- if cookiecutter.enable_teams %}
+        organization_id: UUID,
+{%- endif %}
+    ) -> tuple[list[McpConnection], int]:
+        return await mcp_connection_repo.list_for_user(
+            self.db,
+            user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=organization_id,
+{%- endif %}
+        )
 
-    async def create(self, *, user_id: UUID, data: McpConnectionCreate) -> McpConnection:
+    async def create(
+        self,
+        *,
+        user_id: UUID,
+{%- if cookiecutter.enable_teams %}
+        organization_id: UUID,
+{%- endif %}
+        data: McpConnectionCreate,
+    ) -> McpConnection:
         url = await validate_mcp_url(data.url)
-        existing = await mcp_connection_repo.get_by_name(self.db, user_id=user_id, name=data.name)
+        existing = await mcp_connection_repo.get_by_name(
+            self.db,
+            user_id=user_id,
+            name=data.name,
+{%- if cookiecutter.enable_teams %}
+            organization_id=organization_id,
+{%- endif %}
+        )
         if existing is not None:
             raise AlreadyExistsError(
                 message="MCP connection with this name already exists",
@@ -189,6 +217,9 @@ class McpConnectionService:
             return await mcp_connection_repo.create(
                 self.db,
                 user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+                organization_id=organization_id,
+{%- endif %}
                 name=data.name,
                 url=url,
                 auth_token=encrypt_value(token, settings.SECRET_KEY) if token else None,
@@ -202,9 +233,22 @@ class McpConnectionService:
             ) from exc
 
     async def update(
-        self, *, user_id: UUID, connection_id: UUID, data: McpConnectionUpdate
+        self,
+        *,
+        user_id: UUID,
+{%- if cookiecutter.enable_teams %}
+        organization_id: UUID,
+{%- endif %}
+        connection_id: UUID,
+        data: McpConnectionUpdate,
     ) -> McpConnection:
-        db_connection = await self._get_owned(user_id=user_id, connection_id=connection_id)
+        db_connection = await self._get_owned(
+            user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=organization_id,
+{%- endif %}
+            connection_id=connection_id,
+        )
         update_data: dict[str, Any] = data.model_dump(
             exclude_unset=True, exclude={"clear_allowed_tools"}
         )
@@ -214,7 +258,10 @@ class McpConnectionService:
 
         if "name" in update_data and update_data["name"] != db_connection.name:
             collision = await mcp_connection_repo.get_by_name(
-                self.db, user_id=user_id, name=update_data["name"]
+                self.db, user_id=user_id, name=update_data["name"],
+{%- if cookiecutter.enable_teams %}
+                organization_id=organization_id,
+{%- endif %}
             )
             if collision is not None and collision.id != db_connection.id:
                 raise AlreadyExistsError(
@@ -250,15 +297,92 @@ class McpConnectionService:
             self.db, db_connection=db_connection, update_data=update_data
         )
 
-    async def delete(self, *, user_id: UUID, connection_id: UUID) -> None:
-        db_connection = await self._get_owned(user_id=user_id, connection_id=connection_id)
+    async def delete(
+        self,
+        *,
+        user_id: UUID,
+{%- if cookiecutter.enable_teams %}
+        organization_id: UUID,
+{%- endif %}
+        connection_id: UUID,
+    ) -> None:
+        db_connection = await self._get_owned(
+            user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=organization_id,
+{%- endif %}
+            connection_id=connection_id,
+        )
         await mcp_connection_repo.delete(self.db, db_connection=db_connection)
 
+    async def rotate(
+        self,
+        *,
+        user_id: UUID,
+{%- if cookiecutter.enable_teams %}
+        organization_id: UUID,
+{%- endif %}
+        connection_id: UUID,
+        auth_token: str,
+    ) -> McpConnection:
+        """Replace a bearer secret inside the same owner/Tenant boundary."""
+        return await self.update(
+            user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=organization_id,
+{%- endif %}
+            connection_id=connection_id,
+            data=McpConnectionUpdate(auth_token=auth_token),
+        )
+
+    async def revoke(
+        self,
+        *,
+        user_id: UUID,
+{%- if cookiecutter.enable_teams %}
+        organization_id: UUID,
+{%- endif %}
+        connection_id: UUID,
+    ) -> McpConnection:
+        """Revoke all bearer/OAuth material without deleting audit identity."""
+        db_connection = await self._get_owned(
+            user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=organization_id,
+{%- endif %}
+            connection_id=connection_id,
+        )
+        return await mcp_connection_repo.update(
+            self.db,
+            db_connection=db_connection,
+            update_data={
+                "auth_token": None,
+                "oauth_payload": None,
+                "oauth_pending_payload": None,
+                "oauth_state": None,
+                "last_status": None,
+                "last_error": None,
+                "last_checked_at": None,
+            },
+        )
+
     async def test(
-        self, *, user_id: UUID, connection_id: UUID
+        self,
+        *,
+        user_id: UUID,
+{%- if cookiecutter.enable_teams %}
+        organization_id: UUID,
+{%- endif %}
+        connection_id: UUID,
     ) -> tuple[McpConnection, list[McpToolInfo], str | None]:
         """Probe the server, persist the result, and return discovered tools."""
-        db_connection = await self._get_owned(user_id=user_id, connection_id=connection_id)
+        db_connection = await self._get_owned(
+            user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=organization_id,
+{%- endif %}
+            connection_id=connection_id,
+        )
         tools: list[McpToolInfo] = []
         error: str | None = None
         headers = await _resolve_auth_headers(self.db, db_connection)
@@ -280,7 +404,16 @@ class McpConnectionService:
         )
         return db_connection, tools, error
 
-    async def oauth_start(self, *, user_id: UUID, name: str, url: str) -> str:
+    async def oauth_start(
+        self,
+        *,
+        user_id: UUID,
+{%- if cookiecutter.enable_teams %}
+        organization_id: UUID,
+{%- endif %}
+        name: str,
+        url: str,
+    ) -> str:
         """Begin the OAuth authorization-code flow for a server.
 
         Discovers the authorization server, dynamically registers this app,
@@ -313,7 +446,12 @@ class McpConnectionService:
         )
         enc = encrypt_value(payload.model_dump_json(), settings.SECRET_KEY)
 
-        existing = await mcp_connection_repo.get_by_name(self.db, user_id=user_id, name=name)
+        existing = await mcp_connection_repo.get_by_name(
+            self.db, user_id=user_id, name=name,
+{%- if cookiecutter.enable_teams %}
+            organization_id=organization_id,
+{%- endif %}
+        )
         if existing is not None:
             if existing.auth_type != "oauth":
                 raise AlreadyExistsError(
@@ -335,6 +473,9 @@ class McpConnectionService:
             await mcp_connection_repo.create(
                 self.db,
                 user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+                organization_id=organization_id,
+{%- endif %}
                 name=name,
                 url=url,
                 auth_token=None,
@@ -393,9 +534,23 @@ class McpConnectionService:
             },
         )
 
-    async def _get_owned(self, *, user_id: UUID, connection_id: UUID) -> McpConnection:
+    async def _get_owned(
+        self,
+        *,
+        user_id: UUID,
+{%- if cookiecutter.enable_teams %}
+        organization_id: UUID,
+{%- endif %}
+        connection_id: UUID,
+    ) -> McpConnection:
         db_connection = await mcp_connection_repo.get_by_id(self.db, connection_id)
-        if db_connection is None or db_connection.user_id != user_id:
+        if (
+            db_connection is None
+            or db_connection.user_id != user_id
+{%- if cookiecutter.enable_teams %}
+            or db_connection.organization_id != organization_id
+{%- endif %}
+        ):
             raise NotFoundError(
                 message="MCP connection not found",
                 details={"connection_id": str(connection_id)},
@@ -403,7 +558,58 @@ class McpConnectionService:
         return db_connection
 
 
-async def build_toolsets_for_user(user_id: UUID | None) -> list[Any]:
+async def resolve_connection_specs_for_user(
+    user_id: UUID | None,
+{%- if cookiecutter.enable_teams %}
+    *,
+    organization_id: UUID | None = None,
+{%- endif %}
+) -> list[McpServerSpec]:
+    """Resolve authorized MCP specs for one owner and Active Tenant.
+
+    This is the Control Plane seam used before any runtime tool construction.
+    It returns only redacted routing metadata plus short-lived auth headers;
+    database ciphertext and OAuth payloads never cross into AgentScope.
+    """
+    specs = static_server_specs()
+    if user_id is None:
+        return specs
+{%- if cookiecutter.enable_teams %}
+    if organization_id is None:
+        raise ValueError("Active Tenant is required to resolve personal connections")
+{%- endif %}
+    async with get_db_context() as db:
+        connections, _ = await mcp_connection_repo.list_for_user(
+            db,
+            user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=organization_id,
+{%- endif %}
+            enabled_only=True,
+        )
+        for connection in connections:
+            headers = await _resolve_auth_headers(db, connection)
+            if headers is None:
+                logger.info("Skipping MCP connection %r: no usable credentials", connection.name)
+                continue
+            specs.append(
+                McpServerSpec(
+                    name=connection.name,
+                    url=connection.url,
+                    headers=headers,
+                    allowed_tools=connection.allowed_tools,
+                )
+            )
+    return specs
+
+
+async def build_toolsets_for_user(
+    user_id: UUID | None,
+{%- if cookiecutter.enable_teams %}
+    *,
+    organization_id: UUID | None = None,
+{%- endif %}
+) -> list[Any]:
     """Agent toolsets for one chat turn: static MCP_SERVERS + the user's
     enabled connections. Unreachable servers are skipped, never fatal.
 
@@ -411,27 +617,10 @@ async def build_toolsets_for_user(user_id: UUID | None) -> list[Any]:
     the deployment-managed servers still apply, there are just no per-user
     connections to add.
     """
-    specs = static_server_specs()
-    if user_id is not None:
-        async with get_db_context() as db:
-            connections, _ = await mcp_connection_repo.list_for_user(
-                db, user_id=user_id, enabled_only=True
-            )
-            for connection in connections:
-                headers = await _resolve_auth_headers(db, connection)
-                if headers is None:
-                    # OAuth not authorized / expired, or an undecryptable bearer
-                    # token (e.g. SECRET_KEY rotated) — skip, never crash the turn.
-                    logger.info(
-                        "Skipping MCP connection %r: no usable credentials", connection.name
-                    )
-                    continue
-                specs.append(
-                    McpServerSpec(
-                        name=connection.name,
-                        url=connection.url,
-                        headers=headers,
-                        allowed_tools=connection.allowed_tools,
-                    )
-                )
+    specs = await resolve_connection_specs_for_user(
+        user_id,
+{%- if cookiecutter.enable_teams %}
+        organization_id=organization_id,
+{%- endif %}
+    )
     return await build_mcp_toolsets(specs)

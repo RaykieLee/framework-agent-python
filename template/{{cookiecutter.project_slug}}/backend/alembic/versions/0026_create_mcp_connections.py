@@ -44,6 +44,14 @@ def upgrade() -> None:
             sa.ForeignKey("users.id", ondelete="CASCADE"),
             nullable=False,
         ),
+{%- if cookiecutter.enable_teams %}
+        sa.Column(
+            "organization_id",
+            PG_UUID(as_uuid=True),
+            sa.ForeignKey("organizations.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+{%- endif %}
         sa.Column("name", sa.String(64), nullable=False),
         sa.Column("url", sa.String(2048), nullable=False),
         sa.Column("auth_token", sa.Text(), nullable=True),
@@ -73,14 +81,29 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True),
+{%- if cookiecutter.enable_teams %}
+        sa.UniqueConstraint(
+            "organization_id",
+            "user_id",
+            "name",
+            name="uq_mcp_connections_tenant_user_name",
+        ),
+{%- else %}
         sa.UniqueConstraint("user_id", "name", name="uq_mcp_connections_user_name"),
+{%- endif %}
     )
     op.create_index("ix_mcp_connections_user_id", "mcp_connections", ["user_id"])
+{%- if cookiecutter.enable_teams %}
+    op.create_index("ix_mcp_connections_organization_id", "mcp_connections", ["organization_id"])
+{%- endif %}
     op.create_index("ix_mcp_connections_oauth_state", "mcp_connections", ["oauth_state"])
 
 
 def downgrade() -> None:
     op.drop_index("ix_mcp_connections_oauth_state", table_name="mcp_connections")
+{%- if cookiecutter.enable_teams %}
+    op.drop_index("ix_mcp_connections_organization_id", table_name="mcp_connections")
+{%- endif %}
     op.drop_index("ix_mcp_connections_user_id", table_name="mcp_connections")
     op.drop_table("mcp_connections")
 {%- endif %}

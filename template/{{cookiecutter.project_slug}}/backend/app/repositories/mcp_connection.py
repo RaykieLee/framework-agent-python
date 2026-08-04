@@ -36,12 +36,25 @@ async def get_by_id_for_update(db: AsyncSession, connection_id: UUID) -> McpConn
     return result.scalar_one_or_none()
 
 
-async def get_by_name(db: AsyncSession, *, user_id: UUID, name: str) -> McpConnection | None:
+async def get_by_name(
+    db: AsyncSession,
+    *,
+    user_id: UUID,
+    name: str,
+{%- if cookiecutter.enable_teams %}
+    organization_id: UUID,
+{%- else %}
+    organization_id: UUID | None = None,
+{%- endif %}
+) -> McpConnection | None:
+    predicates = [McpConnection.user_id == user_id, McpConnection.name == name]
+{%- if cookiecutter.enable_teams %}
+    predicates.append(McpConnection.organization_id == organization_id)
+{%- elif organization_id is not None %}
+    del organization_id
+{%- endif %}
     result = await db.execute(
-        select(McpConnection).where(
-            McpConnection.user_id == user_id,
-            McpConnection.name == name,
-        )
+        select(McpConnection).where(*predicates)
     )
     return result.scalar_one_or_none()
 
@@ -53,13 +66,26 @@ async def get_by_oauth_state(db: AsyncSession, state: str) -> McpConnection | No
 
 
 async def list_for_user(
-    db: AsyncSession, *, user_id: UUID, enabled_only: bool = False
+    db: AsyncSession,
+    *,
+    user_id: UUID,
+{%- if cookiecutter.enable_teams %}
+    organization_id: UUID,
+{%- else %}
+    organization_id: UUID | None = None,
+{%- endif %}
+    enabled_only: bool = False,
 ) -> tuple[list[McpConnection], int]:
     stmt = (
         select(McpConnection)
         .where(McpConnection.user_id == user_id)
         .order_by(McpConnection.created_at.asc())
     )
+{%- if cookiecutter.enable_teams %}
+    stmt = stmt.where(McpConnection.organization_id == organization_id)
+{%- elif organization_id is not None %}
+    del organization_id
+{%- endif %}
     if enabled_only:
         stmt = stmt.where(McpConnection.is_enabled.is_(True))
     count_stmt = select(func.count()).select_from(stmt.subquery())
@@ -72,6 +98,9 @@ async def create(
     db: AsyncSession,
     *,
     user_id: UUID,
+{%- if cookiecutter.enable_teams %}
+    organization_id: UUID,
+{%- endif %}
     name: str,
     url: str,
     auth_token: str | None,
@@ -84,6 +113,9 @@ async def create(
 ) -> McpConnection:
     connection = McpConnection(
         user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+        organization_id=organization_id,
+{%- endif %}
         name=name,
         url=url,
         auth_token=auth_token,

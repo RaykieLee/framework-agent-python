@@ -185,7 +185,12 @@ class AgentInvocationService:
         # Channel messages run the same agent as the web chat, so the user's
         # Settings → Integrations servers apply here too. Traffic with no mapped
         # account still gets the deployment-managed MCP_SERVERS.
-        mcp_toolsets = await build_toolsets_for_user(kwargs.get("user_id"))
+        mcp_toolsets = await build_toolsets_for_user(
+            kwargs.get("user_id"),
+{%- if cookiecutter.enable_teams %}
+            organization_id=kwargs.get("organization_id"),
+{%- endif %}
+        )
         assistant = get_agent(model_name=model_name, extra_toolsets=mcp_toolsets)
 {%- else %}
         assistant = get_agent(model_name=model_name)

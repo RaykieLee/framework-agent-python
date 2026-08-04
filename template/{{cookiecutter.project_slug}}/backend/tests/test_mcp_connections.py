@@ -61,6 +61,9 @@ def _connection(**overrides) -> McpConnection:
     defaults: dict = {
         "id": uuid4(),
         "user_id": uuid4(),
+{%- if cookiecutter.enable_teams %}
+        "organization_id": uuid4(),
+{%- endif %}
         "name": "github",
         "url": "https://example.com/mcp",
         "auth_token": None,
@@ -468,7 +471,13 @@ class TestMcpConnectionService:
     async def test_create_blocks_internal_urls(self, service, repo):
         data = McpConnectionCreate(name="internal", url="http://127.0.0.1:8000/mcp")
         with pytest.raises(SSRFBlockedError):
-            await service.create(user_id=uuid4(), data=data)
+            await service.create(
+                user_id=uuid4(),
+{%- if cookiecutter.enable_teams %}
+                organization_id=uuid4(),
+{%- endif %}
+                data=data,
+            )
         repo.create.assert_not_called()
 
     @pytest.mark.anyio
@@ -477,7 +486,13 @@ class TestMcpConnectionService:
         data = McpConnectionCreate(
             name="github", url="https://example.com/mcp", auth_token="secret"
         )
-        await service.create(user_id=uuid4(), data=data)
+        await service.create(
+            user_id=uuid4(),
+{%- if cookiecutter.enable_teams %}
+            organization_id=uuid4(),
+{%- endif %}
+            data=data,
+        )
 
         stored = repo.create.call_args.kwargs["auth_token"]
         assert stored != "secret"
@@ -487,8 +502,86 @@ class TestMcpConnectionService:
     async def test_create_without_token_stores_none(self, service, repo, monkeypatch):
         _allow_any_url(monkeypatch)
         data = McpConnectionCreate(name="github", url="https://example.com/mcp")
-        await service.create(user_id=uuid4(), data=data)
+        await service.create(
+            user_id=uuid4(),
+{%- if cookiecutter.enable_teams %}
+            organization_id=uuid4(),
+{%- endif %}
+            data=data,
+        )
         assert repo.create.call_args.kwargs["auth_token"] is None
+
+{%- if cookiecutter.enable_teams %}
+    @pytest.mark.anyio
+    async def test_create_binds_connection_to_active_tenant(self, service, repo, monkeypatch):
+        _allow_any_url(monkeypatch)
+        user_id = uuid4()
+        tenant_id = uuid4()
+        data = McpConnectionCreate(
+            name="github", url="https://example.com/mcp", auth_token="secret"
+        )
+
+        await service.create(user_id=user_id, organization_id=tenant_id, data=data)
+
+        assert repo.create.call_args.kwargs["user_id"] == user_id
+        assert repo.create.call_args.kwargs["organization_id"] == tenant_id
+        stored = repo.create.call_args.kwargs["auth_token"]
+        assert stored != "secret"
+        assert decrypt_value(stored, settings.SECRET_KEY) == "secret"
+
+    @pytest.mark.anyio
+    async def test_wrong_active_tenant_cannot_mutate_connection(self, service, repo):
+        owner_id = uuid4()
+        connection_tenant_id = uuid4()
+        repo.get_by_id.return_value = _connection(
+            user_id=owner_id, organization_id=connection_tenant_id
+        )
+
+        with pytest.raises(NotFoundError):
+            await service.delete(
+                user_id=owner_id,
+                organization_id=uuid4(),
+                connection_id=repo.get_by_id.return_value.id,
+            )
+
+        repo.delete.assert_not_called()
+
+    @pytest.mark.anyio
+    async def test_list_for_user_is_scoped_to_active_tenant(self, service, repo):
+        user_id = uuid4()
+        tenant_id = uuid4()
+        await service.list_for_user(user_id=user_id, organization_id=tenant_id)
+        repo.list_for_user.assert_awaited_once_with(
+            service.db, user_id=user_id, organization_id=tenant_id
+        )
+
+    @pytest.mark.anyio
+    async def test_rotate_and_revoke_never_return_secret(self, service, repo):
+        user_id = uuid4()
+        tenant_id = uuid4()
+        connection = _connection(user_id=user_id, organization_id=tenant_id)
+        repo.get_by_id.return_value = connection
+        repo.update.return_value = connection
+
+        rotated = await service.rotate(
+            user_id=user_id,
+            organization_id=tenant_id,
+            connection_id=connection.id,
+            auth_token="new-secret",
+        )
+        assert rotated is connection
+        encrypted = repo.update.call_args.kwargs["update_data"]["auth_token"]
+        assert decrypt_value(encrypted, settings.SECRET_KEY) == "new-secret"
+        assert "new-secret" not in McpConnectionRead.from_model(connection).model_dump_json()
+
+        await service.revoke(
+            user_id=user_id, organization_id=tenant_id, connection_id=connection.id
+        )
+        revoked = repo.update.call_args.kwargs["update_data"]
+        assert revoked["auth_token"] is None
+        assert revoked["oauth_payload"] is None
+        assert revoked["oauth_pending_payload"] is None
+{%- endif %}
 
     @pytest.mark.anyio
     async def test_update_empty_token_clears_it(self, service, repo):
@@ -498,6 +591,9 @@ class TestMcpConnectionService:
 
         await service.update(
             user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=conn.organization_id,
+{%- endif %}
             connection_id=conn.id,
             data=McpConnectionUpdate(auth_token=""),
         )
@@ -516,6 +612,9 @@ class TestMcpConnectionService:
         with pytest.raises(SSRFBlockedError):
             await service.update(
                 user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+                organization_id=conn.organization_id,
+{%- endif %}
                 connection_id=conn.id,
                 data=McpConnectionUpdate(url="http://169.254.169.254/mcp"),
             )
@@ -524,7 +623,13 @@ class TestMcpConnectionService:
     async def test_other_users_connection_is_not_found(self, service, repo):
         repo.get_by_id.return_value = _connection(user_id=uuid4())
         with pytest.raises(NotFoundError):
-            await service.delete(user_id=uuid4(), connection_id=uuid4())
+            await service.delete(
+                user_id=uuid4(),
+{%- if cookiecutter.enable_teams %}
+                organization_id=uuid4(),
+{%- endif %}
+                connection_id=uuid4(),
+            )
 
     @pytest.mark.anyio
     async def test_test_records_failure(self, service, repo, monkeypatch):
@@ -538,7 +643,13 @@ class TestMcpConnectionService:
 
         monkeypatch.setattr(mcp_connection_service, "probe_mcp_server", failing_probe)
 
-        _, tools, error = await service.test(user_id=user_id, connection_id=conn.id)
+        _, tools, error = await service.test(
+            user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=conn.organization_id,
+{%- endif %}
+            connection_id=conn.id,
+        )
 
         assert tools == []
         assert error is not None and "timed out" in error
@@ -557,7 +668,13 @@ class TestMcpConnectionService:
 
         monkeypatch.setattr(mcp_connection_service, "probe_mcp_server", ok_probe)
 
-        _, tools, error = await service.test(user_id=user_id, connection_id=conn.id)
+        _, tools, error = await service.test(
+            user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=conn.organization_id,
+{%- endif %}
+            connection_id=conn.id,
+        )
 
         assert error is None
         assert [t.name for t in tools] == ["search"]
@@ -577,7 +694,14 @@ class TestMcpConnectionService:
         monkeypatch.setattr(mcp_oauth, "discover", AsyncMock(return_value=discovered))
         monkeypatch.setattr(mcp_oauth, "register_client", AsyncMock(return_value=("cid", "csec")))
 
-        url = await service.oauth_start(user_id=uuid4(), name="linear", url="https://srv/mcp")
+        url = await service.oauth_start(
+            user_id=uuid4(),
+{%- if cookiecutter.enable_teams %}
+            organization_id=uuid4(),
+{%- endif %}
+            name="linear",
+            url="https://srv/mcp",
+        )
 
         assert url.startswith("https://srv/authorize?")
         assert "code_challenge=" in url and "state=" in url
@@ -617,7 +741,14 @@ class TestMcpConnectionService:
         monkeypatch.setattr(mcp_oauth, "discover", AsyncMock(return_value=discovered))
         monkeypatch.setattr(mcp_oauth, "register_client", AsyncMock(return_value=("cid", None)))
 
-        await service.oauth_start(user_id=uuid4(), name="linear", url="https://other/mcp")
+        await service.oauth_start(
+            user_id=uuid4(),
+{%- if cookiecutter.enable_teams %}
+            organization_id=uuid4(),
+{%- endif %}
+            name="linear",
+            url="https://other/mcp",
+        )
 
         update_data = repo.update.call_args.kwargs["update_data"]
         assert update_data["oauth_pending_payload"]
@@ -628,7 +759,12 @@ class TestMcpConnectionService:
     async def test_oauth_start_rejects_internal_urls(self, service, repo):
         with pytest.raises(SSRFBlockedError):
             await service.oauth_start(
-                user_id=uuid4(), name="evil", url="http://169.254.169.254/mcp"
+                user_id=uuid4(),
+{%- if cookiecutter.enable_teams %}
+                organization_id=uuid4(),
+{%- endif %}
+                name="evil",
+                url="http://169.254.169.254/mcp",
             )
         repo.create.assert_not_called()
 
@@ -721,6 +857,9 @@ class TestMcpConnectionService:
 
         await service.update(
             user_id=user_id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=conn.organization_id,
+{%- endif %}
             connection_id=conn.id,
             data=McpConnectionUpdate(url="https://elsewhere.example/mcp"),
         )

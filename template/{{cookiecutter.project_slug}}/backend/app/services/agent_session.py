@@ -216,7 +216,12 @@ class AgentSession:
 {%- if cookiecutter.enable_mcp_client %}
             # Rebuilt every turn so Settings → Integrations changes apply
             # immediately; unreachable/unauthorized servers are skipped there.
-            mcp_toolsets = await build_toolsets_for_user(self.user.id)
+            mcp_toolsets = await build_toolsets_for_user(
+                self.user.id,
+{%- if cookiecutter.enable_teams %}
+                organization_id=organization_id,
+{%- endif %}
+            )
 {%- endif %}
             assistant = get_agent(
                 model_name=data.get("model"),

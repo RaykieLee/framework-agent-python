@@ -35,10 +35,26 @@ if TYPE_CHECKING:
 
 
 class McpConnection(Base, TimestampMixin):
-    """One user-scoped MCP server connection."""
+    """One personally-owned MCP connection bound to one active Tenant.
+
+    The user remains the owner, while ``organization_id`` (when Teams are
+    enabled) prevents a multi-tenant user from carrying a credential into a
+    different execution boundary.
+    """
 
     __tablename__ = "mcp_connections"
-    __table_args__ = (UniqueConstraint("user_id", "name", name="uq_mcp_connections_user_name"),)
+    __table_args__ = (
+{%- if cookiecutter.enable_teams %}
+        UniqueConstraint(
+            "organization_id",
+            "user_id",
+            "name",
+            name="uq_mcp_connections_tenant_user_name",
+        ),
+{%- else %}
+        UniqueConstraint("user_id", "name", name="uq_mcp_connections_user_name"),
+{%- endif %}
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(
@@ -47,6 +63,14 @@ class McpConnection(Base, TimestampMixin):
         nullable=False,
         index=True,
     )
+{%- if cookiecutter.enable_teams %}
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+{%- endif %}
     name: Mapped[str] = mapped_column(String(64), nullable=False)
     url: Mapped[str] = mapped_column(String(2048), nullable=False)
     auth_token: Mapped[str | None] = mapped_column(Text, nullable=True)

@@ -39,8 +39,17 @@ class McpConnectionUpdate(BaseSchema):
     is_enabled: bool | None = None
 
 
+class McpConnectionRotate(BaseSchema):
+    """Replacement bearer token; the plaintext is accepted only in the body."""
+
+    auth_token: str = Field(..., min_length=1, max_length=4096)
+
+
 class McpConnectionRead(TimestampSchema, BaseSchema):
     id: UUID
+{%- if cookiecutter.enable_teams %}
+    organization_id: UUID
+{%- endif %}
     name: str
     url: str
     # The token itself never leaves the backend.
@@ -67,6 +76,9 @@ class McpConnectionRead(TimestampSchema, BaseSchema):
         )
         return cls(
             id=connection.id,
+{%- if cookiecutter.enable_teams %}
+            organization_id=connection.organization_id,
+{%- endif %}
             name=connection.name,
             url=connection.url,
             has_auth_token=connection.auth_token is not None,
