@@ -2773,6 +2773,10 @@ from fastapi import WebSocket
 
 from app.agents.agentscope_assistant import AgentScopeAssistant, get_agent
 from app.services.agent import send_event
+from app.services.agentscope_durable_session import (
+    AgentScopeDurableSession,
+    RequestResult,
+)
 {%- if cookiecutter.use_database %}
 from app.services.agent import persist_assistant_turn, persist_user_turn
 {%- endif %}
@@ -2890,13 +2894,16 @@ class AgentSession:
         user: Any = None,
         *,
         assistant: AgentScopeAssistant | None = None,
+        durable_session: AgentScopeDurableSession | None = None,
     ) -> None:
         self.websocket = websocket
         self.user = user
         self.assistant = assistant
+        self.durable_session = durable_session
         self.current_conversation_id: str | None = None
         self._turn_task: asyncio.Task[None] | None = None
         self._pending_human_event: RequireUserConfirmEvent | None = None
+        self._active_request_id: str | None = None
 
     async def handle_frame(self, data: dict[str, Any]) -> None:
         """Dispatch user turns, HITL responses, and cancellation frames."""
@@ -2936,6 +2943,8 @@ class AgentSession:
 
     async def _cancel_turn(self) -> None:
         task = self._turn_task
+        if self.durable_session is not None and self._active_request_id:
+            await self.durable_session.cancel(self._active_request_id)
         if task is None or task.done():
             return
         task.cancel()
@@ -2946,7 +2955,40 @@ class AgentSession:
         await self._cancel_turn()
 
     async def process_message(self, data: dict[str, Any], *, continuation: bool = False) -> None:
-        """Persist, run, translate, and complete one AgentScope turn."""
+        """Persist, run, translate, and complete one AgentScope turn.
+
+        A client request ID is the idempotency boundary. The durable coordinator
+        holds a Redis lock while the native AgentScope turn runs, then records
+        the result before a reconnect can retry it.
+        """
+        request_id = str(data.get("request_id") or "")
+        if not continuation and self.durable_session is not None and request_id:
+            existing = await self.durable_session.result(request_id)
+            if existing is not None:
+                await send_event(
+                    self.websocket,
+                    "complete",
+                    {
+                        "conversation_id": self.current_conversation_id,
+                        "content": existing.content,
+                        "request_id": request_id,
+                        "replayed": True,
+                    },
+                )
+                return
+
+            async def run_once(_token: Any) -> RequestResult:
+                content = await self._process_message_inner(data, continuation=False)
+                return RequestResult(request_id=request_id, content=content)
+
+            await self.durable_session.execute(request_id, run_once)
+            return
+        await self._process_message_inner(data, continuation=continuation)
+
+    async def _process_message_inner(
+        self, data: dict[str, Any], *, continuation: bool = False
+    ) -> str:
+        """Run one turn once; callers provide idempotency at the public seam."""
         role = data.get("active_tenant_role") or getattr(self.user, "active_tenant_role", None)
         try:
             authorize_execution(
@@ -2956,12 +2998,14 @@ class AgentSession:
             )
         except ActiveTenantError as exc:
             await send_event(self.websocket, "error", {"message": str(exc)})
-            return
+            return ""
 
         user_message = str(data.get("message", ""))
+        request_id = str(data.get("request_id") or "")
+        self._active_request_id = request_id or None
         if not continuation and not user_message:
             await send_event(self.websocket, "error", {"message": "Empty message"})
-            return
+            return ""
 
 {%- if cookiecutter.use_database %}
         organization_id: str | None = None
@@ -3040,8 +3084,19 @@ class AgentSession:
         await send_event(
             self.websocket,
             "complete",
-            {"conversation_id": self.current_conversation_id, "content": output or ""},
+            {
+                "conversation_id": self.current_conversation_id,
+                "content": output or "",
+                "request_id": request_id or None,
+            },
         )
+        if self.durable_session is not None and request_id:
+            await self.durable_session.emit(
+                request_id,
+                "complete",
+                {"conversation_id": self.current_conversation_id, "content": output or ""},
+            )
+        return output or ""
 
     def _build_confirmation(self, data: dict[str, Any]) -> UserConfirmResultEvent:
         """Turn product HITL decisions into AgentScope's native event."""

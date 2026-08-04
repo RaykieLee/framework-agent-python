@@ -418,6 +418,8 @@ class TestGeneratedAgentScopeBaseline:
         root = generated_agentscope_project / "backend" / "app"
         assert (root / "agents" / "agentscope_assistant.py").exists()
         assert (root / "services" / "agent_session.py").exists()
+        assert (root / "services" / "agentscope_durable_session.py").exists()
+        assert (generated_agentscope_project / "backend" / "tests" / "test_agentscope_durable_session.py").exists()
         assert "AgentScope" in (root / "agents" / "agentscope_assistant.py").read_text()
 
 
