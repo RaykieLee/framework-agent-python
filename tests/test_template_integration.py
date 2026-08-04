@@ -409,6 +409,7 @@ class TestGeneratedAgentScopeBaseline:
         compose = (generated_agentscope_project / "docker-compose.yml").read_text()
 
         assert "agentscope[storage-redis,storage-sql,vdb-qdrant,memory-mem0]" in backend_pyproject
+        assert "agentscope[service]" in backend_pyproject
         assert "qdrant/qdrant" in compose
         assert "qdrant_data:/qdrant/storage" in compose
         assert "redis:7-alpine" in compose
@@ -482,6 +483,38 @@ class TestGeneratedAgentScopeAgentDefinitions:
         assert "test_private_fields_are_redacted" in contract
         route = (root / "app" / "api" / "routes" / "v1" / "agent_definitions.py").read_text()
         assert "AgentScope" not in route
+
+
+@pytest.fixture(scope="module")
+def generated_agentscope_execution_team_project(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Generate the AgentScope tenant/team configuration for Ticket 09."""
+    config = ProjectConfig(
+        project_name="test_agentscope_execution_team",
+        database=DatabaseType.POSTGRESQL,
+        ai_framework=AIFrameworkType.AGENTSCOPE,
+        enable_redis=True,
+        enable_docker=True,
+        enable_teams=True,
+        background_tasks=BackgroundTaskType.NONE,
+        rag_features=RAGFeatures(enable_rag=True, vector_store=VectorStoreType.QDRANT),
+    )
+    return generate_project(config, tmp_path_factory.mktemp("agentscope_execution_team"))
+
+
+class TestGeneratedAgentScopeExecutionTeam:
+    def test_dynamic_team_service_and_contract_are_generated(
+        self, generated_agentscope_execution_team_project: Path
+    ) -> None:
+        root = generated_agentscope_execution_team_project / "backend"
+        service = root / "app" / "services" / "agentscope_execution_team.py"
+        contract = root / "tests" / "test_agentscope_execution_team.py"
+        assert service.exists()
+        assert contract.exists()
+        content = service.read_text()
+        assert "MAX_WORKERS = 6" in content
+        assert "MessageBus" in content
+        assert "NestedTeamNotAllowed" in content
+        assert "def reconnect" in content
 
 
 # ---------------------------------------------------------------------------
