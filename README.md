@@ -32,7 +32,7 @@
 </p>
 
 <p align="center">
-  <b>🎮 5 个 AI 代理框架</b> <i>（PydanticAI、PydanticDeep、LangChain、LangGraph、DeepAgents）</i>
+  <b>🎮 6 个 AI 代理框架</b> <i>（PydanticAI、PydanticDeep、LangChain、LangGraph、DeepAgents、AgentScope）</i>
   <br>
   <b>📫 RAG 管道</b> <i>（Milvus、Qdrant、pgvector、ChromaDB）</i>
   <br>
@@ -802,7 +802,7 @@ graph LR
 
 ## 🎮 AI 代理
 
-在生成项目时从 **5 个 AI 框架**和 **4 个 LLM 提供商**中选择：
+在生成项目时从 **6 个 AI 框架**和 **4 个 LLM 提供商**中选择：
 
 ```bash
 # PydanticAI 配合 OpenAI（默认）
@@ -946,7 +946,7 @@ uv run my_app rag-sync-s3 --collection docs --prefix reports/ --bucket my-bucket
 - **图像描述** — 从文档中提取图像，通过 LLM 视觉 API 进行描述（自愿加入）
 - **分块** — RecursiveCharacterTextSplitter，可配置大小/重叠
 - **重排序** — Cohere API 或本地 CrossEncoder，提升搜索质量
-- **代理集成** — 所有 5 个 AI 框架自动获得 `search_knowledge_base` 工具
+- **代理集成** — 所有 6 个 AI 框架自动获得 `search_knowledge_base` 工具
 
 ---
 

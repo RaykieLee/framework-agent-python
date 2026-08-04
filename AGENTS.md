@@ -56,7 +56,7 @@ Jinja2 条件语句：`{%- if cookiecutter.enable_rag %}...{%- endif %}`
 
 ## 主要功能
 
-- **5 个 AI 框架**：PydanticAI、PydanticDeep、LangChain、LangGraph、DeepAgents
+- **6 个 AI 框架**：PydanticAI、PydanticDeep、LangChain、LangGraph、DeepAgents、AgentScope
 - **4 个 LLM 提供商**：OpenAI、Anthropic、Google Gemini、OpenRouter
 - **RAG**：4 个向量数据库（Milvus、Qdrant、ChromaDB、pgvector）、4 个嵌入提供商、重排序、图像描述
 - **文档源**：本地文件（CLI）、API 上传、Google Drive（服务账号）、S3/MinIO

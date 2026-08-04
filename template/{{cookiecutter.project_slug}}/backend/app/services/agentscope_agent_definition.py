@@ -31,7 +31,7 @@ class AgentDefinitionService:
         )
         if not membership:
             raise NotFoundError(
-                message="Organization not found or access denied",
+                message="Tenant not found or access denied",
                 details={"organization_id": str(organization_id)},
             )
         return membership

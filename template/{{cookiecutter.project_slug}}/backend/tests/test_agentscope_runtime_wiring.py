@@ -9,6 +9,7 @@ from agentscope.message import Msg, TextBlock
 
 from app.services.agent_session import AgentSession
 from app.services.agentscope_runtime import (
+    AgentScopeRuntimeWiring,
     AgentScopeTenantContext,
     get_agentscope_runtime,
 )
@@ -31,6 +32,33 @@ async def test_default_resources_are_tenant_bound() -> None:
     assert resources.memory_middleware.tenant_id == "tenant-a"
     assert resources.delegation_policy.tenant_id == "tenant-a"
     assert resources.personal_connections[0].tenant_id == "tenant-a"
+
+
+@pytest.mark.anyio
+async def test_team_control_frame_uses_server_tenant_context() -> None:
+    websocket = MagicMock()
+    websocket.send_json = AsyncMock()
+    seen: dict[str, object] = {}
+
+    async def handle(context: AgentScopeTenantContext, frame: dict[str, object]) -> dict[str, object]:
+        seen.update({"tenant_id": context.tenant_id, "frame_tenant_id": frame.get("active_tenant_id")})
+        return {"run_id": "run-a", "tenant_id": context.tenant_id}
+
+    runtime = AgentScopeRuntimeWiring(
+        durable_store_factory=lambda: get_agentscope_runtime().durable_store_factory(),
+        team_frame_handler=handle,
+    )
+    session = AgentSession(
+        websocket,
+        tenant_context=AgentScopeTenantContext("tenant-a", "user-a", "owner", False),
+        runtime_wiring=runtime,
+    )
+    await session.handle_frame({"type": "team_start", "active_tenant_id": "tenant-b"})
+
+    assert seen == {"tenant_id": "tenant-a", "frame_tenant_id": "tenant-b"}
+    message = websocket.send_json.await_args.args[0]
+    assert message["type"] == "team_run"
+    assert message["data"]["tenant_id"] == "tenant-a"
 
 
 @pytest.mark.anyio

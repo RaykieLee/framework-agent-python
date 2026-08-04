@@ -42,7 +42,7 @@
 4. 把框架事件翻译成模板统一的 WebSocket 事件。
 5. 持久化助手消息、tool call 和 usage，并触发计费。
 
-除 WebSocket 外，渠道调用使用 `AgentInvocationService`，它也包含五个框架的分支（[agent_invocation.py](../template/%7B%7Bcookiecutter.project_slug%7D%7D/backend/app/services/agent_invocation.py#L77-L117)）。AgentScope 接入必须同时覆盖这两个入口，否则 Slack/Telegram 与网页行为会不一致。
+除 WebSocket 外，渠道调用使用 `AgentInvocationService`，它也包含各框架的分支（[agent_invocation.py](../template/%7B%7Bcookiecutter.project_slug%7D%7D/backend/app/services/agent_invocation.py#L77-L117)）。AgentScope 接入必须同时覆盖这两个入口，否则 Slack/Telegram 与网页行为会不一致。
 
 当前 `agent_session.py` 已经按框架复制了大量执行流程。首轮集成接受这一现状，直接新增 AgentScope 专用分支，不同时重构其他五个 runtime，以缩小回归面。AgentScope 分支仍应使用独立 `AgentScopeEventAdapter` 隔离事件协议，并通过契约测试证明租户、KB、消息和计费行为与现有入口一致；统一 `AgentRuntimeAdapter` 延后到 AgentScope 功能对等且运行稳定后再评估。
 

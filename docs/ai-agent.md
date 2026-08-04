@@ -4,7 +4,7 @@ This document describes the AI agent integrations available in the template.
 
 ## Overview
 
-The template supports 5 AI frameworks for building intelligent agents:
+The template supports 6 AI frameworks for building intelligent agents:
 
 | Framework | Description | Best For |
 |-----------|-------------|----------|
@@ -13,6 +13,7 @@ The template supports 5 AI frameworks for building intelligent agents:
 | **LangChain** | Comprehensive AI tooling ecosystem | Complex chains, many integrations |
 | **LangGraph** | Graph-based ReAct agents | Multi-step reasoning, tool loops |
 | **DeepAgents** | Agentic framework with subagent delegation | Advanced multi-step tasks |
+| **AgentScope** | MessageBus-based teams with tenant-scoped control-plane adapters | Multi-agent collaboration, durable runs, knowledge and memory |
 
 Select your framework during project creation:
 
@@ -22,6 +23,7 @@ framework-agent-python create my_project --ai-framework pydantic_deep
 framework-agent-python create my_project --ai-framework langchain
 framework-agent-python create my_project --ai-framework langgraph
 framework-agent-python create my_project --ai-framework deepagents
+framework-agent-python create my_project --ai-framework agentscope
 ```
 
 ---

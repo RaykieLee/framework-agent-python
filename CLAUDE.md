@@ -67,7 +67,7 @@ template/
     │   │   ├── schemas/                 # Pydantic 请求/响应模型
     │   │   ├── repositories/            # 数据访问层
     │   │   ├── services/                # 业务逻辑
-    │   │   ├── agents/                  # AI 代理（5 个框架）
+    │   │   ├── agents/                  # AI 代理（6 个框架）
     │   │   ├── rag/                     # RAG 模块（4 个向量数据库、嵌入、源）
     │   │   │   └── connectors/          # 同步源连接器（Google Drive、S3）
     │   │   ├── commands/                # Django 风格的 CLI 命令
@@ -91,7 +91,7 @@ template/
 
 ## 关键设计决策
 
-- 5 个 AI 框架：PydanticAI、PydanticDeep、LangChain、LangGraph、DeepAgents
+- 6 个 AI 框架：PydanticAI、PydanticDeep、LangChain、LangGraph、DeepAgents、AgentScope
 - 4 个 LLM 提供商：OpenAI、Anthropic、Google Gemini、OpenRouter
 - 4 个向量数据库后端：Milvus、Qdrant、ChromaDB、pgvector
 - 4 个嵌入提供商：OpenAI、Voyage、Gemini（多模态）、SentenceTransformers
