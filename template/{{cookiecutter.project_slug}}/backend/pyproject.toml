@@ -417,6 +417,9 @@ unknown-argument = "ignore"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "integration: requires external PostgreSQL, Redis, Qdrant, or Mem0 services",
+]
 
 [tool.coverage.run]
 source = ["app"]
