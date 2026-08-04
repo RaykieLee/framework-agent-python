@@ -151,12 +151,17 @@ async def test_consent_is_required_for_runtime_read_write_and_middleware() -> No
 
 @pytest.mark.anyio
 async def test_build_middleware_uses_public_mem0_extension_seam() -> None:
-    adapter = AgentScopeUserMemoryAdapter(FakeMem0())
+    backend = FakeMem0()
+    adapter = AgentScopeUserMemoryAdapter(backend)
 
     middleware = adapter.build_middleware(_context())
     tools = await middleware.list_tools()
 
     assert {tool.name for tool in tools} == {"search_memory", "add_memory"}
+    await tools[1](thinking="durable fact", content=["written by AgentScope"])
+    assert [item.text for item in await adapter.search(_context(), "AgentScope")] == [
+        "written by AgentScope"
+    ]
 
 
 @pytest.mark.anyio

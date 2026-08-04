@@ -122,6 +122,42 @@ class UserMemoryWriteResult:
     expires_at: datetime | None
 
 
+class _ScopedMem0Client:
+    """Bind AgentScope middleware's public client calls to one scope."""
+
+    def __init__(self, client: Mem0AsyncClient, scope: UserMemoryScope) -> None:
+        self._client = client
+        self._scope = scope
+
+    async def search(self, query: str, **kwargs: Any) -> Any:
+        if kwargs.get("filters") != AgentScopeUserMemoryAdapter._filters(self._scope):
+            raise MemoryConsentRequired("memory scope cannot be changed during execution")
+        return await self._client.search(query, **kwargs)
+
+    async def add(self, messages: list[dict[str, str]], **kwargs: Any) -> Any:
+        expected = AgentScopeUserMemoryAdapter._filters(self._scope)
+        if kwargs.get("user_id") != expected["user_id"] or kwargs.get("agent_id") != expected["agent_id"]:
+            raise MemoryConsentRequired("memory scope cannot be changed during execution")
+        metadata = dict(kwargs.pop("metadata", {}) or {})
+        metadata.update(self._scope.metadata)
+        kwargs["metadata"] = metadata
+        return await self._client.add(messages, **kwargs)
+
+    async def get_all(self, **kwargs: Any) -> Any:
+        if kwargs.get("filters") != AgentScopeUserMemoryAdapter._filters(self._scope):
+            raise MemoryConsentRequired("memory scope cannot be changed during execution")
+        return await self._client.get_all(**kwargs)
+
+    async def delete(self, memory_id: str) -> Any:
+        return await self._client.delete(memory_id)
+
+    async def delete_all(self, **kwargs: Any) -> Any:
+        expected = AgentScopeUserMemoryAdapter._filters(self._scope)
+        if kwargs.get("user_id") != expected["user_id"] or kwargs.get("agent_id") != expected["agent_id"]:
+            raise MemoryConsentRequired("memory scope cannot be changed during execution")
+        return await self._client.delete_all(**kwargs)
+
+
 class AgentScopeUserMemoryAdapter:
     """Tenant-scoped Mem0 adapter with a public AgentScope middleware seam."""
 
@@ -261,7 +297,7 @@ class AgentScopeUserMemoryAdapter:
         return Mem0Middleware(
             user_id=context.scope.mem0_user_id,
             agent_id=context.scope.mem0_agent_id,
-            client=cast(Any, self.client),
+            client=cast(Any, _ScopedMem0Client(self.client, context.scope)),
             mode=mode,
             top_k=top_k,
             threshold=threshold,

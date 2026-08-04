@@ -23,6 +23,8 @@
   `list_tools()` seam. No AgentScope source is modified.
 - Results missing any of the three namespace metadata fields are rejected;
   legacy/unscoped bare text results are rejected as well (defense in depth).
+- The middleware receives a scope-bound client proxy, so its native add/search
+  tools cannot change filters and its writes carry the same namespace metadata.
 - Generated-project contract tests cover isolation, fresh-context recall,
   consent, middleware wiring, deletion, retention, and product-safe backend
   failures. The Qdrant test is marked `integration` and skips without
