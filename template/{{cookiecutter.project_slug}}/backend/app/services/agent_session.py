@@ -2736,37 +2736,332 @@ class AgentSession:
                     },
                 )
 {%- elif cookiecutter.use_agentscope %}
-"""AgentScope WebSocket session seam.
+"""AgentScope WebSocket adapter.
 
-The full event adapter is implemented in the next ticket. This baseline keeps
-the generated application importable while making AgentScope an explicit,
-mutually-exclusive runtime choice.
+The adapter translates AgentScope's public event objects into the existing
+product event vocabulary. Native AgentScope objects never cross the route
+boundary, and persistence remains delegated to the control-plane helpers.
 """
 
+import asyncio
+import contextlib
 from typing import Any
 
+from agentscope.event import (
+    AgentEvent,
+    ExceedMaxItersEvent,
+    ExternalExecutionResultEvent,
+    ModelCallEndEvent,
+    ModelCallStartEvent,
+    ReplyEndEvent,
+    ReplyStartEvent,
+    RequireExternalExecutionEvent,
+    RequireUserConfirmEvent,
+    TextBlockDeltaEvent,
+    ThinkingBlockDeltaEvent,
+    ToolCallDeltaEvent,
+    ToolCallEndEvent,
+    ToolCallStartEvent,
+    ToolResultEndEvent,
+    ToolResultStartEvent,
+    ToolResultTextDeltaEvent,
+    UserConfirmResultEvent,
+)
+from agentscope.message import Msg, ToolCallBlock
+from agentscope.event import ConfirmResult
 from fastapi import WebSocket
+
+from app.agents.agentscope_assistant import AgentScopeAssistant, get_agent
+from app.services.agent import send_event
+{%- if cookiecutter.use_database %}
+from app.services.agent import persist_assistant_turn, persist_user_turn
+{%- endif %}
+
+
+class ActiveTenantError(PermissionError):
+    """Raised when a WebSocket frame crosses the active-tenant boundary."""
+
+
+def authorize_execution(
+    *,
+    active_tenant_role: str | None = None,
+    active_tenant_id: str | None = None,
+    conversation_tenant_id: str | None = None,
+) -> None:
+    """Enforce the execution-side tenant checks at a pure public seam."""
+    if active_tenant_role == "viewer":
+        raise ActiveTenantError("Organization viewers cannot start agent execution")
+    if (
+        active_tenant_id is not None
+        and conversation_tenant_id is not None
+        and str(active_tenant_id) != str(conversation_tenant_id)
+    ):
+        raise ActiveTenantError("Conversation does not belong to the active tenant")
+
+
+def event_to_wire(event: AgentEvent) -> tuple[str, dict[str, Any]] | None:
+    """Map one AgentScope event to a framework-neutral product event."""
+    if isinstance(event, ReplyStartEvent):
+        return "agent_start", {"reply_id": event.reply_id, "name": event.name}
+    if isinstance(event, ReplyEndEvent):
+        return "agent_end", {
+            "reply_id": event.reply_id,
+            "finished_reason": str(event.finished_reason),
+            "error": event.error.model_dump() if event.error else None,
+        }
+    if isinstance(event, ModelCallStartEvent):
+        return "model_request_start", {"reply_id": event.reply_id, "model": event.model_name}
+    if isinstance(event, ModelCallEndEvent):
+        return "usage", {
+            "reply_id": event.reply_id,
+            "input_tokens": event.input_tokens,
+            "output_tokens": event.output_tokens,
+            "finished_reason": str(event.finished_reason),
+        }
+    if isinstance(event, TextBlockDeltaEvent):
+        return "text_delta", {"reply_id": event.reply_id, "delta": event.delta}
+    if isinstance(event, ThinkingBlockDeltaEvent):
+        return "thinking_delta", {"reply_id": event.reply_id, "delta": event.delta}
+    if isinstance(event, ToolCallStartEvent):
+        return "tool_call", {
+            "reply_id": event.reply_id,
+            "tool_call_id": event.tool_call_id,
+            "tool_name": event.tool_call_name,
+        }
+    if isinstance(event, ToolCallDeltaEvent):
+        return "tool_call_delta", {
+            "reply_id": event.reply_id,
+            "tool_call_id": event.tool_call_id,
+            "args_delta": event.delta,
+        }
+    if isinstance(event, ToolCallEndEvent):
+        return "tool_call_end", {
+            "reply_id": event.reply_id,
+            "tool_call_id": event.tool_call_id,
+        }
+    if isinstance(event, ToolResultStartEvent):
+        return "tool_result_start", {
+            "reply_id": event.reply_id,
+            "tool_call_id": event.tool_call_id,
+            "tool_name": event.tool_call_name,
+        }
+    if isinstance(event, ToolResultTextDeltaEvent):
+        return "tool_result_delta", {
+            "reply_id": event.reply_id,
+            "tool_call_id": event.tool_call_id,
+            "delta": event.delta,
+        }
+    if isinstance(event, ToolResultEndEvent):
+        return "tool_result", {
+            "reply_id": event.reply_id,
+            "tool_call_id": event.tool_call_id,
+            "state": str(event.state),
+            **event.metadata,
+        }
+    if isinstance(event, RequireUserConfirmEvent):
+        return "ask_user", {
+            "reply_id": event.reply_id,
+            "questions": [
+                {"tool_call_id": call.id, "tool_name": call.name, "input": call.input}
+                for call in event.tool_calls
+            ],
+        }
+    if isinstance(event, RequireExternalExecutionEvent):
+        return "external_execution_required", {
+            "reply_id": event.reply_id,
+            "tool_calls": [call.model_dump() for call in event.tool_calls],
+        }
+    if isinstance(event, ExternalExecutionResultEvent):
+        return "external_execution_result", {
+            "reply_id": event.reply_id,
+            "results": [result.model_dump() for result in event.execution_results],
+        }
+    if isinstance(event, ExceedMaxItersEvent):
+        return "error", {"reply_id": event.reply_id, "message": "Agent exceeded max iterations"}
+    return None
 
 
 class AgentSession:
-    """Minimal session boundary reserved for the AgentScope adapter."""
+    """One cancellable AgentScope conversation over the existing WebSocket."""
 
-    def __init__(self, websocket: WebSocket, user: Any = None) -> None:
+    def __init__(
+        self,
+        websocket: WebSocket,
+        user: Any = None,
+        *,
+        assistant: AgentScopeAssistant | None = None,
+    ) -> None:
         self.websocket = websocket
         self.user = user
+        self.assistant = assistant
+        self.current_conversation_id: str | None = None
+        self._turn_task: asyncio.Task[None] | None = None
+        self._pending_human_event: RequireUserConfirmEvent | None = None
 
-    async def handle_frame(self, _data: dict[str, Any]) -> None:
-        """Reject execution until the streaming adapter is installed."""
-        await self.websocket.send_json(
-            {
-                "type": "error",
-                "data": {"message": "AgentScope execution adapter is not enabled yet"},
-            }
-        )
+    async def handle_frame(self, data: dict[str, Any]) -> None:
+        """Dispatch user turns, HITL responses, and cancellation frames."""
+        msg_type = data.get("type")
+        if msg_type == "stop":
+            await self._cancel_turn()
+            return
+        if msg_type in {"ask_user_response", "tool_confirmation"} and self._pending_human_event:
+            if self._turn_task is not None and not self._turn_task.done():
+                return
+            self._turn_task = asyncio.create_task(self._run_turn(data, continuation=True))
+            self._turn_task.add_done_callback(self._on_turn_done)
+            return
+        if msg_type is not None:
+            return
+        if self._turn_task is not None and not self._turn_task.done():
+            return
+        self._turn_task = asyncio.create_task(self._run_turn(data))
+        self._turn_task.add_done_callback(self._on_turn_done)
+
+    def _on_turn_done(self, task: asyncio.Task[None]) -> None:
+        if self._turn_task is task:
+            self._turn_task = None
+        if not task.cancelled() and task.exception() is not None:
+            task.exception()  # mark the exception retrieved for asyncio
+
+    async def _run_turn(self, data: dict[str, Any], continuation: bool = False) -> None:
+        try:
+            await self.process_message(data, continuation=continuation)
+        except asyncio.CancelledError:
+            await send_event(
+                self.websocket,
+                "complete",
+                {"conversation_id": self.current_conversation_id, "stopped": True},
+            )
+            raise
+
+    async def _cancel_turn(self) -> None:
+        task = self._turn_task
+        if task is None or task.done():
+            return
+        task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await task
 
     async def shutdown(self) -> None:
-        """Release any resources held by the session."""
-        return None
+        await self._cancel_turn()
+
+    async def process_message(self, data: dict[str, Any], *, continuation: bool = False) -> None:
+        """Persist, run, translate, and complete one AgentScope turn."""
+        role = data.get("active_tenant_role") or getattr(self.user, "active_tenant_role", None)
+        try:
+            authorize_execution(
+                active_tenant_role=role,
+                active_tenant_id=data.get("active_tenant_id"),
+                conversation_tenant_id=data.get("conversation_tenant_id"),
+            )
+        except ActiveTenantError as exc:
+            await send_event(self.websocket, "error", {"message": str(exc)})
+            return
+
+        user_message = str(data.get("message", ""))
+        if not continuation and not user_message:
+            await send_event(self.websocket, "error", {"message": "Empty message"})
+            return
+
+{%- if cookiecutter.use_database %}
+        organization_id: str | None = None
+        if not continuation:
+            self.current_conversation_id, created, organization_id = await persist_user_turn(
+{%- if cookiecutter.websocket_auth_jwt %}
+                self.user,
+{%- endif %}
+                user_message,
+                data.get("file_ids", []),
+                requested_conversation_id=data.get("conversation_id"),
+                current_conversation_id=self.current_conversation_id,
+            )
+            if created and self.current_conversation_id:
+                await send_event(
+                    self.websocket,
+                    "conversation_created",
+                    {"conversation_id": self.current_conversation_id},
+                )
+{%- endif %}
+        if not continuation:
+            await send_event(self.websocket, "user_prompt", {"content": user_message})
+
+        if self.assistant is None:
+            self.assistant = get_agent(model_name=data.get("model"))
+        pending_tools: list[dict[str, Any]] = []
+        final_message: Msg | None = None
+        continuation_event: Any | None = None
+        if continuation:
+            continuation_event = self._build_confirmation(data)
+            self._pending_human_event = None
+
+        try:
+            async for event in self.assistant.stream(
+                user_message,
+                continuation=continuation_event,
+            ):
+                if isinstance(event, Msg):
+                    final_message = event
+                    continue
+                if isinstance(event, ToolCallStartEvent):
+                    pending_tools.append(
+                        {"tool_call_id": event.tool_call_id, "tool_name": event.tool_call_name, "args": ""}
+                    )
+                elif isinstance(event, ToolCallDeltaEvent):
+                    for call in pending_tools:
+                        if call["tool_call_id"] == event.tool_call_id:
+                            call["args"] += event.delta
+                elif isinstance(event, RequireUserConfirmEvent):
+                    self._pending_human_event = event
+                wire = event_to_wire(event)
+                if wire is not None:
+                    await send_event(self.websocket, wire[0], wire[1])
+                if isinstance(event, RequireUserConfirmEvent):
+                    return
+        except Exception as exc:
+            await send_event(self.websocket, "error", {"message": str(exc)})
+            return
+
+        output = final_message.get_text_content() if final_message else ""
+{%- if cookiecutter.use_database %}
+        if self.current_conversation_id and final_message is not None:
+            message_id = await persist_assistant_turn(
+                self.current_conversation_id,
+                output or "",
+                self.assistant.model_name,
+                pending_tools,
+            )
+            if message_id:
+                await send_event(
+                    self.websocket,
+                    "message_saved",
+                    {"message_id": message_id, "conversation_id": self.current_conversation_id},
+                )
+{%- endif %}
+        await send_event(
+            self.websocket,
+            "complete",
+            {"conversation_id": self.current_conversation_id, "content": output or ""},
+        )
+
+    def _build_confirmation(self, data: dict[str, Any]) -> UserConfirmResultEvent:
+        """Turn product HITL decisions into AgentScope's native event."""
+        pending = self._pending_human_event
+        if pending is None:
+            raise ActiveTenantError("No AgentScope confirmation is pending")
+        decisions = data.get("confirmations") or data.get("answers") or []
+        by_id = {
+            str(item.get("tool_call_id")): item
+            for item in decisions
+            if isinstance(item, dict) and item.get("tool_call_id")
+        }
+        results = [
+            ConfirmResult(
+                confirmed=bool(by_id.get(call.id, {}).get("confirmed", False)),
+                tool_call=call,
+            )
+            for call in pending.tool_calls
+        ]
+        return UserConfirmResultEvent(reply_id=pending.reply_id, confirm_results=results)
 {%- else %}
 """AI Agent session - not configured."""
 {%- endif %}

@@ -33,6 +33,9 @@ from app.agents.langgraph_assistant import get_agent
 {%- if cookiecutter.use_deepagents %}
 from app.agents.deepagents_assistant import get_agent
 {%- endif %}
+{%- if cookiecutter.use_agentscope %}
+from app.agents.agentscope_assistant import get_agent
+{%- endif %}
 {%- if (cookiecutter.use_langchain or cookiecutter.use_langgraph or cookiecutter.use_deepagents) and cookiecutter.enable_teams and cookiecutter.enable_rag %}
 from app.agents.tools.rag_tool import _active_kb_collections
 {%- endif %}
@@ -134,8 +137,36 @@ class AgentInvocationService:
         return await self._call_langgraph(user_message=user_message, history=history, **kwargs)
 {%- elif cookiecutter.use_deepagents %}
         return await self._call_deepagents(user_message=user_message, history=history, **kwargs)
+{%- elif cookiecutter.use_agentscope %}
+        return await self._call_agentscope(user_message=user_message, history=history, **kwargs)
 {%- else %}
         return f"Echo: {user_message}", []
+{%- endif %}
+
+{%- if cookiecutter.use_agentscope %}
+
+    async def _call_agentscope(
+        self,
+        *,
+        user_message: str,
+        history: list[dict[str, str]],
+        **kwargs: Any,
+    ) -> tuple[str, list[ToolEvent]]:
+        """Invoke AgentScope for non-streaming channel entry points."""
+        assistant = get_agent(model_name=kwargs.get("model_override"))
+        output = ""
+        tool_events: list[ToolEvent] = []
+        async for event in assistant.stream(user_message):
+            if hasattr(event, "get_text_content"):
+                output = event.get_text_content() or output
+            if getattr(event, "type", None) == "TOOL_CALL_START":
+                tool_events.append(
+                    ToolEvent(
+                        tool_name=getattr(event, "tool_call_name", "unknown"),
+                        args={},
+                    )
+                )
+        return output, tool_events
 {%- endif %}
 
 {%- if cookiecutter.use_pydantic_ai %}
