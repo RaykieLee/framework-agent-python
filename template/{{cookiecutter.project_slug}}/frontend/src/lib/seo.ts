@@ -49,6 +49,7 @@ export const OG_LOCALE: Record<(typeof locales)[number], string> = {
   en: "en_US",
 {%- if cookiecutter.enable_i18n %}
   pl: "pl_PL",
+  zh: "zh_CN",
 {%- endif %}
 };
 
