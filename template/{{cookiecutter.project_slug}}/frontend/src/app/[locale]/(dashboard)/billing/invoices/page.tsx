@@ -1,6 +1,7 @@
 "use client";
 
 import { Download, FileText } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 
 import { Badge, Button, DataTable, type Column } from "@/components/ui";
 import { useInvoices } from "@/hooks";
@@ -17,26 +18,28 @@ const STATUS_TONES: Record<string, string> = {
 };
 
 export default function InvoicesPage() {
+  const t = useTranslations("billing");
+  const locale = useLocale();
   const { invoices, isLoading } = useInvoices();
 
   const columns: Column<InvoiceRead>[] = [
     {
       key: "date",
-      header: "Date",
+      header: t("date"),
       cell: (inv) => (
         <div className="min-w-0">
           <p className="text-foreground font-medium">
-            {inv.number ?? `Invoice ${inv.id.slice(0, 8)}`}
+            {inv.number ?? t("invoiceNumber", { id: inv.id.slice(0, 8) })}
           </p>
           <p className="text-muted-foreground text-xs">
-            {formatDate(inv.period_start)} — {formatDate(inv.period_end)}
+            {formatDate(inv.period_start, locale)} — {formatDate(inv.period_end, locale)}
           </p>
         </div>
       ),
     },
     {
       key: "amount",
-      header: "Amount",
+      header: t("amount"),
       align: "right",
       cell: (inv) => (
         <span className="font-mono tabular-nums">
@@ -46,7 +49,7 @@ export default function InvoicesPage() {
     },
     {
       key: "status",
-      header: "Status",
+      header: t("status"),
       hideBelow: "sm",
       cell: (inv) => (
         <Badge
@@ -72,8 +75,8 @@ export default function InvoicesPage() {
               href={inv.invoice_pdf}
               target="_blank"
               rel="noopener noreferrer"
-              title="Download PDF"
-              aria-label="Download invoice PDF"
+              title={t("downloadPdf")}
+              aria-label={t("downloadPdf")}
             >
               <Download className="h-3.5 w-3.5" />
             </a>
@@ -94,9 +97,9 @@ export default function InvoicesPage() {
         empty={
           <div className="flex flex-col items-center gap-2">
             <FileText className="text-muted-foreground h-7 w-7" />
-            <p className="text-foreground text-sm">No invoices yet</p>
+            <p className="text-foreground text-sm">{t("noInvoices")}</p>
             <p className="text-muted-foreground text-xs">
-              Invoices appear here after your first paid period.
+              {t("invoiceEmptyDesc")}
             </p>
           </div>
         }

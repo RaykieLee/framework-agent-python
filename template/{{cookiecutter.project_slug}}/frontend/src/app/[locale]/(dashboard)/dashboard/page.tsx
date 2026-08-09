@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import {
 {%- if cookiecutter.enable_credits_system %}
   Activity,
@@ -78,11 +79,11 @@ interface ConversationsResponse {
   items: Array<{ id: string }>;
 }
 
-function getGreeting(): string {
+function getGreeting(t: (key: "greetingMorning" | "greetingAfternoon" | "greetingEvening") => string): string {
   const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 18) return "Good afternoon";
-  return "Good evening";
+  if (hour < 12) return t("greetingMorning");
+  if (hour < 18) return t("greetingAfternoon");
+  return t("greetingEvening");
 }
 {%- if cookiecutter.enable_credits_system %}
 function pctDelta(current: number[], prior: number[]): number | undefined {
@@ -94,6 +95,7 @@ function pctDelta(current: number[], prior: number[]): number | undefined {
 {%- endif %}
 
 export default function DashboardPage() {
+  const t = useTranslations("dashboard");
   const { user } = useAuth();
 {%- if cookiecutter.enable_credits_system %}
   const [period, setPeriod] = useState<7 | 30 | 90>(7);
@@ -159,7 +161,7 @@ export default function DashboardPage() {
         timeline.slice(-period * 2, -period).map((b) => b.total_calls),
       )
     : undefined;
-  const deltaLabel = `vs prior ${period}d`;
+  const deltaLabel = t("priorPeriod", { days: period });
 {%- endif %}
 
   const firstName = user?.full_name?.split(" ")[0] || user?.email?.split("@")[0];
@@ -170,14 +172,14 @@ export default function DashboardPage() {
       <OnboardingBanner />
 
       <PageHeader
-        eyebrow="Dashboard"
-        title={firstName ? `${getGreeting()}, ${firstName}` : getGreeting()}
-        description="Here's what's happening with your workspace today."
+        eyebrow={t("eyebrow")}
+        title={firstName ? `${getGreeting(t)}，${firstName}` : getGreeting(t)}
+        description={t("intro")}
         actions={
           <Button asChild>
             <Link href={ROUTES.CHAT}>
               <Plus className="h-4 w-4" />
-              New chat
+              {t("newChat")}
             </Link>
           </Button>
         }
@@ -193,7 +195,7 @@ export default function DashboardPage() {
             )}
           />
           <span className="text-foreground font-medium">
-            {healthy ? health.data?.status || "Operational" : "API offline"}
+            {healthy ? health.data?.status || t("operational") : t("apiOffline")}
           </span>
         </span>
         {health.data?.version && (
@@ -202,12 +204,12 @@ export default function DashboardPage() {
 {%- if cookiecutter.enable_rag %}
         <span className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
           <Database className="h-3.5 w-3.5" />
-          {rag.data ? `${rag.data.collections} collections` : "—"}
+          {rag.data ? t("collectionsCount", { count: rag.data.collections }) : "—"}
         </span>
 {%- endif %}
 {%- if cookiecutter.enable_billing %}
         <span className="ml-auto inline-flex items-center gap-2">
-          <span className="text-muted-foreground text-xs">Plan</span>
+          <span className="text-muted-foreground text-xs">{t("plan")}</span>
           <SubscriptionChip />
         </span>
 {%- endif %}
@@ -215,7 +217,7 @@ export default function DashboardPage() {
 
       <div className="flex items-center justify-between">
         <h2 className="text-muted-foreground font-mono text-xs tracking-wider uppercase">
-          Workspace metrics
+          {t("workspaceMetrics")}
         </h2>
         {%- if cookiecutter.enable_credits_system %}
         <SegmentedControl
@@ -233,28 +235,28 @@ export default function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {%- if cookiecutter.enable_credits_system %}
         <StatCard
-          label="Credits balance"
+          label={t("creditsBalance")}
           value={credits.isLoading ? "—" : (credits.data?.balance ?? 0).toLocaleString()}
           icon={Sparkles}
           delta={creditsDelta}
           deltaLabel={deltaLabel}
           footer={
-            credits.data ? `${credits.data.low_threshold.toLocaleString()} low threshold` : undefined
+            credits.data ? t("lowThreshold", { count: credits.data.low_threshold.toLocaleString() }) : undefined
           }
           spark={creditsSpark.length >= 2 ? creditsSpark : undefined}
           loading={credits.isLoading}
         />
         {%- endif %}
         <StatCard
-          label="Conversations"
+          label={t("conversations")}
           value={conversations.isLoading ? "—" : (conversations.data ?? 0).toLocaleString()}
           icon={MessageSquare}
-          footer="across all chats"
+          footer={t("allChats")}
           loading={conversations.isLoading}
         />
         {%- if cookiecutter.enable_credits_system %}
         <StatCard
-          label={`API calls (${period}d)`}
+          label={t("apiCalls", { days: period })}
           value={timeline ? callsSpark.reduce((a, b) => a + b, 0).toLocaleString() : "—"}
           icon={Activity}
           delta={callsDelta}
@@ -264,14 +266,14 @@ export default function DashboardPage() {
         />
         {%- endif %}
         <StatCard
-          label="Knowledge base"
+          label={t("knowledgeBase")}
           value={rag.data ? rag.data.vectors.toLocaleString() : "—"}
-          unit={rag.data ? `vector${rag.data.vectors === 1 ? "" : "s"}` : undefined}
+          unit={rag.data ? t("vectors", { count: rag.data.vectors }) : undefined}
           icon={Database}
           footer={
             rag.data
-              ? `${rag.data.collections} collection${rag.data.collections === 1 ? "" : "s"} indexed`
-              : "indexed vectors"
+              ? t("collectionsIndexed", { count: rag.data.collections })
+              : t("indexedVectors")
           }
           loading={rag.isLoading}
         />
@@ -284,7 +286,7 @@ export default function DashboardPage() {
           className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-xs transition-colors"
         >
           <CreditCard className="h-3.5 w-3.5" />
-          Manage billing →
+          {t("manageBilling")}
         </Link>
       </div>
 {%- endif %}
@@ -318,20 +320,20 @@ export default function DashboardPage() {
       {isAppAdmin(user) && (
         <div>
           <h2 className="font-display text-foreground mb-3 text-base font-semibold">
-            Admin actions
+            {t("adminActions")}
           </h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
 {%- if cookiecutter.use_ai %}
             <AdminTile
               icon={Star}
-              label="Response ratings"
-              description="View and manage ratings"
+              label={t("responseRatings")}
+              description={t("manageRatings")}
               href={ROUTES.ADMIN_RATINGS}
             />
             <AdminTile
               icon={List}
-              label="All conversations"
-              description="Inspect any user's chats"
+              label={t("allConversations")}
+              description={t("inspectChats")}
               href={ROUTES.ADMIN_CONVERSATIONS}
             />
 {%- endif %}

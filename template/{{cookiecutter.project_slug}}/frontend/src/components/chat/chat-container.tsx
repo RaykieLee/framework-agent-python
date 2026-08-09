@@ -277,6 +277,7 @@ function ChatUI({
   onStop,
 }: ChatUIProps) {
   const tc = useTranslations("common");
+  const t = useTranslations("chat");
 {%- if cookiecutter.enable_deep_research %}
   const currentTurnId = useResearchStore((s) => s.currentTurnId);
 {%- endif %}
@@ -383,7 +384,7 @@ function ChatUI({
             </div>
           </div>
           <p className="text-foreground/40 mt-2 text-center font-mono text-[10px] tracking-wider uppercase">
-            AI can make mistakes. Verify important information.
+            {t("disclaimer")}
           </p>
         </div>
       </div>

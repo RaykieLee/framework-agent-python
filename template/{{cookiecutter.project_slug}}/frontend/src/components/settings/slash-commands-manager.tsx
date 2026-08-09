@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import {
   Button,
@@ -24,6 +25,11 @@ import type { UserSlashCommandRecord } from "@/lib/slash-commands-api";
 const NAME_PATTERN = /^[a-z0-9][a-z0-9-]{0,31}$/;
 
 export function SlashCommandsManager() {
+  const t = useTranslations("settings");
+  const builtinDescriptions: Record<string, string> = {
+    clear: t("cmdClear"), regen: t("cmdRegen"), settings: t("cmdSettings"),
+    summarize: t("cmdSummarize"), explain: t("cmdExplain"),
+  };
   const {
     records,
     isLoading,
@@ -66,11 +72,11 @@ export function SlashCommandsManager() {
     const name = draftName.trim().toLowerCase();
     const prompt = draftPrompt.trim();
     if (!NAME_PATTERN.test(name)) {
-      toast.error("Name must be lowercase letters, digits, and hyphens (max 32 chars).");
+      toast.error(t("invalidName"));
       return;
     }
     if (!prompt) {
-      toast.error("Prompt cannot be empty.");
+      toast.error(t("emptyPrompt"));
       return;
     }
     setSubmitting(true);
@@ -89,7 +95,7 @@ export function SlashCommandsManager() {
           ? e.message
           : e instanceof Error
             ? e.message
-            : "Failed to save command";
+            : t("saveCommandFailed");
       toast.error(msg);
     } finally {
       setSubmitting(false);
@@ -100,7 +106,7 @@ export function SlashCommandsManager() {
     try {
       await updateCustom(record.id, { is_enabled: next });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to toggle");
+      toast.error(e instanceof Error ? e.message : t("toggleFailed"));
     }
   };
 
@@ -108,17 +114,17 @@ export function SlashCommandsManager() {
     try {
       await setBuiltinEnabled(name, next);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to toggle");
+      toast.error(e instanceof Error ? e.message : t("toggleFailed"));
     }
   };
 
   const handleDelete = async (record: UserSlashCommandRecord) => {
-    if (!confirm(`Delete /${record.name}?`)) return;
+    if (!confirm(t("deleteCommandConfirm", { name: record.name }))) return;
     try {
       await remove(record.id);
       toast.success(`/${record.name} deleted.`);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to delete");
+      toast.error(e instanceof Error ? e.message : t("deleteCommandFailed"));
     }
   };
 
@@ -128,7 +134,7 @@ export function SlashCommandsManager() {
         <div className="border-destructive/30 bg-destructive/5 text-destructive flex items-center justify-between rounded-xl border px-4 py-3 text-sm">
           <span>{error}</span>
           <Button size="sm" variant="ghost" onClick={() => refresh()}>
-            Retry
+            {t("retry")}
           </Button>
         </div>
       )}
@@ -136,9 +142,9 @@ export function SlashCommandsManager() {
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-3">
           <div>
-            <h3 className="text-foreground text-sm font-semibold">Built-in commands</h3>
+            <h3 className="text-foreground text-sm font-semibold">{t("builtinCommands")}</h3>
             <p className="text-foreground/55 mt-0.5 text-xs">
-              Disable any you don&apos;t want to see in the palette.
+              {t("builtinDesc")}
             </p>
           </div>
         </div>
@@ -154,11 +160,11 @@ export function SlashCommandsManager() {
                     </code>
                     {cmd.action.kind === "client" && (
                       <span className="text-foreground/45 font-mono text-[10px] tracking-wider uppercase">
-                        local
+                        {t("local")}
                       </span>
                     )}
                   </div>
-                  <p className="text-foreground/65 mt-1 text-xs">{cmd.description}</p>
+                  <p className="text-foreground/65 mt-1 text-xs">{builtinDescriptions[cmd.name] ?? cmd.description}</p>
                 </div>
                 <Switch
                   checked={enabled}
@@ -175,22 +181,21 @@ export function SlashCommandsManager() {
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-3">
           <div>
-            <h3 className="text-foreground text-sm font-semibold">Your custom commands</h3>
+            <h3 className="text-foreground text-sm font-semibold">{t("customCommands")}</h3>
             <p className="text-foreground/55 mt-0.5 text-xs">
-              Slash shortcuts for prompts you type often. Typing <code>/name</code> in chat sends
-              the stored prompt.
+              {t("customDesc")}
             </p>
           </div>
           <Button size="sm" onClick={openCreate}>
             <Plus className="mr-1 h-3.5 w-3.5" />
-            New command
+            {t("newCommand")}
           </Button>
         </div>
 
         {customs.length === 0 ? (
           <EmptyState
-            title="No custom commands yet"
-            description="Create one to send a long prompt with a few keystrokes."
+            title={t("noCustom")}
+            description={t("noCustomDesc")}
           />
         ) : (
           <ul className="border-foreground/10 divide-foreground/8 divide-y rounded-xl border">
@@ -213,8 +218,8 @@ export function SlashCommandsManager() {
                   type="button"
                   onClick={() => openEdit(record)}
                   className="text-foreground/55 hover:bg-foreground/5 hover:text-foreground inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors"
-                  title="Edit"
-                  aria-label="Edit"
+                  title={t("edit")}
+                  aria-label={t("edit")}
                 >
                   <Pencil className="h-3.5 w-3.5" />
                 </button>
@@ -222,8 +227,8 @@ export function SlashCommandsManager() {
                   type="button"
                   onClick={() => handleDelete(record)}
                   className="text-foreground/55 hover:bg-destructive/10 hover:text-destructive inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors"
-                  title="Delete"
-                  aria-label="Delete"
+                  title={t("delete")}
+                  aria-label={t("delete")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -237,12 +242,12 @@ export function SlashCommandsManager() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingId === "new" ? "New custom command" : `Edit /${draftName}`}
+              {editingId === "new" ? t("newCustom") : t("editCommand", { name: draftName })}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="cmd-name">Name</Label>
+              <Label htmlFor="cmd-name">{t("name")}</Label>
               <div className="mt-1.5 flex items-center gap-2">
                 <span className="text-foreground/45 font-mono text-sm">/</span>
                 <Input
@@ -255,39 +260,39 @@ export function SlashCommandsManager() {
                 />
               </div>
               <p className="text-foreground/45 mt-1 text-[11px]">
-                Lowercase letters, digits, hyphens. Max 32 chars.
+                {t("nameHint")}
               </p>
             </div>
             <div>
-              <Label htmlFor="cmd-prompt">Prompt</Label>
+              <Label htmlFor="cmd-prompt">{t("prompt")}</Label>
               <Textarea
                 id="cmd-prompt"
                 value={draftPrompt}
                 onChange={(e) => setDraftPrompt(e.target.value)}
-                placeholder="Summarize the conversation as a checklist of action items."
+                placeholder={t("promptPlaceholder")}
                 rows={6}
                 maxLength={10_000}
                 className="mt-1.5 font-mono text-sm"
               />
               <p className="text-foreground/45 mt-1 text-[11px]">
-                Sent as a regular user message when you type <code>/{draftName || "name"}</code>.
+                {t("promptHint", { name: draftName || "name" })}
               </p>
             </div>
             {editingId !== "new" && (
               <div className="flex items-center gap-3">
                 <Switch id="cmd-enabled" checked={draftEnabled} onCheckedChange={setDraftEnabled} />
                 <Label htmlFor="cmd-enabled" className="text-sm font-normal">
-                  Enabled
+                  {t("enabled")}
                 </Label>
               </div>
             )}
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={closeDialog} disabled={submitting}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button onClick={handleSubmit} disabled={submitting}>
-              {submitting ? "Saving…" : editingId === "new" ? "Create" : "Save"}
+              {submitting ? t("commandSaving") : editingId === "new" ? t("create") : t("save")}
             </Button>
           </DialogFooter>
         </DialogContent>

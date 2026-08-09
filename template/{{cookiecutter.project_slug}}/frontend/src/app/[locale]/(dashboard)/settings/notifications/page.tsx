@@ -4,14 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import { CreditCard, MessageSquare, Sparkles, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import { Button, Switch } from "@/components/ui";
 import { SectionCard } from "@/components/settings/settings-section";
 
 interface NotificationCategory {
   key: string;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   icon: LucideIcon;
   /** Default values for new users. */
   defaults: { email: boolean; inApp: boolean };
@@ -20,29 +21,29 @@ interface NotificationCategory {
 const CATEGORIES: NotificationCategory[] = [
   {
     key: "billing",
-    label: "Billing",
-    description: "Subscription renewals, payment failures, low credit warnings.",
+    labelKey: "catBilling",
+    descriptionKey: "catBillingDesc",
     icon: CreditCard,
     defaults: { email: true, inApp: true },
   },
   {
     key: "members",
-    label: "Team activity",
-    description: "Invitations accepted, members joining or leaving your workspace.",
+    labelKey: "catTeam",
+    descriptionKey: "catTeamDesc",
     icon: Users,
     defaults: { email: true, inApp: true },
   },
   {
     key: "security",
-    label: "Security alerts",
-    description: "New device sign-ins, password changes, suspicious activity.",
+    labelKey: "catSecurity",
+    descriptionKey: "catSecurityDesc",
     icon: MessageSquare,
     defaults: { email: true, inApp: true },
   },
   {
     key: "product",
-    label: "Product updates",
-    description: "New features, release notes, occasional how-to tips.",
+    labelKey: "catProduct",
+    descriptionKey: "catProductDesc",
     icon: Sparkles,
     defaults: { email: false, inApp: true },
   },
@@ -74,6 +75,7 @@ function savePrefs(prefs: Prefs) {
 }
 
 export default function NotificationsSettingsPage() {
+  const t = useTranslations("settings");
   const [prefs, setPrefs] = useState<Prefs>(defaultPrefs);
   const [dirty, setDirty] = useState(false);
   const initialPrefs = useMemo(loadPrefs, []);
@@ -96,7 +98,7 @@ export default function NotificationsSettingsPage() {
 
   const handleSave = () => {
     savePrefs(prefs);
-    toast.success("Notification preferences saved");
+    toast.success(t("preferencesSaved"));
     setDirty(false);
   };
 
@@ -108,15 +110,15 @@ export default function NotificationsSettingsPage() {
   return (
     <div className="space-y-6">
       <SectionCard
-        title="Notification preferences"
-        description="Pick which events we send by email versus only show in-app."
+        title={t("notificationsTitle")}
+        description={t("notificationsDesc")}
         action={
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={handleReset}>
-              Reset to defaults
+              {t("resetDefaults")}
             </Button>
             <Button onClick={handleSave} disabled={!dirty} size="sm">
-              Save changes
+              {t("saveChanges")}
             </Button>
           </div>
         }
@@ -124,13 +126,13 @@ export default function NotificationsSettingsPage() {
         <div className="border-border overflow-hidden rounded-xl border">
           <div className="border-border bg-muted grid grid-cols-[1fr_70px_70px] items-center gap-2 border-b px-5 py-3 sm:grid-cols-[1.5fr_90px_90px]">
             <span className="text-muted-foreground text-[11px] font-medium tracking-wide uppercase">
-              Category
+              {t("category")}
             </span>
             <span className="text-muted-foreground text-center text-[11px] font-medium tracking-wide uppercase">
-              Email
+              {t("email")}
             </span>
             <span className="text-muted-foreground text-center text-[11px] font-medium tracking-wide uppercase">
-              In-app
+              {t("inApp")}
             </span>
           </div>
           <ul className="divide-border divide-y">
@@ -146,9 +148,9 @@ export default function NotificationsSettingsPage() {
                       <c.icon className="h-4 w-4" />
                     </span>
                     <div className="min-w-0">
-                      <p className="text-foreground text-sm font-medium">{c.label}</p>
+                      <p className="text-foreground text-sm font-medium">{t(c.labelKey)}</p>
                       <p className="text-muted-foreground mt-0.5 text-xs leading-relaxed">
-                        {c.description}
+                        {t(c.descriptionKey)}
                       </p>
                     </div>
                   </div>
@@ -156,14 +158,14 @@ export default function NotificationsSettingsPage() {
                     <Switch
                       checked={p.email}
                       onCheckedChange={() => toggle(c.key, "email")}
-                      aria-label={`Email notifications for ${c.label}`}
+                      aria-label={t("emailFor", { category: t(c.labelKey) })}
                     />
                   </div>
                   <div className="flex justify-center">
                     <Switch
                       checked={p.inApp}
                       onCheckedChange={() => toggle(c.key, "inApp")}
-                      aria-label={`In-app notifications for ${c.label}`}
+                      aria-label={t("inAppFor", { category: t(c.labelKey) })}
                     />
                   </div>
                 </li>
@@ -172,8 +174,7 @@ export default function NotificationsSettingsPage() {
           </ul>
         </div>
         <p className="text-muted-foreground mt-4 text-xs leading-relaxed">
-          Preferences are stored locally for now. Backend wiring required (
-          <code className="font-mono">/users/me/notifications</code>) to sync across devices.
+          {t("preferencesLocal")}
         </p>
       </SectionCard>
     </div>

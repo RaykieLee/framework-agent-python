@@ -6,6 +6,7 @@ import { Wrench } from "lucide-react";
 import { LoadingState } from "@/components/states";
 import { apiClient } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface ToolStat {
   tool_name: string;
@@ -33,6 +34,7 @@ function formatDuration(ms: number | null): string {
 }
 
 export function ToolUsage() {
+  const t = useTranslations("dashboard");
   const [data, setData] = useState<ToolStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -62,10 +64,10 @@ export function ToolUsage() {
     <section className="border-border bg-card flex flex-col rounded-xl border p-5 lg:p-6">
       <header>
         <p className="text-foreground/55 font-mono text-[11px] tracking-wider uppercase">
-          Tools used · 7d
+          {t("toolsUsed")}
         </p>
         <h2 className="font-display text-foreground mt-1 text-xl font-semibold tracking-tight">
-          What the agent reaches for
+          {t("agentTools")}
         </h2>
       </header>
 
@@ -75,9 +77,9 @@ export function ToolUsage() {
         ) : error || items.length === 0 ? (
           <div className="border-foreground/10 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed py-10 text-center">
             <Wrench className="text-foreground/30 h-8 w-8" />
-            <p className="text-foreground/55 text-sm">No tool calls in the last 7 days.</p>
+            <p className="text-foreground/55 text-sm">{t("noToolCalls")}</p>
             <p className="text-foreground/45 text-xs">
-              Web search, RAG search, etc. show up here once the agent uses them.
+              {t("toolHint")}
             </p>
           </div>
         ) : (
@@ -104,12 +106,12 @@ export function ToolUsage() {
                         {humanize(tool.tool_name)}
                       </p>
                       <p className="text-foreground/55 text-xs tabular-nums">
-                        avg {formatDuration(tool.avg_duration_ms)}
+                        {t("avgDuration", { duration: formatDuration(tool.avg_duration_ms) })}
                         {hasFailures && (
                           <>
                             {" · "}
                             <span className="text-destructive">
-                              {tool.failed_calls} fail{tool.failed_calls === 1 ? "" : "s"}
+                              {t("failures", { count: tool.failed_calls })}
                               {failRate >= 1 ? ` (${failRate.toFixed(0)}%)` : ""}
                             </span>
                           </>
@@ -126,7 +128,7 @@ export function ToolUsage() {
                         {tool.total_calls.toLocaleString()}
                       </p>
                       <p className="text-foreground/45 text-[10px] tracking-wider uppercase">
-                        call{tool.total_calls === 1 ? "" : "s"}
+                        {t("callCount", { count: tool.total_calls })}
                       </p>
                     </div>
                   </div>

@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBilling, useSubscription } from "@/hooks";
+import { useTranslations } from "next-intl";
 
 const CARD_BRAND_LABELS: Record<string, string> = {
   visa: "Visa",
@@ -25,6 +26,7 @@ const CARD_BRAND_LABELS: Record<string, string> = {
 };
 
 export function PaymentMethodsPanel() {
+  const t = useTranslations("billing");
   const { subscription, isLoading } = useSubscription();
   const { isLoading: billingLoading, openPortal } = useBilling();
 
@@ -32,7 +34,7 @@ export function PaymentMethodsPanel() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Payment Methods</CardTitle>
+          <CardTitle>{t("paymentMethods")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Skeleton className="h-20 w-full" />
@@ -46,9 +48,9 @@ export function PaymentMethodsPanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CreditCard className="h-5 w-5" />
-          Payment Methods
+          {t("paymentMethods")}
         </CardTitle>
-        <CardDescription>Payment methods are securely managed through Stripe.</CardDescription>
+        <CardDescription>{t("paymentMethodsDesc")}</CardDescription>
       </CardHeader>
       <CardContent>
         {subscription ? (
@@ -60,28 +62,28 @@ export function PaymentMethodsPanel() {
               <div>
                 <p className="text-sm font-medium">
                   {subscription.status === "active" || subscription.status === "trialing"
-                    ? "Active subscription"
-                    : "Subscription on file"}
+                    ? t("activeSubscription")
+                    : t("subscriptionOnFile")}
                 </p>
                 <p className="text-muted-foreground text-xs">
-                  Use the billing portal to update your payment method.
+                  {t("updatePaymentHint")}
                 </p>
               </div>
               <Badge variant="secondary" className="ml-auto shrink-0">
-                Managed by Stripe
+                {t("managedByStripe")}
               </Badge>
             </div>
           </div>
         ) : (
           <div className="text-muted-foreground flex items-center gap-3 rounded-lg border border-dashed p-4 text-sm">
             <Shield className="h-5 w-5 shrink-0" />
-            <p>No active subscription. Upgrade to add a payment method.</p>
+            <p>{t("noActiveSubscription")}</p>
           </div>
         )}
       </CardContent>
       <CardFooter>
         <Button variant="outline" onClick={openPortal} disabled={billingLoading || !subscription}>
-          {billingLoading ? "Redirecting…" : "Manage Payment Methods"}
+          {billingLoading ? t("redirecting") : t("managePaymentMethods")}
         </Button>
       </CardFooter>
     </Card>

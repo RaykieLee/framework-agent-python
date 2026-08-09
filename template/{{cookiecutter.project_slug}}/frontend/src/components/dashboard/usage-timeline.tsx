@@ -8,6 +8,7 @@ import { SegmentedControl } from "@/components/dashboard/segmented-control";
 import { EmptyState, ErrorState, LoadingState } from "@/components/states";
 import { apiClient, ApiError } from "@/lib/api-client";
 import { getErrorMessage } from "@/lib/utils";
+import { useLocale, useTranslations } from "next-intl";
 
 // Recharts loads on demand — keeps it out of the dashboard's initial bundle.
 const UsageTimelineChart = dynamic(
@@ -40,13 +41,9 @@ const RANGES = [
 
 type Metric = "credits" | "calls" | "tokens";
 
-const METRIC_LABELS: Record<Metric, string> = {
-  credits: "Credits",
-  calls: "Calls",
-  tokens: "Tokens",
-};
-
 export function UsageTimeline() {
+  const t = useTranslations("dashboard");
+  const locale = useLocale();
   const [days, setDays] = useState<number>(30);
   const [metric, setMetric] = useState<Metric>("credits");
   const [data, setData] = useState<UsageBucket[] | null>(null);
@@ -66,7 +63,7 @@ export function UsageTimeline() {
         if (err instanceof ApiError && err.status === 404) {
           setData([]);
         } else {
-          setError(getErrorMessage(err, "Failed to load usage timeline"));
+          setError(getErrorMessage(err, t("loadUsageFailed")));
         }
       } finally {
         setLoading(false);
@@ -83,12 +80,12 @@ export function UsageTimeline() {
     if (!data) return [];
     return data.map((b) => ({
       day: b.day,
-      label: formatDayLabel(b.day, days),
+      label: formatDayLabel(b.day, locale),
       credits: b.credits_charged,
       calls: b.total_calls,
       tokens: b.input_tokens + b.output_tokens,
     }));
-  }, [data, days]);
+  }, [data, days, locale]);
 
   const totalForMetric = chartData.reduce((sum, p) => sum + (p[metric] as number), 0);
 
@@ -97,14 +94,14 @@ export function UsageTimeline() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-foreground/55 font-mono text-[11px] tracking-wider uppercase">
-            Usage over time
+            {t("usageOverTime")}
           </p>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="font-display text-foreground text-2xl font-bold">
               {totalForMetric.toLocaleString()}
             </span>
             <span className="text-foreground/55 text-sm">
-              {METRIC_LABELS[metric].toLowerCase()}
+              {t(metric)}
             </span>
           </div>
         </div>
@@ -114,9 +111,9 @@ export function UsageTimeline() {
             value={metric}
             onChange={(v) => setMetric(v as Metric)}
             options={[
-              { label: "Credits", value: "credits" },
-              { label: "Calls", value: "calls" },
-              { label: "Tokens", value: "tokens" },
+              { label: t("credits"), value: "credits" },
+              { label: t("calls"), value: "calls" },
+              { label: t("tokens"), value: "tokens" },
             ]}
           />
           <SegmentedControl
@@ -129,19 +126,19 @@ export function UsageTimeline() {
 
       <div className="mt-5 h-56 w-full">
         {loading ? (
-          <LoadingState variant="dot-pulse" label="Loading usage…" />
+          <LoadingState variant="dot-pulse" label={t("loadingUsage")} />
         ) : error ? (
           <ErrorState
-            title="Couldn't load usage"
+            title={t("couldntLoadUsage")}
             description={error}
-            cta={{ label: "Retry", onClick: () => fetchTimeline(days) }}
+            cta={{ label: t("retry"), onClick: () => fetchTimeline(days) }}
             className="h-full"
           />
         ) : !chartData || chartData.length === 0 ? (
           <EmptyState
             icon={Activity}
-            title="No usage yet"
-            description="Once you start sending messages, usage will appear here."
+            title={t("noUsage")}
+            description={t("noUsageDesc")}
             fill
           />
         ) : (
@@ -152,9 +149,9 @@ export function UsageTimeline() {
   );
 }
 
-function formatDayLabel(day: string, _range: number): string {
+function formatDayLabel(day: string, locale: string): string {
   const d = new Date(day);
   if (Number.isNaN(d.getTime())) return day;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return d.toLocaleDateString(locale === "zh" ? "zh-CN" : locale, { month: "short", day: "numeric" });
 }
 {% endraw %}

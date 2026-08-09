@@ -13,14 +13,16 @@ import { useKnowledgeBases } from "@/hooks";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
 import type { KBScope, KnowledgeBase } from "@/types";
+import { useTranslations } from "next-intl";
 
-const SCOPE_META: Record<KBScope, { label: string; icon: LucideIcon }> = {
-  personal: { label: "Personal", icon: Lock },
-  org: { label: "Organization", icon: Users },
-  app: { label: "App-wide", icon: Sparkles },
+const SCOPE_META: Record<KBScope, { labelKey: string; icon: LucideIcon }> = {
+  personal: { labelKey: "personal", icon: Lock },
+  org: { labelKey: "organization", icon: Users },
+  app: { labelKey: "appWide", icon: Sparkles },
 };
 
 export default function KBPage() {
+  const t = useTranslations("knowledgeBases");
   const { kbs, isLoading, fetchKBs, deleteKB } = useKnowledgeBases();
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -37,13 +39,13 @@ export default function KBPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Knowledge"
-        title="Knowledge bases"
-        description="Group related documents into a base. Open one to upload files, then choose in chat which bases the agent should search."
+        eyebrow={t("eyebrow")}
+        title={t("pageTitle")}
+        description={t("pageDescription")}
         actions={
           <Button size="sm" onClick={() => setCreateOpen(true)}>
             <Plus className="h-4 w-4" />
-            New knowledge base
+            {t("newKB")}
           </Button>
         }
       />
@@ -53,9 +55,9 @@ export default function KBPage() {
       ) : kbs.length === 0 ? (
         <EmptyState
           icon={Database}
-          title="No knowledge bases yet"
-          description="Create one to give your assistant access to documents from your collections."
-          cta={{ label: "Create knowledge base", onClick: () => setCreateOpen(true) }}
+          title={t("noBases")}
+          description={t("noBasesDesc")}
+          cta={{ label: t("create"), onClick: () => setCreateOpen(true) }}
         />
       ) : (
         <div className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -71,6 +73,7 @@ export default function KBPage() {
 }
 
 function KBCard({ kb, onDelete }: { kb: KnowledgeBase; onDelete: () => void }) {
+  const t = useTranslations("knowledgeBases");
   const meta = SCOPE_META[kb.scope];
 
   return (
@@ -83,7 +86,7 @@ function KBCard({ kb, onDelete }: { kb: KnowledgeBase; onDelete: () => void }) {
       <Link
         href={ROUTES.KB_DETAIL(kb.id)}
         className="focus-visible:ring-ring absolute inset-0 z-10 rounded-[inherit] focus-visible:ring-2 focus-visible:outline-none"
-        aria-label={`Open ${kb.name}`}
+        aria-label={t("open", { name: kb.name })}
       />
 
       <div className="pointer-events-none relative z-20 flex h-full flex-col p-5">
@@ -95,7 +98,7 @@ function KBCard({ kb, onDelete }: { kb: KnowledgeBase; onDelete: () => void }) {
           <div className="flex items-center gap-1.5">
             {kb.is_default && (
               <Badge variant="outline" className="border-border text-muted-foreground font-normal">
-                Default
+                {t("default")}
               </Badge>
             )}
             {!kb.is_default && (
@@ -106,14 +109,14 @@ function KBCard({ kb, onDelete }: { kb: KnowledgeBase; onDelete: () => void }) {
                   e.stopPropagation();
                   if (
                     confirm(
-                      `Delete "${kb.name}"? This will remove the knowledge base and all its documents.`,
+                      t("deleteConfirm", { name: kb.name }),
                     )
                   ) {
                     onDelete();
                   }
                 }}
                 className="text-muted-foreground hover:bg-accent hover:text-destructive pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-lg opacity-0 transition-colors group-hover:opacity-100 focus-visible:opacity-100"
-                aria-label="Delete knowledge base"
+                aria-label={t("deleteLabel")}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -137,7 +140,7 @@ function KBCard({ kb, onDelete }: { kb: KnowledgeBase; onDelete: () => void }) {
         <div className="text-muted-foreground mt-5 flex items-center justify-between gap-2 text-xs">
           <span className="inline-flex items-center gap-1.5 truncate">
             <meta.icon className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{meta.label}</span>
+            <span className="truncate">{t(meta.labelKey)}</span>
           </span>
           <ArrowUpRight className="h-4 w-4 shrink-0" />
         </div>

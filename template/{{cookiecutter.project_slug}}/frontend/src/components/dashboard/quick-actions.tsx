@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   BookOpen,
@@ -12,12 +14,13 @@ import {
 {%- endif %}
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { BACKEND_URL, ROUTES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 interface Action {
-  label: string;
+  labelKey: string;
   icon: LucideIcon;
   href: string;
   external?: boolean;
@@ -25,34 +28,35 @@ interface Action {
 }
 
 const ACTIONS: Action[] = [
-  { label: "Start a chat", icon: MessageSquare, href: ROUTES.CHAT, featured: true },
-  { label: "Upload to KB", icon: Database, href: ROUTES.RAG },
+  { labelKey: "startChat", icon: MessageSquare, href: ROUTES.CHAT, featured: true },
+  { labelKey: "uploadKb", icon: Database, href: ROUTES.RAG },
 {%- if cookiecutter.enable_teams %}
-  { label: "Invite team", icon: Users, href: ROUTES.ORGS },
+  { labelKey: "inviteTeam", icon: Users, href: ROUTES.ORGS },
 {%- endif %}
 {%- if cookiecutter.enable_billing %}
-  { label: "Billing", icon: CreditCard, href: ROUTES.BILLING },
+  { labelKey: "billing", icon: CreditCard, href: ROUTES.BILLING },
 {%- endif %}
-  { label: "Settings", icon: Settings, href: ROUTES.SETTINGS },
-  { label: "API docs", icon: BookOpen, href: `${BACKEND_URL}/docs`, external: true },
+  { labelKey: "settings", icon: Settings, href: ROUTES.SETTINGS },
+  { labelKey: "apiDocs", icon: BookOpen, href: `${BACKEND_URL}/docs`, external: true },
 ];
 
 export function QuickActions() {
+  const t = useTranslations("dashboard");
   return (
     <div className="border-border bg-card rounded-xl border p-4 sm:p-5">
       <h2 className="text-foreground/55 mb-2.5 font-mono text-[11px] tracking-wider uppercase">
-        Quick actions
+        {t("quickActions")}
       </h2>
       <div className="flex flex-wrap gap-1.5">
         {ACTIONS.map((action) => (
-          <ActionPill key={action.label} action={action} />
+          <ActionPill key={action.labelKey} action={action} label={t(action.labelKey)} />
         ))}
       </div>
     </div>
   );
 }
 
-function ActionPill({ action }: { action: Action }) {
+function ActionPill({ action, label }: { action: Action; label: string }) {
   const inner = (
     <span
       className={cn(
@@ -63,7 +67,7 @@ function ActionPill({ action }: { action: Action }) {
       )}
     >
       <action.icon className="h-3.5 w-3.5 shrink-0" />
-      {action.label}
+      {label}
     </span>
   );
 

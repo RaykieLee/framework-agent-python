@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Check } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import { SubscriptionPanel } from "@/components/billing";
 import { LoadingState } from "@/components/states";
@@ -12,13 +13,14 @@ import { useBilling, usePlans } from "@/hooks";
 import { cn, formatCurrency } from "@/lib/utils";
 
 export default function SubscriptionPage() {
+  const t = useTranslations("billing");
   const searchParams = useSearchParams();
   const { plans, isLoading: plansLoading } = usePlans();
   const { startCheckout, isLoading: checkoutLoading } = useBilling();
 
   useEffect(() => {
     if (searchParams.get("success") === "1") {
-      toast.success("Subscription updated successfully!");
+      toast.success(t("subscriptionUpdated"));
     }
   }, [searchParams]);
 
@@ -28,17 +30,16 @@ export default function SubscriptionPage() {
 
       <section className="space-y-3">
         <div>
-          <h2 className="text-foreground text-sm font-semibold">Switch plan</h2>
+          <h2 className="text-foreground text-sm font-semibold">{t("switchPlan")}</h2>
           <p className="text-muted-foreground text-xs">
-            Upgrade, downgrade, or pick a different billing interval. Changes take effect on the next
-            billing cycle.
+            {t("switchPlanDesc")}
           </p>
         </div>
 
         {plansLoading ? (
           <LoadingState variant="skeleton-cards" rows={3} />
         ) : plans.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No alternative plans configured.</p>
+          <p className="text-muted-foreground text-sm">{t("noPlans")}</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {plans.map((plan) => {
@@ -60,7 +61,7 @@ export default function SubscriptionPage() {
                       </h3>
                       {plan.is_active && (
                         <Badge variant="outline" className="text-[10px] uppercase">
-                          Current
+                          {t("current")}
                         </Badge>
                       )}
                     </div>
@@ -74,7 +75,7 @@ export default function SubscriptionPage() {
                   <ul className="my-5 space-y-1.5 text-sm">
                     {activePrices.map((price) => (
                       <li key={price.id} className="flex items-baseline justify-between gap-2">
-                        <span className="text-muted-foreground capitalize">{price.interval}</span>
+                        <span className="text-muted-foreground">{price.interval === "month" ? t("month") : t("year")}</span>
                         <span className="text-foreground font-mono tabular-nums">
                           {formatCurrency(price.amount_cents, price.currency)}
                         </span>
@@ -83,7 +84,7 @@ export default function SubscriptionPage() {
                     {plan.monthly_credits_base > 0 && (
                       <li className="text-muted-foreground flex items-center gap-1.5 pt-1 text-xs">
                         <Check className="h-3.5 w-3.5" />
-                        {plan.monthly_credits_base.toLocaleString()} credits / month
+                        {t("creditsPerMonth", { count: plan.monthly_credits_base.toLocaleString() })}
                       </li>
                     )}
                   </ul>
@@ -105,7 +106,7 @@ export default function SubscriptionPage() {
                         }
                         className="w-full"
                       >
-                        Choose {price.interval === "month" ? "monthly" : "annual"}
+                        {t("chooseInterval", { interval: price.interval === "month" ? t("month") : t("year") })}
                       </Button>
                     ))}
                   </div>

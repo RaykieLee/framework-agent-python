@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { useKnowledgeBases } from "@/hooks";
 import type { KBScope } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface CreateKBDialogProps {
   open: boolean;
@@ -30,6 +31,7 @@ interface CreateKBDialogProps {
 }
 
 export function CreateKBDialog({ open, onOpenChange, onCreated }: CreateKBDialogProps) {
+  const t = useTranslations("knowledgeBases");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [scope, setScope] = useState<KBScope>("personal");
@@ -59,45 +61,45 @@ export function CreateKBDialog({ open, onOpenChange, onCreated }: CreateKBDialog
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Create knowledge base</DialogTitle>
+          <DialogTitle>{t("createTitle")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Name" htmlFor="kb-name">
+          <FormField label={t("nameLabel")} htmlFor="kb-name">
             <Input
               id="kb-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Product docs"
+              placeholder={t("namePlaceholder")}
               autoFocus
             />
           </FormField>
-          <FormField label="Description (optional)" htmlFor="kb-description">
+          <FormField label={t("descriptionLabel")} htmlFor="kb-description">
             <Textarea
               id="kb-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="What documents will this KB contain?"
+              placeholder={t("descriptionPlaceholder")}
               rows={2}
             />
           </FormField>
           <div className="space-y-1.5">
-            <Label htmlFor="kb-scope">Scope</Label>
+            <Label htmlFor="kb-scope">{t("scopeLabel")}</Label>
             <Select value={scope} onValueChange={(v) => setScope(v as KBScope)}>
               <SelectTrigger id="kb-scope">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="personal">Personal — only you</SelectItem>
-                <SelectItem value="org">Organization — all members</SelectItem>
+                <SelectItem value="personal">{t("scopePersonal")}</SelectItem>
+                <SelectItem value="org">{t("scopeOrganization")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button type="submit" disabled={!name.trim() || isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create"}
+              {isSubmitting ? t("creating") : t("create")}
             </Button>
           </DialogFooter>
         </form>

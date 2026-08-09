@@ -7,10 +7,12 @@ import { ArrowRight, Sparkles, X } from "lucide-react";
 import { isOnboardingCompleted } from "@/components/onboarding/onboarding-state";
 import { useAuth } from "@/hooks";
 import { ROUTES } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 
 const DISMISS_KEY = "onboarding.banner_dismissed";
 
 export function OnboardingBanner() {
+  const t = useTranslations("dashboard");
   const { user } = useAuth();
   const [show, setShow] = useState(false);
 
@@ -28,9 +30,9 @@ export function OnboardingBanner() {
         <Sparkles className="h-4 w-4" />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-foreground text-sm font-semibold">Finish setting up your workspace</p>
+        <p className="text-foreground text-sm font-semibold">{t("onboardingTitle")}</p>
         <p className="text-muted-foreground mt-0.5 text-sm">
-          Pick an agent, connect data, and invite your team — under 2 minutes.
+          {t("onboardingDesc")}
         </p>
       </div>
       <div className="flex shrink-0 items-center gap-1.5">
@@ -38,7 +40,7 @@ export function OnboardingBanner() {
           href={ROUTES.ONBOARDING}
           className="bg-foreground text-background hover:bg-foreground/90 inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors"
         >
-          Continue
+          {t("continue")}
           <ArrowRight className="h-3.5 w-3.5" />
         </Link>
         <button
@@ -48,7 +50,7 @@ export function OnboardingBanner() {
             setShow(false);
           }}
           className="text-muted-foreground hover:text-foreground hover:bg-accent inline-flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
-          aria-label="Dismiss"
+          aria-label={t("dismiss")}
         >
           <X className="h-4 w-4" />
         </button>

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Activity, Coins, Cpu, Download } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { StatCard } from "@/components/dashboard/stat-card";
 import { LoadingState } from "@/components/states";
@@ -80,6 +81,7 @@ function ChartCard({
 }
 
 export default function UsageDashboardPage() {
+  const t = useTranslations("billing");
   const [aggregate, setAggregate] = useState<UsageAggregate | null>(null);
   const [timeline, setTimeline] = useState<UsageTimeline | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -158,7 +160,7 @@ export default function UsageDashboardPage() {
       <div className="flex justify-end">
         <Button type="button" variant="outline" size="sm" onClick={handleExport}>
           <Download className="h-3.5 w-3.5" />
-          Export CSV
+          {t("exportCsv")}
         </Button>
       </div>
 
@@ -167,13 +169,13 @@ export default function UsageDashboardPage() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-3">
           <StatCard
-            label="Credits used"
+            label={t("creditsUsed")}
             value={aggregate?.total_credits_charged.toLocaleString() ?? "—"}
             icon={Coins}
           />
-          <StatCard label="Tokens" value={totalTokens?.toLocaleString() ?? "—"} icon={Cpu} />
+          <StatCard label={t("tokens")} value={totalTokens?.toLocaleString() ?? "—"} icon={Cpu} />
           <StatCard
-            label="API calls"
+            label={t("apiCalls")}
             value={aggregate?.total_calls.toLocaleString() ?? "—"}
             icon={Activity}
           />
@@ -182,8 +184,8 @@ export default function UsageDashboardPage() {
 
       {!isLoading && timelineChartData.length > 0 && (
         <ChartCard
-          title="Daily usage"
-          description="Last 30 days of credit consumption and API calls."
+          title={t("dailyUsage")}
+          description={t("dailyUsageDesc")}
         >
           <DailyCreditsChart data={timelineChartData} />
         </ChartCard>
@@ -191,15 +193,15 @@ export default function UsageDashboardPage() {
 
       {!isLoading && byModelChartData.length > 0 && (
         <ChartCard
-          title="Usage by model"
-          description="Tokens and credits, by model."
+          title={t("usageByModel")}
+          description={t("usageByModelDesc")}
         >
           <CreditsByModelChart data={byModelChartData} />
         </ChartCard>
       )}
 
       {!isLoading && aggregate && aggregate.by_model.length > 0 && (
-        <ChartCard title="Per-model breakdown">
+        <ChartCard title={t("modelBreakdown")}>
           <div className="divide-border -mx-1 divide-y">
             {aggregate.by_model.map((m) => (
               <div key={m.model} className="grid grid-cols-4 gap-4 px-1 py-3 text-sm tabular-nums">
@@ -208,13 +210,13 @@ export default function UsageDashboardPage() {
                   <p className="text-muted-foreground text-xs">{m.provider}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">Tokens</p>
+                  <p className="text-muted-foreground text-xs">{t("tokens")}</p>
                   <p className="text-foreground font-mono">
                     {(m.input_tokens + m.output_tokens).toLocaleString()}
                   </p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground text-xs">Credits</p>
+                  <p className="text-muted-foreground text-xs">{t("tabCredits")}</p>
                   <p className="text-foreground font-mono">{m.credits_charged.toLocaleString()}</p>
                 </div>
               </div>

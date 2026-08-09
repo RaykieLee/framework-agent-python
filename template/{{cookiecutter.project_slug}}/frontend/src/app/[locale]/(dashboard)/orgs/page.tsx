@@ -12,8 +12,10 @@ import { Button } from "@/components/ui";
 import { useOrganizations } from "@/hooks";
 import { getErrorMessage, MAX_AVATAR_SIZE_BYTES } from "@/lib/utils";
 import { ROUTES } from "@/lib/constants";
+import { useTranslations } from "next-intl";
 
 export default function OrgsPage() {
+  const t = useTranslations("organizations");
   const { orgs, activeOrgId, fetchOrgs, switchOrg } = useOrganizations();
   const [createOpen, setCreateOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -25,7 +27,7 @@ export default function OrgsPage() {
 
   const handleAvatarUpload = async (orgId: string, file: File) => {
     if (file.size > MAX_AVATAR_SIZE_BYTES) {
-      toast.error("Avatar too large. Maximum 2MB.");
+      toast.error(t("avatarTooLarge"));
       return;
     }
     setUploadingFor(orgId);
@@ -34,13 +36,13 @@ export default function OrgsPage() {
       fd.append("file", file);
       const res = await fetch(`/api/orgs/${orgId}/avatar`, { method: "POST", body: fd });
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ detail: "Upload failed" }));
-        throw new Error(err.detail || "Upload failed");
+        const err = await res.json().catch(() => ({ detail: t("uploadFailed") }));
+        throw new Error(err.detail || t("uploadFailed"));
       }
-      toast.success("Organization avatar updated");
+      toast.success(t("avatarUpdated"));
       await fetchOrgs(true);
     } catch (err) {
-      toast.error(getErrorMessage(err, "Failed to upload avatar"));
+      toast.error(getErrorMessage(err, t("avatarUploadFailed")));
     } finally {
       setUploadingFor(null);
     }
@@ -61,13 +63,13 @@ export default function OrgsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Team"
-        title="Organizations"
-        description="Switch between workspaces, manage members, and spin up new organizations to collaborate with your team."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("pageDescription")}
         actions={
           <Button onClick={() => setCreateOpen(true)}>
             <Plus className="h-4 w-4" />
-            New organization
+            {t("newOrg")}
           </Button>
         }
       />
@@ -77,9 +79,9 @@ export default function OrgsPage() {
       ) : orgs.length === 0 ? (
         <EmptyState
           icon={Building2}
-          title="No organizations yet"
-          description="Create your first workspace to invite teammates and share access to conversations and knowledge bases."
-          cta={{ label: "Create organization", onClick: () => setCreateOpen(true) }}
+          title={t("noOrgs")}
+          description={t("noOrgsDesc")}
+          cta={{ label: t("createTitle"), onClick: () => setCreateOpen(true) }}
         />
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
@@ -99,7 +101,7 @@ export default function OrgsPage() {
                       fileInputRef.current?.click();
                     }}
                     disabled={uploadingFor !== null}
-                    title="Change organization avatar"
+                    title={t("changeAvatar")}
                   >
                     {org.avatar_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -121,13 +123,13 @@ export default function OrgsPage() {
                       <h2 className="text-foreground truncate text-sm font-semibold">{org.name}</h2>
                       {org.is_personal && (
                         <span className="border-border text-muted-foreground rounded-full border px-2 py-0.5 text-[10px] font-medium tracking-wide uppercase">
-                          Personal
+                          {t("personal")}
                         </span>
                       )}
                       {isActive && (
                         <span className="border-border bg-muted text-foreground inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium tracking-wide uppercase">
                           <Check className="h-2.5 w-2.5" />
-                          Active
+                          {t("active")}
                         </span>
                       )}
                     </div>
@@ -150,7 +152,7 @@ export default function OrgsPage() {
                     }}
                   >
                     <ArrowRightLeft className="h-3.5 w-3.5" />
-                    {isActive ? "Current" : "Switch"}
+                    {isActive ? t("current") : t("switch")}
                   </Button>{% endraw %}{% if cookiecutter.enable_rag %}{% raw %}
                   <Button
                     variant="outline"
@@ -159,7 +161,7 @@ export default function OrgsPage() {
                     onClick={() => router.push(ROUTES.ORG_INTEGRATIONS(org.id))}
                   >
                     <Plug className="h-3.5 w-3.5" />
-                    Integrations
+                    {t("integrations")}
                   </Button>{% endraw %}{% endif %}{% raw %}
                   <Button
                     variant="outline"
@@ -168,7 +170,7 @@ export default function OrgsPage() {
                     onClick={() => router.push(ROUTES.ORG_MEMBERS(org.id))}
                   >
                     <Settings className="h-3.5 w-3.5" />
-                    Manage
+                    {t("manage")}
                   </Button>
                 </div>
               </li>

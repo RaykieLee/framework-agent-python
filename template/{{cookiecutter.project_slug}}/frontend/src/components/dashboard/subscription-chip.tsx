@@ -8,6 +8,7 @@ import { apiClient } from "@/lib/api-client";
 import { ROUTES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { SubscriptionRead } from "@/types";
+import { useTranslations } from "next-intl";
 
 const TONE: Record<string, string> = {
   trialing: "bg-foreground/[0.04] text-foreground/80 border-foreground/15",
@@ -29,6 +30,7 @@ function daysUntil(iso: string | null | undefined): number | null {
 }
 
 export function SubscriptionChip() {
+  const t = useTranslations("dashboard");
   const [sub, setSub] = useState<SubscriptionRead | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -66,7 +68,7 @@ export function SubscriptionChip() {
         )}
       >
         <Sparkles className="h-3 w-3" />
-        Free · Upgrade
+        {t("freeUpgrade")}
         <ArrowUpRight className="h-2.5 w-2.5" />
       </Link>
     );
@@ -80,17 +82,17 @@ export function SubscriptionChip() {
   let icon = <Clock className="h-3 w-3" />;
 
   if (status === "trialing" && trialDays !== null) {
-    label = `Trial · ${trialDays}d left`;
+    label = t("trialDays", { days: trialDays });
   } else if (status === "active" && sub.cancel_at_period_end && renewDays !== null) {
-    label = `Ends in ${renewDays}d`;
+    label = t("endsIn", { days: renewDays });
     icon = <XCircle className="h-3 w-3" />;
   } else if (status === "active" && renewDays !== null) {
-    label = `Active · renews in ${renewDays}d`;
+    label = t("renewsIn", { days: renewDays });
   } else if (status === "canceled") {
-    label = renewDays !== null ? `Canceled · ${renewDays}d access` : "Canceled";
+    label = renewDays !== null ? t("canceledAccess", { days: renewDays }) : t("canceled");
     icon = <XCircle className="h-3 w-3" />;
   } else if (status === "past_due") {
-    label = "Past due — update payment";
+    label = t("pastDue");
   } else {
     label = status.replace(/_/g, " ");
   }

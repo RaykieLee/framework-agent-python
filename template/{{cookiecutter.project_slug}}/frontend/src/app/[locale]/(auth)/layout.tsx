@@ -1,4 +1,4 @@
-import Link from "next/link";
+{% raw %}import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
@@ -84,3 +84,4 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
     </div>
   );
 }
+{% endraw %}

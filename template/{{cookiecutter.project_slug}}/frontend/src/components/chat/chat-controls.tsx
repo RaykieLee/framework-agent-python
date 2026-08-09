@@ -30,6 +30,7 @@ import {
 {%- endif %}
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui";
 {%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
@@ -94,6 +95,7 @@ export function ChatControls({
   onTemperatureChange,
   onThinkingEffortChange,
 }: ChatControlsProps) {
+  const t = useTranslations("chat");
 {%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
   const [tab, setTab] = useState<Tab>("kb");
 {%- else %}
@@ -208,8 +210,8 @@ export function ChatControls({
 {%- endif %}
     if (selectedModel.value) parts.push(selectedModel.value);
     if (settingsOverridden) parts.push("Custom");
-    return parts.length ? parts.join(" · ") : "Controls";
-  }, [{% if cookiecutter.enable_deep_research %}deepResearch, {% endif %}{% if cookiecutter.enable_teams and cookiecutter.enable_rag %}activeCount, {% endif %}selectedModel, settingsOverridden]);
+    return parts.length ? parts.join(" · ") : t("controls");
+  }, [{% if cookiecutter.enable_deep_research %}deepResearch, {% endif %}{% if cookiecutter.enable_teams and cookiecutter.enable_rag %}activeCount, {% endif %}selectedModel, settingsOverridden, t]);
 
   const hasOverrides =
     {% if cookiecutter.enable_deep_research %}deepResearch || {% endif %}{% if cookiecutter.enable_teams and cookiecutter.enable_rag %}activeCount > 0 || {% endif %}selectedModel.value !== "" || settingsOverridden;
@@ -219,7 +221,7 @@ export function ChatControls({
       <PopoverTrigger asChild>
         <button
           type="button"
-          aria-label="Chat controls"
+          aria-label={t("chatControls")}
           className={cn(
             "border-foreground/10 bg-card hover:border-foreground/25 hover:bg-foreground/[0.04] inline-flex items-center gap-1.5 rounded-full border py-1 pr-2 pl-2.5 font-mono text-[11px] tracking-wider uppercase transition-colors",
             hasOverrides ? "text-foreground" : "text-foreground/65",

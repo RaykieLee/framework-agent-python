@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
+import { useTranslations } from "next-intl";
 import { AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -54,6 +55,7 @@ function StatusIcon({ status }: { status: SubscriptionRead["status"] }) {
 }
 
 export function SubscriptionPanel() {
+  const t = useTranslations("billing");
   const { subscription, isLoading, cancelSubscription, reactivateSubscription, updateSeats } =
     useSubscription();
   const { isLoading: billingLoading, openPortal, startCheckout } = useBilling();
@@ -64,8 +66,8 @@ export function SubscriptionPanel() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Subscription</CardTitle>
-          <CardDescription>Loading subscription details…</CardDescription>
+          <CardTitle>{t("tabSubscription")}</CardTitle>
+          <CardDescription>{t("loadingSubscription")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="bg-muted h-24 animate-pulse rounded-md" />
@@ -78,12 +80,12 @@ export function SubscriptionPanel() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>No active subscription</CardTitle>
-          <CardDescription>Upgrade to unlock premium features.</CardDescription>
+          <CardTitle>{t("noActiveSubscription")}</CardTitle>
+          <CardDescription>{t("upgradePremium")}</CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-sm">
-            You&apos;re currently on the free plan. Choose a plan to get started.
+            {t("freePlanCurrent")}
           </p>
         </CardContent>
         <CardFooter>
@@ -96,7 +98,7 @@ export function SubscriptionPanel() {
             }
             disabled={billingLoading}
           >
-            View Plans
+            {t("viewPlans")}
           </Button>
         </CardFooter>
       </Card>

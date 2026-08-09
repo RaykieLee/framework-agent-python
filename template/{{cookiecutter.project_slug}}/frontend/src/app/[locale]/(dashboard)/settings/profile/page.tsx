@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Camera, Globe, Monitor, Smartphone, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useLocale, useTranslations } from "next-intl";
 
 import {
   AlertDialog,
@@ -33,6 +34,8 @@ function DeviceIcon({ type }: { type?: string | null }) {
 }
 
 export default function ProfileSettingsPage() {
+  const t = useTranslations("profile");
+  const locale = useLocale();
   const { user } = useAuth();
   const { setUser, bumpAvatarVersion, avatarVersion } = useAuthStore();
 
@@ -81,15 +84,15 @@ export default function ProfileSettingsPage() {
       if (email !== user.email) payload.email = email;
       if (name !== (user.full_name ?? "")) payload.full_name = name || null;
       if (Object.keys(payload).length === 0) {
-        toast.info("Nothing changed");
+        toast.info(t("nothingChanged"));
         setSaving(false);
         return;
       }
       const updated = await apiClient.patch<User>("/users/me", payload);
       setUser(updated);
-      toast.success("Profile updated");
+      toast.success(t("profileUpdated"));
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Failed to update profile");
+      toast.error(err instanceof ApiError ? err.message : t("profileUpdateFailed"));
     } finally {
       setSaving(false);
     }
@@ -100,7 +103,7 @@ export default function ProfileSettingsPage() {
     if (!file) return;
     e.target.value = "";
     if (file.size > MAX_AVATAR_SIZE_BYTES) {
-      toast.error("Avatar too large. Maximum 2MB.");
+      toast.error(t("avatarTooLarge"));
       return;
     }
     setAvatarUploading(true);
@@ -109,15 +112,15 @@ export default function ProfileSettingsPage() {
       formData.append("file", file);
       const res = await fetch("/api/users/me/avatar", { method: "POST", body: formData });
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ detail: "Upload failed" }));
-        throw new Error(err.detail || "Upload failed");
+        const err = await res.json().catch(() => ({ detail: t("uploadFailed") }));
+        throw new Error(err.detail || t("uploadFailed"));
       }
       const updated = await res.json();
       setUser(updated);
       bumpAvatarVersion();
-      toast.success("Avatar updated");
+      toast.success(t("avatarUpdated"));
     } catch (err) {
-      toast.error(getErrorMessage(err, "Failed to upload avatar"));
+      toast.error(getErrorMessage(err, t("avatarUploadFailed")));
     } finally {
       setAvatarUploading(false);
     }
@@ -127,9 +130,9 @@ export default function ProfileSettingsPage() {
     try {
       await apiClient.delete(`/sessions/${sessionId}`);
       setSessions((prev) => prev.filter((s) => s.id !== sessionId));
-      toast.success("Session revoked");
+      toast.success(t("sessionRevoked"));
     } catch {
-      toast.error("Failed to revoke session");
+      toast.error(t("sessionRevokeFailed"));
     }
   };
 
@@ -137,9 +140,9 @@ export default function ProfileSettingsPage() {
     try {
       await apiClient.delete("/sessions");
       setSessions((prev) => prev.filter((s) => s.is_current));
-      toast.success("All other sessions revoked");
+      toast.success(t("sessionsRevoked"));
     } catch {
-      toast.error("Failed to revoke sessions");
+      toast.error(t("sessionsRevokeFailed"));
     }
   };
 
@@ -150,15 +153,15 @@ export default function ProfileSettingsPage() {
   return (
     <div className="space-y-6">
       <SectionCard
-        title="Avatar"
-        description="Square images look best. Up to 2MB. JPG, PNG, WEBP, or GIF."
+        title={t("avatar")}
+        description={t("avatarDesc")}
       >
         <div className="flex items-center gap-5">
           <button
             type="button"
             onClick={() => avatarInputRef.current?.click()}
             disabled={avatarUploading}
-            aria-label={user.avatar_url ? "Replace avatar" : "Upload avatar"}
+            aria-label={user.avatar_url ? t("replaceAvatar") : t("uploadAvatar")}
             className="border-border bg-muted hover:bg-accent group relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border transition-colors"
           >
             {user.avatar_url ? (
@@ -195,41 +198,41 @@ export default function ProfileSettingsPage() {
               disabled={avatarUploading}
             >
               {avatarUploading
-                ? "Uploading…"
+                ? t("uploading")
                 : user.avatar_url
-                  ? "Replace avatar"
-                  : "Upload avatar"}
+                  ? t("replaceAvatar")
+                  : t("uploadAvatar")}
             </Button>
             <p className="text-muted-foreground mt-2 text-xs">
-              {isAppAdmin(user) ? "Admin · " : ""}Member since{" "}
-              {formatDate(user.created_at)}
+              {isAppAdmin(user) ? `${t("admin")} · ` : ""}
+              {t("memberSince", { date: formatDate(user.created_at, locale) })}
             </p>
           </div>
         </div>
       </SectionCard>
 
       <SectionCard
-        title="Personal info"
-        description="Visible to teammates in shared organizations."
+        title={t("personalInfo")}
+        description={t("personalInfoDesc")}
         action={
           <Button onClick={handleSaveProfile} disabled={saving} size="sm">
-            {saving ? "Saving…" : "Save changes"}
+            {saving ? t("saving") : t("saveChanges")}
           </Button>
         }
       >
         <div className="space-y-4">
-          <FormField label="Display name" htmlFor="profile-name">
+          <FormField label={t("displayName")} htmlFor="profile-name">
             <Input
               id="profile-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="How should we call you?"
+              placeholder={t("namePlaceholder")}
             />
           </FormField>
           <FormField
-            label="Email"
+            label={t("email")}
             htmlFor="profile-email"
-            description="Changing email may require re-verification depending on your auth setup."
+            description={t("emailChangeDesc")}
           >
             <Input
               id="profile-email"
@@ -243,26 +246,26 @@ export default function ProfileSettingsPage() {
 
       {sessionsAvailable && (
         <SectionCard
-          title="Active sessions"
-          description="Devices currently signed in to your account."
+          title={t("activeSessions")}
+          description={t("activeSessionsDesc")}
           action={
             sessions.filter((s) => !s.is_current).length > 0 ? (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="outline" size="sm">
-                    Revoke all others
+                    {t("revokeOthers")}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Revoke all other sessions?</AlertDialogTitle>
+                    <AlertDialogTitle>{t("revokeConfirm")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Every device signed in to your account will be signed out, except this one.
+                      {t("revokeConfirmDesc")}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleRevokeAll}>Revoke all</AlertDialogAction>
+                    <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleRevokeAll}>{t("revokeAll")}</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -276,7 +279,7 @@ export default function ProfileSettingsPage() {
               ))}
             </div>
           ) : sessions.length === 0 ? (
-            <p className="text-muted-foreground text-sm">No session data available.</p>
+            <p className="text-muted-foreground text-sm">{t("noSessions")}</p>
           ) : (
             <ul className="space-y-2">
               {sessions.map((session) => (
@@ -293,16 +296,16 @@ export default function ProfileSettingsPage() {
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="text-foreground flex items-center gap-2 text-sm font-medium">
-                        <span className="truncate">{session.device_name || "Unknown device"}</span>
+                        <span className="truncate">{session.device_name || t("unknownDevice")}</span>
                         {session.is_current && (
                           <span className="bg-card border-border text-muted-foreground inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium tracking-wide uppercase">
-                            Current
+                            {t("current")}
                           </span>
                         )}
                       </p>
                       <p className="text-muted-foreground truncate text-xs">
                         {session.ip_address && `${session.ip_address} · `}
-                        Last active {timeAgo(session.last_used_at)}
+                        {t("lastActive", { time: timeAgo(session.last_used_at, locale) })}
                       </p>
                     </div>
                   </div>
@@ -312,8 +315,8 @@ export default function ProfileSettingsPage() {
                       size="sm"
                       className="text-muted-foreground hover:text-destructive h-8 shrink-0"
                       onClick={() => handleRevokeSession(session.id)}
-                      title="Revoke session"
-                      aria-label="Revoke session"
+                      title={t("revokeSession")}
+                      aria-label={t("revokeSession")}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>

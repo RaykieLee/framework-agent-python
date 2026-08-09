@@ -252,13 +252,13 @@ function ConversationList({
       <div className="px-3 pb-2">
         <div className="bg-secondary/50 flex rounded-lg p-0.5">
           <ViewTab
-            label="Active"
+            label={t("active")}
             count={activeCount}
             active={view === "active"}
             onClick={() => setView("active")}
           />
           <ViewTab
-            label="Archived"
+            label={t("archived")}
             count={archivedCount}
             active={view === "archived"}
             onClick={() => setView("archived")}
@@ -294,10 +294,10 @@ function ConversationList({
               )}
             </span>
             <p className="text-foreground text-sm font-medium">
-              {isArchivedView ? "No archived conversations" : t("noConversations")}
+              {isArchivedView ? t("noArchived") : t("noConversations")}
             </p>
             <p className="text-muted-foreground mt-1 text-xs">
-              {isArchivedView ? "Conversations you archive will appear here." : t("startNewChat")}
+              {isArchivedView ? t("archivedHint") : t("startNewChat")}
             </p>
           </div>
         ) : (
@@ -413,7 +413,7 @@ export function ConversationSidebar({ className }: ConversationSidebarProps) {
             size="sm"
             className="h-8 w-8 p-0"
             onClick={() => setIsCollapsed(true)}
-            aria-label="Collapse conversations sidebar"
+            aria-label={t("collapseSidebar")}
           >
             <ChevronLeft className="h-4 w-4" aria-hidden />
           </Button>
