@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
   ArrowDown,
@@ -152,6 +152,7 @@ function DemoToggle({ conv, onToggle }: { conv: Conversation; onToggle: (id: str
 
 export default function AdminConversationsPage() {
   const t = useTranslations("admin");
+  const locale = useLocale();
   const { conversations: rawConversations, conversationsTotal, users, isLoading, fetchConversations, fetchUsers } =
     useAdminConversations();
   const [localDemoState, setLocalDemoState] = useState<Record<string, boolean>>({});
@@ -268,7 +269,7 @@ export default function AdminConversationsPage() {
         ),
         cell: (conv) => (
           <span className="text-muted-foreground">
-            {formatDate(conv.created_at)}
+            {formatDate(conv.created_at, locale === "zh" ? "zh-CN" : locale)}
           </span>
         ),
       },

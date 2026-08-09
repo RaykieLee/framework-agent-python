@@ -139,7 +139,7 @@ export function UserDetailDrawer({
             <KV label={zh ? "用户 ID" : "User ID"} value={user.id} mono onCopy={handleCopyId} copyTitle={zh ? "复制" : "Copy"} />
             <KV label={zh ? "邮箱" : "Email"} value={user.email} mono />
             {user.full_name && <KV label={zh ? "显示名称" : "Display name"} value={user.full_name} />}
-            <KV label={zh ? "加入时间" : "Joined"} value={formatDateTime(user.created_at)} />
+            <KV label={zh ? "加入时间" : "Joined"} value={formatDateTime(user.created_at, zh ? "zh-CN" : "en-US")} />
             <KV label={zh ? "角色" : "Role"} value={user.role} mono />
           </dl>
 
@@ -163,7 +163,7 @@ export function UserDetailDrawer({
                         {c.title || (zh ? "无标题" : "Untitled")}
                       </p>
                       <p className="text-foreground/45 truncate font-mono text-[10px] tracking-wider uppercase">
-                        {formatDateTime(c.created_at)}
+                        {formatDateTime(c.created_at, zh ? "zh-CN" : "en-US")}
                         {typeof c.message_count === "number" && ` · ${c.message_count} msg`}
                       </p>
                     </div>

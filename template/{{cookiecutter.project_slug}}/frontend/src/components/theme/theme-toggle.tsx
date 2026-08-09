@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Moon, Sun, Monitor } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useThemeStore, Theme, getResolvedTheme } from "@/stores/theme-store";
@@ -11,6 +12,7 @@ interface ThemeToggleProps {
 }
 
 export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
+  const t = useTranslations("common");
   const { theme, setTheme } = useThemeStore();
   const [mounted, setMounted] = useState(false);
 
@@ -31,7 +33,7 @@ export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
   // Render placeholder during SSR to prevent hydration mismatch
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" className={className} aria-label="Toggle theme">
+      <Button variant="ghost" size="icon" className={className} aria-label={t("toggleTheme")}>
         <Sun className="h-5 w-5" />
       </Button>
     );
@@ -44,11 +46,11 @@ export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
         size="icon"
         onClick={cycleTheme}
         className={className}
-        aria-label={`Switch theme (current: ${theme})`}
-        title={`Theme: ${theme}`}
+        aria-label={t("switchTheme", { theme: theme ?? "system" })}
+        title={t("themeTitle", { theme: theme ?? "system" })}
       >
         {resolvedTheme === "dark" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-        {theme === "system" && <span className="sr-only">(following system)</span>}
+        {theme === "system" && <span className="sr-only">{t("followingSystem")}</span>}
       </Button>
     );
   }
@@ -59,8 +61,8 @@ export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
         variant={theme === "light" ? "default" : "ghost"}
         size="icon"
         onClick={() => setTheme("light")}
-        aria-label="Light mode"
-        title="Light mode"
+        aria-label={t("lightMode")}
+        title={t("lightMode")}
       >
         <Sun className="h-4 w-4" />
       </Button>
@@ -68,8 +70,8 @@ export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
         variant={theme === "dark" ? "default" : "ghost"}
         size="icon"
         onClick={() => setTheme("dark")}
-        aria-label="Dark mode"
-        title="Dark mode"
+        aria-label={t("darkMode")}
+        title={t("darkMode")}
       >
         <Moon className="h-4 w-4" />
       </Button>
@@ -77,8 +79,8 @@ export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
         variant={theme === "system" ? "default" : "ghost"}
         size="icon"
         onClick={() => setTheme("system")}
-        aria-label="System theme"
-        title="System theme"
+        aria-label={t("systemTheme")}
+        title={t("systemTheme")}
       >
         <Monitor className="h-4 w-4" />
       </Button>

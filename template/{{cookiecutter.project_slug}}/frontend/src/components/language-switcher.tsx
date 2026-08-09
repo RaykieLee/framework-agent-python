@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Globe } from "lucide-react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -73,6 +73,7 @@ export function LanguageSwitcher() {
  */
 export function LanguageSwitcherCompact() {
   const locale = useLocale() as Locale;
+  const tc = useTranslations("common");
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -104,7 +105,7 @@ export function LanguageSwitcherCompact() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        aria-label="Language"
+        aria-label={tc("language")}
         aria-haspopup="menu"
         aria-expanded={open}
         className={cn(
@@ -177,6 +178,7 @@ export function LanguageSwitcherCompact() {
  */
 export function LanguageSwitcherIcon() {
   const locale = useLocale() as Locale;
+  const tc = useTranslations("common");
   const router = useRouter();
   const pathname = usePathname();
 
@@ -189,7 +191,7 @@ export function LanguageSwitcherIcon() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          aria-label="Language"
+          aria-label={tc("language")}
           className={cn(
             "text-muted-foreground hover:text-foreground hover:bg-accent",
             "focus-visible:ring-ring inline-flex h-9 w-9 items-center justify-center rounded-lg",

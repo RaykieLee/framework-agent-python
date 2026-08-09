@@ -1,5 +1,15 @@
 {
   "common": {
+    "language": "Language",
+    "loginPageTitle": "Sign in",
+    "loginPageDescription": "Sign in to your workspace.",
+    "toggleTheme": "Toggle theme",
+    "switchTheme": "Switch theme (current: {theme})",
+    "themeTitle": "Theme: {theme}",
+    "followingSystem": "(following system)",
+    "lightMode": "Light mode",
+    "darkMode": "Dark mode",
+    "systemTheme": "System theme",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
@@ -159,6 +169,8 @@
     "emailPlaceholder": "name@company.com",
     "orSignInWith": "or sign in with",
     "orSignUpWith": "or sign up with",
+    "loginPageTitle": "Sign in",
+    "loginPageDescription": "Sign in to your workspace.",
     "loginHeading": "Sign in to <emphasis>your workspace.</emphasis>",
     "loginFailed": "Login failed. Please try again.",
     "marketing": {

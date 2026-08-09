@@ -178,7 +178,7 @@ export default function AdminOverviewPage() {
                     <p className="text-muted-foreground truncate text-xs">
                       {e.description}
                       {e.description && " · "}
-                      {timeAgo(e.timestamp)}
+                      {timeAgo(e.timestamp, locale === "zh" ? "zh-CN" : locale)}
                     </p>
                   </div>
                 </li>

@@ -2,15 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Activity,
   CreditCard,
   LayoutDashboard,
-{%- if cookiecutter.use_ai %}
   MessageSquare,
   Star,
-{%- endif %}
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -21,32 +19,31 @@ import { localizedPath } from "@/lib/locale-path";
 import type { Locale } from "@/i18n";
 
 interface NavItem {
-  label: string;
+  labelKey: string;
   href: string;
   icon: LucideIcon;
   description?: string;
 }
 
 const ITEMS: NavItem[] = [
-  { label: "Overview", href: ROUTES.ADMIN, icon: LayoutDashboard },
-  { label: "Users", href: ROUTES.ADMIN_USERS, icon: Users },
-{%- if cookiecutter.use_ai %}
-  { label: "Conversations", href: ROUTES.ADMIN_CONVERSATIONS, icon: MessageSquare },
-  { label: "Ratings", href: ROUTES.ADMIN_RATINGS, icon: Star },
-{%- endif %}
-  { label: "Stripe events", href: ROUTES.ADMIN_STRIPE_EVENTS, icon: CreditCard },
-  { label: "System health", href: ROUTES.ADMIN_SYSTEM, icon: Activity },
+  { labelKey: "overview", href: ROUTES.ADMIN, icon: LayoutDashboard },
+  { labelKey: "users", href: ROUTES.ADMIN_USERS, icon: Users },
+  { labelKey: "conversations", href: ROUTES.ADMIN_CONVERSATIONS, icon: MessageSquare },
+  { labelKey: "ratings", href: ROUTES.ADMIN_RATINGS, icon: Star },
+  { labelKey: "stripeEvents", href: ROUTES.ADMIN_STRIPE_EVENTS, icon: CreditCard },
+  { labelKey: "systemHealth", href: ROUTES.ADMIN_SYSTEM, icon: Activity },
 ];
 
 export function AdminNav() {
   const pathname = usePathname();
   const locale = useLocale() as Locale;
+  const t = useTranslations("nav");
   const stripped = pathname.replace(/^\/[a-z]{2}/, "");
 
   return (
     <>      <nav className="hidden lg:block">
         <p className="text-foreground/45 mb-3 px-3 font-mono text-[10px] tracking-wider uppercase">
-          Admin
+          {t("admin")}
         </p>
         <ul className="space-y-0.5">
           {ITEMS.map((item) => {
@@ -71,7 +68,7 @@ export function AdminNav() {
                       active ? "text-foreground" : "text-foreground/40 group-hover:text-foreground",
                     )}
                   />
-                  <span className="font-medium">{item.label}</span>
+                  <span className="font-medium">{t(item.labelKey)}</span>
                   {active && (
                     <span aria-hidden className="bg-brand ml-auto h-1.5 w-1.5 rounded-full" />
                   )}
@@ -98,7 +95,7 @@ export function AdminNav() {
               )}
             >
               <item.icon className="h-3.5 w-3.5" />
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           );
         })}

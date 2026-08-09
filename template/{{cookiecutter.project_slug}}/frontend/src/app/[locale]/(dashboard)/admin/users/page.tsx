@@ -28,7 +28,7 @@ import {
 import { useAdminUsers } from "@/hooks";
 import type { AdminUserRead } from "@/hooks/use-admin-users";
 import { cn, formatDate } from "@/lib/utils";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
 type SortDir = "asc" | "desc";
@@ -46,6 +46,7 @@ function getInitials(nameOrEmail: string): string {
 
 export default function AdminUsersPage() {
   const t = useTranslations("admin");
+  const locale = useLocale();
   const { users, total, isLoading, fetchUsers, updateUser, deleteUser, impersonateUser } =
     useAdminUsers();
   const [search, setSearch] = useState("");
@@ -180,7 +181,7 @@ export default function AdminUsersPage() {
         ),
         cell: (u) => (
           <span className="text-muted-foreground text-sm">
-            {formatDate(u.created_at)}
+            {formatDate(u.created_at, locale === "zh" ? "zh-CN" : locale)}
           </span>
         ),
       },

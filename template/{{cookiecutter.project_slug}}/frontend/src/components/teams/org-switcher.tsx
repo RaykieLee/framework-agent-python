@@ -13,10 +13,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useOrganizations } from "@/hooks";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function OrgSwitcher() {
   const { orgs, activeOrg, fetchOrgs, switchOrg } = useOrganizations();
   const router = useRouter();
+  const t = useTranslations("organizations");
 
   useEffect(() => {
     fetchOrgs();
@@ -33,7 +35,7 @@ export function OrgSwitcher() {
         onClick={() => router.push("/orgs")}
       >
         <Building2 className="mr-2 h-4 w-4" />
-        Select org
+        {t("selectOrg")}
       </Button>
     );
   }
@@ -63,18 +65,18 @@ export function OrgSwitcher() {
             </Avatar>
             <span className="truncate">{org.name}</span>
             {org.is_personal && (
-              <span className="text-muted-foreground ml-auto text-[10px]">Personal</span>
+              <span className="text-muted-foreground ml-auto text-[10px]">{t("personal")}</span>
             )}
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => router.push("/orgs")} className="gap-2">
           <Building2 className="h-4 w-4" />
-          Manage organizations
+          {t("manage")}
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => router.push("/orgs?create=1")} className="gap-2">
           <Plus className="h-4 w-4" />
-          New organization
+          {t("newOrg")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

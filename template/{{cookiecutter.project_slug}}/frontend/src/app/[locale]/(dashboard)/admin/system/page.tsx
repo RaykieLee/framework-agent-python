@@ -240,7 +240,7 @@ export default function SystemHealthPage() {
           </div>
           {lastChecked && (
             <span className="text-muted-foreground text-xs">
-              {zh ? "检查于" : "Checked"} {lastChecked.toLocaleTimeString()}
+              {zh ? "检查于" : "Checked"} {lastChecked.toLocaleTimeString(zh ? "zh-CN" : "en-US")}
             </span>
           )}
         </div>

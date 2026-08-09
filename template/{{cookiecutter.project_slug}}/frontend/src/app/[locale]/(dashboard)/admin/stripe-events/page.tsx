@@ -48,10 +48,10 @@ interface StripeEvent {
 const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
 type StatusFilter = "all" | "processed" | "failed" | "pending";
 
-function formatDateTime(iso: string): string {
+function formatDateTime(iso: string, locale = "en-US"): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleString("en-US", {
+  return d.toLocaleString(locale, {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -249,7 +249,7 @@ export default function StripeEventsPage() {
       hideBelow: "lg",
       cell: (e) => (
         <span className="text-muted-foreground text-xs whitespace-nowrap">
-          {formatDateTime(e.created_at)}
+          {formatDateTime(e.created_at, zh ? "zh-CN" : "en-US")}
         </span>
       ),
     },
@@ -435,7 +435,7 @@ function EventDetailDialog({
               <KV label={zh ? "模式" : "Mode"} value={event.livemode ? "live" : "test"} />
               <KV label={zh ? "状态" : "Status"} value={event.status} />
               <KV label={zh ? "尝试次数" : "Attempts"} value={String(event.attempts)} />
-              <KV label={zh ? "创建时间" : "Created"} value={formatDateTime(event.created_at)} />
+              <KV label={zh ? "创建时间" : "Created"} value={formatDateTime(event.created_at, zh ? "zh-CN" : "en-US")} />
               {event.customer_email && <KV label={zh ? "客户" : "Customer"} value={event.customer_email} />}
               {typeof event.amount_cents === "number" && (
                 <KV label={zh ? "金额" : "Amount"} value={formatAmount(event.amount_cents, event.currency)} />

@@ -1,5 +1,15 @@
 {
   "common": {
+    "language": "语言",
+    "loginPageTitle": "登录",
+    "loginPageDescription": "登录你的工作区。",
+    "toggleTheme": "切换主题",
+    "switchTheme": "切换主题（当前：{theme}）",
+    "themeTitle": "主题：{theme}",
+    "followingSystem": "（跟随系统）",
+    "lightMode": "浅色模式",
+    "darkMode": "深色模式",
+    "systemTheme": "系统主题",
     "loading": "加载中…",
     "error": "出错了",
     "success": "成功",
@@ -159,6 +169,8 @@
     "emailPlaceholder": "name@company.com",
     "orSignInWith": "或使用以下方式登录",
     "orSignUpWith": "或使用以下方式注册",
+    "loginPageTitle": "登录",
+    "loginPageDescription": "登录你的工作区。",
     "loginHeading": "登录<emphasis>你的工作区</emphasis>",
     "loginFailed": "登录失败，请重试。",
     "marketing": {
