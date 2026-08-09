@@ -4,11 +4,28 @@ from uuid import UUID
 
 from fastapi import APIRouter, Query
 
-from app.api.deps import ConversationSvc, CurrentAdmin
+from app.api.deps import ConversationSvc, CurrentAdmin, UserSvc
 from app.schemas.conversation import ConversationRead, ConversationReadWithMessages, ConversationUpdate
 from app.schemas.conversation_share import AdminConversationList
+from app.schemas.user import AdminUserList
 
 router = APIRouter()
+
+
+@router.get("/users", response_model=AdminUserList)
+async def admin_list_conversation_users(
+    _: CurrentAdmin,
+    service: UserSvc,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=500),
+    search: str | None = Query(None),
+    sort_by: Literal["email", "full_name", "conversations", "created_at"] = Query("email"),
+    sort_dir: Literal["asc", "desc"] = Query("asc"),
+) -> Any:
+    """List users available to the admin conversation filter."""
+    return await service.admin_list_with_counts(
+        skip=skip, limit=limit, search=search, sort_by=sort_by, sort_dir=sort_dir
+    )
 
 
 @router.get("", response_model=AdminConversationList)
