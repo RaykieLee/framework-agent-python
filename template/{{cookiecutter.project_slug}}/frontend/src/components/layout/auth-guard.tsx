@@ -14,12 +14,13 @@ import type { Locale } from "@/i18n";
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const locale = useLocale() as Locale;
-  const { isAuthenticated, setUser } = useAuthStore();
-  const [checking, setChecking] = useState(!isAuthenticated);
+  const { setUser } = useAuthStore();
+  // Zustand persists the user for a fast first paint, but the actual session
+  // lives in HTTP-only cookies. Always revalidate before mounting children so
+  // stale local state cannot trigger a burst of 401 requests.
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    if (isAuthenticated) return;
-
     const verify = async () => {
       try {
         const user = await apiClient.get<User>("/auth/me");
@@ -32,9 +33,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     };
 
     verify();
-  }, [isAuthenticated, locale, router, setUser]);
+  }, [locale, router, setUser]);
 
-  if (checking && !isAuthenticated) {
+  if (checking) {
     return (
       <div className="flex h-screen items-center justify-center" role="status" aria-live="polite">
         <Spinner className="text-muted-foreground h-6 w-6" />
