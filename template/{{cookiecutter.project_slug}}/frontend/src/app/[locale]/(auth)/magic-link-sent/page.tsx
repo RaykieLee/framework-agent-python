@@ -1,6 +1,7 @@
 {% raw %}import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Mail } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 import type { Locale } from "@/i18n";
 import { ROUTES } from "@/lib/constants";
@@ -27,6 +28,7 @@ interface PageProps {
 
 export default async function MagicLinkSentPage({ searchParams }: PageProps) {
   const { email } = await searchParams;
+  const t = await getTranslations("auth.magicLink");
 
   return (
     <div className="space-y-8 text-center">
@@ -38,30 +40,29 @@ export default async function MagicLinkSentPage({ searchParams }: PageProps) {
       </div>
 
       <div className="space-y-2">
-        <span className="eyebrow text-foreground/55">Magic link</span>
+        <span className="eyebrow text-foreground/55">{t("eyebrow")}</span>
         <h1 className="text-display-md text-foreground [&_em]:font-accent [&_em]:font-normal [&_em]:italic">
-          Inbox, <em>incoming.</em>
+          {t("heading")} <em>{t("headingAccent")}</em>
         </h1>
         <p className="text-foreground/70 text-sm">
-          We sent a sign-in link
+          {t("sent")}
           {email ? (
             <>
-              {" "}
-              to <span className="text-foreground font-medium">{email}</span>
+              {" "}{t("to")} <span className="text-foreground font-medium">{email}</span>
             </>
           ) : null}
-          . Click it to continue — expires in 15 minutes.
+          。{t("expires")}
         </p>
       </div>
 
       <div className="border-foreground/10 bg-foreground/[0.03] rounded-2xl border px-5 py-4 text-left">
         <p className="text-foreground/70 text-xs leading-relaxed">
-          Don&apos;t see it? Check your spam folder, or{" "}
+          {t("notSeeingIt")} {" "}
           <Link
             href={ROUTES.LOGIN}
             className="text-foreground hover:text-foreground/80 font-medium underline-offset-4 hover:underline"
           >
-            try again
+            {t("tryAgain")}
           </Link>
           .
         </p>
@@ -72,7 +73,7 @@ export default async function MagicLinkSentPage({ searchParams }: PageProps) {
         className="text-foreground/55 hover:text-foreground inline-flex items-center gap-2 text-sm font-medium"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to sign in
+        {t("backToSignIn")}
       </Link>
     </div>
   );

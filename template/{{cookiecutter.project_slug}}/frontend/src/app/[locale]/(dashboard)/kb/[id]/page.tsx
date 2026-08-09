@@ -1,6 +1,7 @@
 {% raw %}"use client";
 
 import { use, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   AlertCircle,
   CheckCircle2,
@@ -35,10 +36,10 @@ import { downloadKBDocument } from "@/lib/rag-api";
 import type { SyncSourceRead } from "@/lib/rag-api";
 import type { KBDocument, KBScope } from "@/types";
 
-const SCOPE_META: Record<KBScope, { label: string; icon: LucideIcon }> = {
-  personal: { label: "Personal", icon: Lock },
-  org: { label: "Organization", icon: Users },
-  app: { label: "App-wide", icon: Sparkles },
+const SCOPE_META: Record<KBScope, { key: "personal" | "organization" | "appWide"; icon: LucideIcon }> = {
+  personal: { key: "personal", icon: Lock },
+  org: { key: "organization", icon: Users },
+  app: { key: "appWide", icon: Sparkles },
 };
 
 const CONNECTOR_BRAND: Record<string, "gdrive" | "github" | "notion" | "slack" | "dropbox" | "s3"> = {
@@ -69,6 +70,8 @@ interface KBDetailPageProps {
 }
 
 export default function KBDetailPage({ params }: KBDetailPageProps) {
+  const ui = useTranslations("ui");
+  const rag = useTranslations("rag");
   const { id } = use(params);
   const {
     kb,
@@ -164,7 +167,7 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
     () => [
       {
         key: "filename",
-        header: "Name",
+        header: ui("name"),
         cell: (doc) => (
           <div className="flex min-w-0 items-center gap-3">
             <span className="bg-muted text-muted-foreground inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
@@ -178,7 +181,7 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
       },
       {
         key: "filetype",
-        header: "Type / size",
+        header: ui("typeSize"),
         className: "hidden sm:table-cell",
         cell: (doc) => (
           <span className="text-muted-foreground text-xs">
@@ -190,7 +193,7 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
       },
       {
         key: "status",
-        header: "Status",
+        header: ui("status"),
         cell: (doc) => <StatusBadge status={doc.status} message={doc.error_message} />,
       },
       {
@@ -209,8 +212,8 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
                     size="sm"
                     className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
                     onClick={() => setViewerDoc(doc)}
-                    title="Preview file"
-                    aria-label="Preview file"
+                    title={ui("previewFile")}
+                    aria-label={ui("previewFile")}
                   >
                     <Eye className="h-3.5 w-3.5" />
                   </Button>
@@ -220,8 +223,8 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
                     className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
                     onClick={() => handleDownload(doc)}
                     disabled={!!downloadingId}
-                    title="Download file"
-                    aria-label="Download file"
+                    title={ui("downloadFile")}
+                    aria-label={ui("downloadFile")}
                   >
                     {dlBusy ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -239,8 +242,8 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
                   if (confirm(`Remove "${doc.filename}" from this knowledge base?`))
                     deleteDocument(doc.id);
                 }}
-                title="Remove document"
-                aria-label="Remove document"
+                title={ui("removeDocument")}
+                aria-label={ui("removeDocument")}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
@@ -292,9 +295,9 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
               <Upload className="h-6 w-6" />
             </span>
             <div className="text-center">
-              <p className="text-foreground text-lg font-semibold">Drop to upload</p>
+            <p className="text-foreground text-lg font-semibold">{ui("dropToUpload")}</p>
               <p className="text-muted-foreground mt-1 text-sm">
-                Files will be added to{" "}
+                {rag("dropDesc")}：{" "}
                 <span className="text-foreground font-medium">{kb.name}</span>
               </p>
             </div>
@@ -312,7 +315,7 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
       />
 
       <PageHeader
-        breadcrumbs={[{ label: "Knowledge bases", href: ROUTES.KB }, { label: kb.name }]}
+        breadcrumbs={[{ label: rag("eyebrow"), href: ROUTES.KB }, { label: kb.name }]}
         title={kb.name}
         description={
           kb.description || (
@@ -323,7 +326,7 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
           <>
             <Button variant="outline" size="sm" onClick={() => refresh()} disabled={isLoading}>
               <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
-              Refresh
+              {ui("refresh")}
             </Button>
             <Button
               size="sm"
@@ -335,7 +338,7 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
               ) : (
                 <Upload className="h-4 w-4" />
               )}
-              {isUploading ? "Uploading…" : "Upload"}
+              {isUploading ? ui("uploading") : ui("upload")}
             </Button>
           </>
         }
@@ -344,11 +347,11 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
       <div className="text-muted-foreground mb-6 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
         <span className="inline-flex items-center gap-1.5">
           <scopeMeta.icon className="h-3.5 w-3.5" />
-          {scopeMeta.label}
-          {kb.is_default && " · Default"}
+          {ui(scopeMeta.key)}
+          {kb.is_default && ` · ${ui("default")}`}
         </span>
         <span>·</span>
-        <span>{documents.length} documents</span>
+        <span>{documents.length} {ui("documents")}</span>
         <span>·</span>
         <span>{documents.reduce((sum, d) => sum + d.chunk_count, 0).toLocaleString()} vectors</span>
       </div>
@@ -366,9 +369,9 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
                 </span>
                 <span className="text-muted-foreground shrink-0 tabular-nums">
                   {up.percent === null
-                    ? "Uploading…"
+                    ? ui("uploading")
                     : up.percent >= 100
-                      ? "Processing…"
+                      ? `${ui("processing")}…`
                       : `${up.percent}%`}
                 </span>
               </div>
@@ -382,7 +385,7 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
       )}
 
       <section className="mb-8">
-        <h2 className="text-foreground mb-3 text-sm font-semibold">Documents</h2>
+        <h2 className="text-foreground mb-3 text-sm font-semibold">{ui("documents")}</h2>
         <DataTable<KBDocument>
           columns={documentColumns}
           rows={documents}
@@ -391,9 +394,9 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
           empty={
             <EmptyState
               icon={Upload}
-              title="No documents yet"
-              description="Drag files anywhere on this page, or pick from your computer."
-              cta={{ label: "Choose files", onClick: () => fileInputRef.current?.click() }}
+              title={ui("noDocumentsYet")}
+              description={ui("dragFiles")}
+              cta={{ label: ui("chooseFiles"), onClick: () => fileInputRef.current?.click() }}
             />
           }
         />
@@ -407,11 +410,11 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
                 disabled={isLoadingMoreDocs}
               >
                 {isLoadingMoreDocs && <Loader2 className="h-4 w-4 animate-spin" />}
-                {isLoadingMoreDocs ? "Loading…" : "Load more"}
+                {isLoadingMoreDocs ? ui("loading") : ui("loadMore")}
               </Button>
             )}
             <p className="text-muted-foreground text-center text-xs">
-              Showing {documents.length} of {documentsTotal} · drag files anywhere to add
+              {ui("showingDocuments", { shown: documents.length, total: documentsTotal })}
             </p>
           </div>
         )}
@@ -419,11 +422,11 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
 
       <section>
         <div className="mb-3 flex items-center justify-between gap-2">
-          <h2 className="text-foreground text-sm font-semibold">Sync sources</h2>
+          <h2 className="text-foreground text-sm font-semibold">{ui("syncSources")}</h2>
           {connectors.length > 0 && (
             <Button variant="outline" size="sm" onClick={() => setWizardOpen(true)}>
               <Plus className="h-4 w-4" />
-              Connect
+              {ui("connectSource")}
             </Button>
           )}
         </div>
@@ -431,15 +434,15 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
         {syncSources.length === 0 ? (
           <EmptyState
             icon={Plug}
-            title={connectors.length > 0 ? "No sources connected" : "No connectors configured"}
+            title={connectors.length > 0 ? ui("noSourcesConnected") : ui("noConnectorsConfigured")}
             description={
               connectors.length > 0
-                ? "Add one to keep this knowledge base in sync automatically."
-                : "Configure connectors at the workspace level to start syncing from external sources."
+                ? ui("addToSync")
+                : ui("configureConnectors")
             }
             cta={
               connectors.length > 0
-                ? { label: "Connect source", onClick: () => setWizardOpen(true) }
+                ? { label: ui("connectSource"), onClick: () => setWizardOpen(true) }
                 : undefined
             }
           />
@@ -465,7 +468,7 @@ export default function KBDetailPage({ params }: KBDetailPageProps) {
                   size="sm"
                   onClick={() => setSyncSourcesExpanded((v) => !v)}
                 >
-                  {syncSourcesExpanded ? "Show less" : `Show all ${syncSources.length} sources`}
+                  {syncSourcesExpanded ? ui("showLess") : ui("showAllSources", { count: syncSources.length })}
                 </Button>
               </div>
             )}
@@ -558,6 +561,7 @@ function SyncSourceRow({
   onTrigger: () => void;
   onDelete: () => void;
 }) {
+  const ui = useTranslations("ui");
   const lastSync = source.last_sync_at ? formatDateTime(source.last_sync_at) : "Never";
   const brand = CONNECTOR_BRAND[source.connector_type];
   return (
@@ -575,11 +579,11 @@ function SyncSourceRow({
             <p className="text-foreground truncate text-sm font-medium">{source.name}</p>
           </div>
           <div className="text-muted-foreground mt-0.5 flex flex-wrap items-center gap-x-2 text-xs">
-            <span>Last sync · {lastSync}</span>
+            <span>{ui("lastSync")} · {lastSync}</span>
             {source.schedule_minutes && source.schedule_minutes > 0 && (
               <>
                 <span>·</span>
-                <span>every {source.schedule_minutes}m</span>
+                <span>{ui("everyMinutes", { minutes: source.schedule_minutes })}</span>
               </>
             )}
           </div>
@@ -592,8 +596,8 @@ function SyncSourceRow({
           size="sm"
           className="text-muted-foreground hover:text-foreground h-8 w-8 p-0"
           onClick={onTrigger}
-          title="Trigger sync now"
-          aria-label="Trigger sync now"
+          title={ui("triggerSync")}
+          aria-label={ui("triggerSync")}
         >
           <RotateCw className="h-3.5 w-3.5" />
         </Button>
@@ -602,10 +606,10 @@ function SyncSourceRow({
           size="sm"
           className="text-muted-foreground hover:text-destructive h-8 w-8 p-0"
           onClick={() => {
-            if (confirm(`Disconnect "${source.name}"?`)) onDelete();
+            if (confirm(`${ui("removeSource")} “${source.name}”？`)) onDelete();
           }}
-          title="Remove source"
-          aria-label="Remove source"
+          title={ui("removeSource")}
+          aria-label={ui("removeSource")}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>
@@ -616,11 +620,12 @@ function SyncSourceRow({
 }
 
 function StatusBadge({ status, message }: { status: string; message: string | null }) {
+  const ui = useTranslations("ui");
   const config = {
-    completed: { Icon: CheckCircle2, label: "Ready", spin: false },
-    processing: { Icon: Loader2, label: "Processing", spin: true },
-    pending: { Icon: Clock, label: "Pending", spin: false },
-    failed: { Icon: AlertCircle, label: "Failed", spin: false },
+    completed: { Icon: CheckCircle2, label: ui("ready"), spin: false },
+    processing: { Icon: Loader2, label: ui("processing"), spin: true },
+    pending: { Icon: Clock, label: ui("pending"), spin: false },
+    failed: { Icon: AlertCircle, label: ui("failed"), spin: false },
   } as const;
   const c = (config as Record<string, (typeof config)[keyof typeof config]>)[status] ?? {
     Icon: Clock,

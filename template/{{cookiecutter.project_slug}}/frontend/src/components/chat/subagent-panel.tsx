@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Bot, CheckCircle2, Loader2, MessageSquare, X, XCircle } from "lucide-react";
 import { useResearchStore } from "@/stores";
 import type { SubagentMessage, SubagentMessageType } from "@/types";
@@ -27,6 +28,7 @@ const MSG_STYLES: Record<SubagentMessageType, { label: string; color: string; bg
 };
 
 function MessageRow({ msg }: { msg: SubagentMessage }) {
+  const ui = useTranslations("ui");
   const style = MSG_STYLES[msg.type];
   const time = new Date(msg.timestamp).toLocaleTimeString([], {
     hour: "2-digit",
@@ -38,7 +40,7 @@ function MessageRow({ msg }: { msg: SubagentMessage }) {
     <div className={cn("rounded-lg p-3", style.bg)}>
       <div className="mb-1 flex items-center justify-between gap-2">
         <span className={cn("text-[10px] font-semibold tracking-wider uppercase", style.color)}>
-          {style.label}
+          {ui(`messageType${msg.type}`)}
         </span>
         <span className="text-foreground/35 font-mono text-[10px]">{time}</span>
       </div>
@@ -50,6 +52,7 @@ function MessageRow({ msg }: { msg: SubagentMessage }) {
 }
 
 export function SubagentPanel() {
+  const ui = useTranslations("ui");
   const selectedId = useResearchStore((s) => s.selectedSubagentId);
   const setSelected = useResearchStore((s) => s.setSelectedSubagent);
   const currentTurnId = useResearchStore((s) => s.currentTurnId);
@@ -84,6 +87,7 @@ export function SubagentPanel() {
   if (!selectedId || !subagent) return null;
 
   const statusStyle = STATUS_STYLES[subagent.status] ?? { label: subagent.status, color: "text-muted-foreground" };
+  const statusLabel = ui(`subagent${subagent.status}`);
   const isRunning = subagent.status === "running" || subagent.status === "retrying";
   const isDone = subagent.status === "completed";
   const isFailed = subagent.status === "failed";
@@ -107,14 +111,14 @@ export function SubagentPanel() {
               {subagent.subagent_name}
             </p>
             <p className={cn("text-[11px] font-medium", statusStyle.color)}>
-              {statusStyle.label}
+              {statusLabel}
             </p>
           </div>
         </div>
         <button
           type="button"
           onClick={() => setSelected(null)}
-          aria-label="Close subagent panel"
+          aria-label={ui("closeSubagentPanel")}
           className="text-foreground/50 hover:text-foreground hover:bg-foreground/8 mt-0.5 shrink-0 rounded-md p-1 transition-colors"
         >
           <X className="h-4 w-4" />
@@ -132,15 +136,13 @@ export function SubagentPanel() {
           isRunning ? (
             <div className="text-muted-foreground flex flex-col items-center gap-2 py-10 text-center">
               <Loader2 className="text-primary h-8 w-8 animate-spin opacity-60" />
-              <p className="text-sm font-medium">Subagent is working…</p>
-              <p className="text-xs opacity-60">
-                Messages will appear when the task progresses
-              </p>
+              <p className="text-sm font-medium">{ui("subagentWorking")}</p>
+              <p className="text-xs opacity-60">{ui("subagentMessagesHint")}</p>
             </div>
           ) : (
             <div className="text-muted-foreground flex flex-col items-center gap-2 py-10 text-center">
               <MessageSquare className="h-8 w-8 opacity-30" />
-              <p className="text-sm">No messages captured</p>
+              <p className="text-sm">{ui("noMessagesCaptured")}</p>
             </div>
           )
         ) : (

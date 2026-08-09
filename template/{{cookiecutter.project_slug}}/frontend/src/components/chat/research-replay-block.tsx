@@ -1,6 +1,7 @@
 {% raw %}"use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Bot, CheckCircle2, Circle, Loader2, Telescope } from "lucide-react";
 import type { ResearchReplay, ResearchTodoStatus } from "@/types";
 import { Card, Progress } from "@/components/ui";
@@ -30,6 +31,7 @@ export function ResearchReplayBlock({
   /** When true, expand each subagent card with its returned findings (computer deep-dive). */
   detailed?: boolean;
 }) {
+  const ui = useTranslations("ui");
   const { todos, subagents } = research;
   const total = todos.length;
   const [completed, setCompleted] = useState(animate ? 0 : total);
@@ -62,7 +64,7 @@ export function ResearchReplayBlock({
         <Telescope
           className={cn("h-3.5 w-3.5 shrink-0", done ? "text-emerald-500" : "text-primary")}
         />
-        <span className="text-sm font-semibold">Deep research</span>
+        <span className="text-sm font-semibold">{ui("deepResearch")}</span>
         {done ? (
           <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
         ) : (
@@ -70,7 +72,7 @@ export function ResearchReplayBlock({
         )}
         {total > 0 && (
           <span className="text-muted-foreground shrink-0 font-mono text-xs tabular-nums">
-            {completed}/{total} steps
+            {completed}/{total} {ui("steps")}
           </span>
         )}
         {total > 0 && <Progress value={pct} className="mx-1 h-1.5 min-w-0 flex-1" />}
@@ -113,7 +115,7 @@ export function ResearchReplayBlock({
         {subagents.length > 0 && (
           <div className="mt-3 space-y-1.5">
             <div className="text-muted-foreground mb-1 font-mono text-[10px] tracking-wider uppercase">
-              Subagents
+              {ui("subagents")}
             </div>
             {subagents.map((s, i) => (
               <div

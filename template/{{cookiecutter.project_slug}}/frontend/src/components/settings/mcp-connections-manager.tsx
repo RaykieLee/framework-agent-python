@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import {
   Building2,
@@ -104,6 +105,7 @@ function StatusDot({ connection }: { connection: McpConnectionRecord }) {
 }
 
 export function McpConnectionsManager() {
+  const ui = useTranslations("ui");
   const { connections, isLoading, error, refresh, create, update, remove, test } =
     useMcpConnections();
   const { data: workspaceServers = [] } = useQuery({
@@ -120,10 +122,10 @@ export function McpConnectionsManager() {
     if (!result) return;
     if (result === "success") {
       const name = params.get("name");
-      toast.success(name ? `${name} connected.` : "Plugin connected.");
+      toast.success(name ? `${name} ${ui("connected")}` : ui("pluginConnected"));
       void refresh();
     } else {
-      toast.error(params.get("reason") ?? "Authorization failed.");
+      toast.error(params.get("reason") ?? ui("authorizationFailed"));
     }
     params.delete("mcp_oauth");
     params.delete("name");
@@ -184,18 +186,18 @@ export function McpConnectionsManager() {
     const url = draftUrl.trim();
     const token = draftToken.trim();
     if (!NAME_PATTERN.test(name)) {
-      toast.error("Name must be lowercase letters, digits, and hyphens (max 32 chars).");
+      toast.error(ui("namePatternError"));
       return;
     }
     if (!/^https?:\/\//.test(url)) {
-      toast.error("URL must start with http:// or https://");
+      toast.error(ui("urlPatternError"));
       return;
     }
     setSubmitting(true);
     try {
       if (editingId === "new") {
         const created = await create({ name, url, ...(token ? { auth_token: token } : {}) });
-        toast.success(`Connection "${name}" added.`);
+        toast.success(`${ui("connection")} “${name}” ${ui("added")}`);
         setEditingId(null);
         void handleEditTools(created);
       } else if (editingId) {
@@ -207,11 +209,11 @@ export function McpConnectionsManager() {
           // Omit auth_token to keep the stored one; "" clears it.
           ...(token ? { auth_token: token } : clearToken ? { auth_token: "" } : {}),
         });
-        toast.success(`Connection "${name}" updated.`);
+        toast.success(`${ui("connection")} “${name}” ${ui("updated")}`);
         setEditingId(null);
       }
     } catch (e) {
-      toast.error(errorMessage(e, "Failed to save connection"));
+      toast.error(errorMessage(e, ui("saveConnectionFailed")));
     } finally {
       setSubmitting(false);
     }
@@ -223,7 +225,7 @@ export function McpConnectionsManager() {
     try {
       const result = await test(connection.id);
       if (!result.ok) {
-        toast.error(result.error ?? "Server is unreachable.");
+        toast.error(result.error ?? ui("serverUnreachable"));
         return null;
       }
       return result.tools;
@@ -350,10 +352,10 @@ export function McpConnectionsManager() {
       } else {
         await update(connection.id, { allowed_tools: [...checked] });
       }
-      toast.success("Tool selection saved.");
+      toast.success(ui("toolSelectionSaved"));
       setToolPicker(null);
     } catch (e) {
-      toast.error(errorMessage(e, "Failed to save tools"));
+      toast.error(errorMessage(e, ui("saveToolsFailed")));
     } finally {
       setSubmitting(false);
     }
@@ -365,7 +367,7 @@ export function McpConnectionsManager() {
         <div className="border-destructive/30 bg-destructive/5 text-destructive flex items-center justify-between rounded-xl border px-4 py-3 text-sm">
           <span>{error}</span>
           <Button size="sm" variant="ghost" onClick={() => refresh()}>
-            Retry
+            {ui("retry")}
           </Button>
         </div>
       )}
@@ -373,9 +375,9 @@ export function McpConnectionsManager() {
       {workspaceServers.length > 0 && (
         <section className="space-y-3">
           <div>
-            <h3 className="text-foreground text-sm font-semibold">Workspace plugins</h3>
+            <h3 className="text-foreground text-sm font-semibold">{ui("workspacePlugins")}</h3>
             <p className="text-foreground/55 mt-0.5 text-xs">
-              Set up by your administrator — always available to the assistant.
+              {ui("workspacePluginsDesc")}
             </p>
           </div>
           <ul className="border-foreground/10 divide-foreground/8 divide-y rounded-xl border">
@@ -386,12 +388,12 @@ export function McpConnectionsManager() {
                   <span className="text-foreground text-sm font-medium">{server.name}</span>
                   <p className="text-foreground/55 mt-0.5 text-xs">
                     {server.allowed_tools === null
-                      ? "All tools exposed"
-                      : `${server.allowed_tools.length} tools selected`}
+                      ? ui("allToolsExposed")
+                      : `${server.allowed_tools.length} ${ui("toolsSelected")}`}
                   </p>
                 </div>
                 <span className="text-foreground/45 border-foreground/15 rounded-full border px-2 py-0.5 font-mono text-[10px] tracking-wider uppercase">
-                  Workspace
+                  {ui("workspace")}
                 </span>
               </li>
             ))}
@@ -401,9 +403,9 @@ export function McpConnectionsManager() {
 
       <section className="space-y-3">
         <div>
-          <h3 className="text-foreground text-sm font-semibold">Browse plugins</h3>
+          <h3 className="text-foreground text-sm font-semibold">{ui("browsePlugins")}</h3>
           <p className="text-foreground/55 mt-0.5 text-xs">
-            Curated, verified servers — connect with one click.
+            {ui("browsePluginsDesc")}
           </p>
         </div>
         <div className="space-y-5">
@@ -418,7 +420,7 @@ export function McpConnectionsManager() {
                 <div key={category.id} className="space-y-3">
                   <div className="flex items-center gap-3">
                     <h4 className="text-foreground/50 shrink-0 font-mono text-[10px] font-medium tracking-[0.12em] uppercase">
-                      {category.label}
+                      {ui(`category${category.id.charAt(0).toUpperCase()}${category.id.slice(1)}`)}
                     </h4>
                     <span aria-hidden className="bg-foreground/10 h-px flex-1" />
                   </div>
@@ -455,22 +457,22 @@ export function McpConnectionsManager() {
                           <div className="mt-auto flex items-center justify-between gap-2 pt-1">
                             <span className="text-foreground/45 font-mono text-[10px] tracking-wider uppercase">
                               {entry.auth === "none"
-                                ? "No account needed"
+                                ? ui("noAccountNeeded")
                                 : entry.auth === "oauth"
-                                  ? "One-click sign-in"
+                                  ? ui("oneClickSignIn")
                                   : entry.auth === "personal-url"
-                                    ? "Your personal link"
-                                    : "Token required"}
+                                    ? ui("personalLink")
+                                    : ui("tokenRequired")}
                             </span>
                             {shadowed ? (
                               <span className="text-foreground/65 inline-flex items-center gap-1 text-xs font-medium">
                                 <Building2 className="text-foreground/45 h-3.5 w-3.5" />
-                                Provided by your workspace
+                                {ui("providedByWorkspace")}
                               </span>
                             ) : existing && !needsAuth ? (
                               <span className="text-foreground/65 inline-flex items-center gap-1 text-xs font-medium">
                                 <Check className="h-3.5 w-3.5 text-emerald-500" />
-                                Connected
+                                {ui("connected")}
                               </span>
                             ) : (
                               <Button
@@ -481,13 +483,13 @@ export function McpConnectionsManager() {
                               >
                                 {busy
                                   ? isOAuth
-                                    ? "Redirecting…"
-                                    : "Connecting…"
+                                    ? ui("redirecting")
+                                    : ui("connecting")
                                   : needsAuth
-                                    ? "Finish sign-in"
+                                    ? ui("finishSignIn")
                                     : isOAuth
-                                      ? "Sign in"
-                                      : "Connect"}
+                                      ? ui("signIn")
+                                      : ui("connect")}
                               </Button>
                             )}
                           </div>
@@ -504,22 +506,21 @@ export function McpConnectionsManager() {
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-3">
           <div>
-            <h3 className="text-foreground text-sm font-semibold">Your connections</h3>
+          <h3 className="text-foreground text-sm font-semibold">{ui("yourConnections")}</h3>
             <p className="text-foreground/55 mt-0.5 text-xs">
-              Only connect servers you trust — their tools and descriptions become part of the
-              conversation.
+              {ui("connectionsDesc")}
             </p>
           </div>
           <Button size="sm" variant="outline" onClick={openCreate}>
             <Plus className="mr-1 h-3.5 w-3.5" />
-            Add custom server
+            {ui("addCustomServer")}
           </Button>
         </div>
 
         {connections.length === 0 ? (
           <EmptyState
-            title="No connections yet"
-            description="Connect a plugin from the catalog above, or add a custom MCP server."
+            title={ui("noConnections")}
+            description={ui("noConnectionsDesc")}
           />
         ) : (
           <ul className="border-foreground/10 divide-foreground/8 divide-y rounded-xl border">
@@ -566,10 +567,10 @@ export function McpConnectionsManager() {
                       variant="outline"
                       onClick={() => handleEditTools(connection)}
                       disabled={testingId === connection.id}
-                      title="Choose which tools the assistant may use"
+                      title={ui("chooseTools")}
                     >
                       <SlidersHorizontal className="mr-1 h-3.5 w-3.5" />
-                      Tools
+                      {ui("tools")}
                     </Button>
                     <Button
                       size="sm"
@@ -578,7 +579,7 @@ export function McpConnectionsManager() {
                       disabled={testingId === connection.id}
                     >
                       <Plug className="mr-1 h-3.5 w-3.5" />
-                      {testingId === connection.id ? "Testing…" : "Test"}
+                      {testingId === connection.id ? ui("testing") : ui("test")}
                     </Button>
                   </>
                 )}
@@ -593,8 +594,8 @@ export function McpConnectionsManager() {
                     type="button"
                     onClick={() => openEdit(connection)}
                     className="text-foreground/55 hover:bg-foreground/5 hover:text-foreground inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors"
-                    title="Edit"
-                    aria-label="Edit"
+                    title={ui("edit")}
+                    aria-label={ui("edit")}
                   >
                     <Pencil className="h-3.5 w-3.5" />
                   </button>
@@ -603,8 +604,8 @@ export function McpConnectionsManager() {
                   type="button"
                   onClick={() => handleDelete(connection)}
                   className="text-foreground/55 hover:bg-destructive/10 hover:text-destructive inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors"
-                  title="Delete"
-                  aria-label="Delete"
+                  title={ui("delete")}
+                  aria-label={ui("delete")}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
@@ -618,12 +619,12 @@ export function McpConnectionsManager() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingId === "new" ? "Add MCP server" : `Edit "${draftName}"`}
+              {editingId === "new" ? ui("addMcpServer") : `${ui("edit")} “${draftName}”`}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="mcp-name">Name</Label>
+              <Label htmlFor="mcp-name">{ui("serverName")}</Label>
               <Input
                 id="mcp-name"
                 value={draftName}
@@ -634,12 +635,11 @@ export function McpConnectionsManager() {
                 className="mt-1.5"
               />
               <p className="text-foreground/45 mt-1 text-[11px]">
-                Lowercase letters, digits, hyphens. Also used to prefix the server&apos;s tool names
-                in chat.
+                {ui("serverNameHint")}
               </p>
             </div>
             <div>
-              <Label htmlFor="mcp-url">Server URL</Label>
+              <Label htmlFor="mcp-url">{ui("serverUrl")}</Label>
               <Input
                 id="mcp-url"
                 value={draftUrl}
@@ -649,11 +649,11 @@ export function McpConnectionsManager() {
                 className="mt-1.5 font-mono text-sm"
               />
               <p className="text-foreground/45 mt-1 text-[11px]">
-                Streamable HTTP endpoint of the MCP server.
+                {ui("serverUrlHint")}
               </p>
             </div>
             <div>
-              <Label htmlFor="mcp-token">Bearer token (optional)</Label>
+              <Label htmlFor="mcp-token">{ui("bearerToken")}</Label>
               <Input
                 id="mcp-token"
                 type="password"
@@ -667,7 +667,7 @@ export function McpConnectionsManager() {
                 className="mt-1.5 font-mono text-sm"
               />
               <p className="text-foreground/45 mt-1 text-[11px]">
-                Sent as an Authorization header. Stored encrypted; never shown again.
+                {ui("tokenHint")}
               </p>
               {editing?.has_auth_token && !draftToken && (
                 <div className="mt-2 flex items-center gap-2">
@@ -677,7 +677,7 @@ export function McpConnectionsManager() {
                     onCheckedChange={setClearToken}
                   />
                   <Label htmlFor="mcp-clear-token" className="text-xs font-normal">
-                    Remove the stored token
+                    {ui("removeStoredToken")}
                   </Label>
                 </div>
               )}
@@ -685,7 +685,7 @@ export function McpConnectionsManager() {
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={closeDialog} disabled={submitting}>
-              Cancel
+              {ui("cancel")}
             </Button>
             <Button onClick={handleSubmit} disabled={submitting}>
               {submitting ? "Saving…" : editingId === "new" ? "Add & test" : "Save"}
@@ -708,7 +708,7 @@ export function McpConnectionsManager() {
             </p>
             <div>
               <Label htmlFor="catalog-token">
-                {connectEntry?.auth === "personal-url" ? "Your personal link" : "Access token"}
+                {connectEntry?.auth === "personal-url" ? ui("personalLink") : ui("accessToken")}
               </Label>
               <Input
                 id="catalog-token"

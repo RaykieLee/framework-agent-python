@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Camera, Loader2, MailPlus, Trash2, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 
@@ -47,6 +48,8 @@ function getInitials(nameOrEmail: string): string {
 
 
 export default function OrgMembersPage({ params }: PageProps) {
+  const ui = useTranslations("ui");
+  const membersT = useTranslations("members");
   const { id } = use(params);
   const { user } = useAuth();
   const { members, total, isLoading, fetchMembers, changeRole, removeMember } = useMembers(id);
@@ -93,7 +96,7 @@ export default function OrgMembersPage({ params }: PageProps) {
     if (!file) return;
     e.target.value = "";
     if (file.size > MAX_AVATAR_SIZE_BYTES) {
-      toast.error("Avatar too large. Maximum 2MB.");
+      toast.error(ui("avatarTooLarge"));
       return;
     }
     setAvatarUploading(true);
@@ -102,13 +105,13 @@ export default function OrgMembersPage({ params }: PageProps) {
       fd.append("file", file);
       const res = await fetch(`/api/orgs/${id}/avatar`, { method: "POST", body: fd });
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ detail: "Upload failed" }));
-        throw new Error(err.detail || "Upload failed");
+        const err = await res.json().catch(() => ({ detail: membersT("failedInvite") }));
+        throw new Error(err.detail || membersT("failedInvite"));
       }
-      toast.success("Workspace avatar updated");
+      toast.success(ui("workspaceAvatarUpdated"));
       await fetchOrgs(true);
     } catch (err) {
-      toast.error(getErrorMessage(err, "Failed to upload avatar"));
+      toast.error(getErrorMessage(err, ui("failedUploadAvatar")));
     } finally {
       setAvatarUploading(false);
     }
@@ -118,7 +121,7 @@ export default function OrgMembersPage({ params }: PageProps) {
     const cols: Column<OrganizationMember>[] = [
       {
         key: "member",
-        header: "Member",
+        header: ui("member"),
         cell: (m) => {
           const isSelf = m.user_id === user?.id;
           return (
@@ -131,7 +134,7 @@ export default function OrgMembersPage({ params }: PageProps) {
               <div className="min-w-0">
                 <p className="text-foreground truncate text-sm font-medium">
                   {m.full_name || m.email.split("@")[0]}
-                  {isSelf && <span className="text-muted-foreground font-normal"> (you)</span>}
+                  {isSelf && <span className="text-muted-foreground font-normal"> ({membersT("you")})</span>}
                 </p>
                 <p className="text-muted-foreground truncate text-xs">{m.email}</p>
               </div>
@@ -141,7 +144,7 @@ export default function OrgMembersPage({ params }: PageProps) {
       },
       {
         key: "role",
-        header: "Role",
+        header: ui("role"),
         cell: (m) => {
           const isSelf = m.user_id === user?.id;
           const isOwner = m.role === "owner";
@@ -152,8 +155,8 @@ export default function OrgMembersPage({ params }: PageProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="member">Member</SelectItem>
+                  <SelectItem value="admin">{ui("admin")}</SelectItem>
+                  <SelectItem value="member">{ui("member")}</SelectItem>
                 </SelectContent>
               </Select>
             );
@@ -167,7 +170,7 @@ export default function OrgMembersPage({ params }: PageProps) {
       },
       {
         key: "joined",
-        header: "Joined",
+        header: ui("joined"),
         cell: (m) => <span className="text-muted-foreground text-sm">{formatDate(m.joined_at)}</span>,
       },
     ];
@@ -203,17 +206,17 @@ export default function OrgMembersPage({ params }: PageProps) {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={org?.name ?? "Members"}
-        description={`${total} ${total === 1 ? "person has" : "people have"} access to this workspace. Owners and admins can invite teammates and adjust roles.`}
+        title={org?.name ?? ui("member")}
+        description={membersT("accessDescription", { count: total })}
         breadcrumbs={[
-          { label: "Organizations", href: ROUTES.ORGS },
-          { label: org?.name ?? "Members" },
+          { label: ui("organizations"), href: ROUTES.ORGS },
+          { label: org?.name ?? ui("member") },
         ]}
         actions={
           canManage ? (
             <Button onClick={() => setInviteOpen(true)}>
               <UserPlus className="h-4 w-4" />
-              Invite teammate
+              {ui("inviteTeammate")}
             </Button>
           ) : undefined
         }
@@ -226,7 +229,7 @@ export default function OrgMembersPage({ params }: PageProps) {
             onClick={() => avatarInputRef.current?.click()}
             disabled={!canManage || avatarUploading}
             className="bg-muted text-foreground group relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl disabled:cursor-default"
-            title={canManage ? "Change workspace avatar" : "Only owners and admins can edit"}
+            title={canManage ? ui("changeWorkspaceAvatar") : ui("onlyAdminsEdit")}
           >
             {org.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -261,10 +264,10 @@ export default function OrgMembersPage({ params }: PageProps) {
           <div className="min-w-0 flex-1 space-y-3">
             <div>
               <p className="text-muted-foreground font-mono text-[11px] tracking-wider uppercase">
-                Workspace profile
+                {ui("workspaceProfile")}
               </p>
               <p className="text-muted-foreground mt-0.5 text-xs">
-                Name and avatar shown across the app to everyone in this workspace.
+                {ui("workspaceProfileDesc")}
               </p>
             </div>
 
@@ -275,18 +278,18 @@ export default function OrgMembersPage({ params }: PageProps) {
                 onChange={(e) => setName(e.target.value)}
                 disabled={!canManage || savingName}
                 className="min-w-0 flex-1"
-                placeholder="Workspace name"
+                placeholder={ui("workspaceName")}
                 maxLength={255}
               />
               {canManage && name.trim() !== org.name && name.trim() !== "" && (
                 <Button onClick={handleSaveName} disabled={savingName}>
-                  {savingName ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save"}
+                  {savingName ? <Loader2 className="h-4 w-4 animate-spin" /> : ui("save")}
                 </Button>
               )}
             </div>
             {!canManage && (
               <p className="text-muted-foreground text-[11px]">
-                Only owners and admins can edit workspace profile.
+                {ui("onlyAdminsEdit")}
               </p>
             )}
           </div>
@@ -298,10 +301,10 @@ export default function OrgMembersPage({ params }: PageProps) {
       ) : members.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="No members yet"
-          description="Invite teammates by email to give them access to this workspace."
+          title={ui("noMembers")}
+          description={ui("inviteDescription")}
           cta={
-            canManage ? { label: "Invite teammate", onClick: () => setInviteOpen(true) } : undefined
+            canManage ? { label: ui("inviteTeammate"), onClick: () => setInviteOpen(true) } : undefined
           }
         />
       ) : (
@@ -309,7 +312,7 @@ export default function OrgMembersPage({ params }: PageProps) {
           columns={columns}
           rows={members}
           getRowKey={(m) => m.id}
-          empty="No members yet."
+          empty={ui("noMembers")}
         />
       )}
 
@@ -317,10 +320,10 @@ export default function OrgMembersPage({ params }: PageProps) {
         <section className="space-y-3">
           <div>
             <p className="text-muted-foreground font-mono text-[11px] tracking-wider uppercase">
-              Pending invitations
+              {membersT("pendingInvitations")}
             </p>
             <h2 className="text-foreground text-sm font-semibold">
-              {pendingInvitations.length} waiting on a response
+              {membersT("pendingCount", { count: pendingInvitations.length })}
             </h2>
           </div>
           <ul className="border-border bg-card divide-border divide-y overflow-hidden rounded-xl border">
@@ -332,8 +335,8 @@ export default function OrgMembersPage({ params }: PageProps) {
                 <div className="min-w-0 flex-1">
                   <p className="text-foreground truncate text-sm font-medium">{inv.email}</p>
                   <p className="text-muted-foreground mt-0.5 truncate text-xs">
-                    Invited {formatDate(inv.created_at)}
-                    {inv.expires_at && <> · expires {formatDate(inv.expires_at)}</>}
+                    {membersT("invitedOn")} {formatDate(inv.created_at)}
+                    {inv.expires_at && <> · {membersT("expiresOn")} {formatDate(inv.expires_at)}</>}
                   </p>
                 </div>
                 <Badge variant={ROLE_VARIANT[inv.role]} className="capitalize">
@@ -346,7 +349,7 @@ export default function OrgMembersPage({ params }: PageProps) {
                     className="text-muted-foreground hover:text-destructive"
                     onClick={() => revokeInvitation(inv.token)}
                   >
-                    Revoke
+                    {membersT("revoke")}
                   </Button>
                 )}
               </li>

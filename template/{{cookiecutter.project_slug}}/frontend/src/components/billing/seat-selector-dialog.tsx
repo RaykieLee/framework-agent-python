@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Minus, Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +34,8 @@ export function SeatSelectorDialog({
   initialSeats = 5,
   onUpdate,
 }: SeatSelectorDialogProps) {
+  const t = useTranslations("ui");
+  const common = useTranslations("common");
   const { plans, isLoading: plansLoading } = usePlans();
   const { startCheckout, isLoading: checkoutLoading } = useBilling();
   const [seats, setSeats] = useState(initialSeats);
@@ -67,11 +70,11 @@ export function SeatSelectorDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>{mode === "update" ? "Change seat count" : "Choose your seats"}</DialogTitle>
+          <DialogTitle>{mode === "update" ? t("changeSeatCount") : t("chooseSeats")}</DialogTitle>
           <DialogDescription>
             {mode === "update"
-              ? "Adjust the number of seats on your current subscription."
-              : "Each seat lets one team member access the workspace."}
+              ? t("adjustSeats")
+              : t("eachSeat")}
           </DialogDescription>
         </DialogHeader>
 
@@ -79,7 +82,7 @@ export function SeatSelectorDialog({
           <div className="flex items-center justify-between gap-4">
             <span className="flex items-center gap-2 text-sm font-medium">
               <Users className="text-muted-foreground h-4 w-4" />
-              Seats
+              {t("member")}
             </span>
             <div className="flex items-center gap-2">
               <Button
@@ -88,7 +91,7 @@ export function SeatSelectorDialog({
                 className="h-8 w-8 p-0"
                 onClick={() => change(-1)}
                 disabled={seats <= 1}
-                aria-label="Remove a seat"
+                aria-label={t("removeSeat")}
               >
                 <Minus className="h-3.5 w-3.5" aria-hidden />
               </Button>
@@ -104,7 +107,7 @@ export function SeatSelectorDialog({
                 size="sm"
                 className="h-8 w-8 p-0"
                 onClick={() => change(1)}
-                aria-label="Add a seat"
+                aria-label={t("addSeat")}
               >
                 <Plus className="h-3.5 w-3.5" aria-hidden />
               </Button>
@@ -114,11 +117,11 @@ export function SeatSelectorDialog({
           {!plansLoading && perSeatCents !== null && (
             <div className="bg-muted/50 rounded-lg p-4 text-sm">
               <div className="text-muted-foreground flex justify-between">
-                <span>Per seat / month</span>
+                <span>{t("perSeatMonth")}</span>
                 <span>{fmt(perSeatCents)}</span>
               </div>
               <div className="mt-2 flex justify-between border-t pt-2">
-                <span className="font-semibold">Total / month</span>
+                <span className="font-semibold">{t("totalMonth")}</span>
                 <span className="text-lg font-bold">{fmt(perSeatCents * seats)}</span>
               </div>
             </div>
@@ -127,10 +130,10 @@ export function SeatSelectorDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={busy}>
-            Cancel
+            {common("cancel")}
           </Button>
           <Button onClick={handleConfirm} disabled={busy}>
-            {busy ? "Please wait…" : mode === "update" ? "Save changes" : "Continue to checkout"}
+            {busy ? t("pleaseWait") : mode === "update" ? t("saveChanges") : t("continueCheckout")}
           </Button>
         </DialogFooter>
       </DialogContent>

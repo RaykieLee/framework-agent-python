@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ interface PageProps {
 }
 
 export default function AcceptInvitationPage({ params }: PageProps) {
+  const ui = useTranslations("ui");
   const { token } = use(params);
   const router = useRouter();
   const { isAuthenticated } = useAuth();
@@ -41,26 +43,24 @@ export default function AcceptInvitationPage({ params }: PageProps) {
     <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle>Team invitation</CardTitle>
-          <CardDescription>You&apos;ve been invited to join an organization.</CardDescription>
+          <CardTitle>{ui("teamInvitation")}</CardTitle>
+          <CardDescription>{ui("invitedToOrganization")}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
           {status === "success" && (
             <>
               <CheckCircle2 className="text-foreground h-12 w-12" />
-              <p className="text-sm font-medium">You joined the organization!</p>
-              <p className="text-muted-foreground text-xs">Redirecting to your organizations...</p>
+              <p className="text-sm font-medium">{ui("joinedOrganization")}</p>
+              <p className="text-muted-foreground text-xs">{ui("redirectingOrganizations")}</p>
             </>
           )}
           {status === "error" && (
             <>
               <XCircle className="text-destructive h-12 w-12" />
-              <p className="text-sm font-medium">Failed to accept invitation</p>
-              <p className="text-muted-foreground text-xs">
-                The invitation may have expired or already been used.
-              </p>
+              <p className="text-sm font-medium">{ui("acceptInvitationFailed")}</p>
+              <p className="text-muted-foreground text-xs">{ui("invitationExpired")}</p>
               <Button variant="outline" onClick={() => router.push("/dashboard")}>
-                Go to dashboard
+                {ui("goDashboard")}
               </Button>
             </>
           )}
@@ -68,10 +68,10 @@ export default function AcceptInvitationPage({ params }: PageProps) {
             <>
               {status === "loading" && <Loader2 className="text-primary h-8 w-8 animate-spin" />}
               <p className="text-muted-foreground text-sm">
-                Click below to accept this invitation and join the team.
+                {ui("acceptInvitationHint")}
               </p>
               <Button onClick={handleAccept} disabled={status === "loading"} className="w-full">
-                {status === "loading" ? "Joining..." : "Accept invitation"}
+                {status === "loading" ? ui("joining") : ui("acceptInvitation")}
               </Button>
             </>
           )}

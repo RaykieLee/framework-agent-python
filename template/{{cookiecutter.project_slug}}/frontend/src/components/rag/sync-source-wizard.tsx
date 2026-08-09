@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, Calendar, Check, Cog, Copy, Database, Plus, Plug } from "lucide-react";
 
 import {
@@ -88,6 +89,7 @@ export function SyncSourceWizard({
   onClone,
   submitting,
 }: SyncSourceWizardProps) {
+  const ui = useTranslations("ui");
   const [mode, setMode] = useState<Mode>("new");
   const [step, setStep] = useState<Step>("source");
   const [form, setForm] = useState<SyncSourceCreate>({ ...EMPTY_FORM, collection_name: defaultCollection ?? null });
@@ -121,7 +123,7 @@ export function SyncSourceWizard({
     await onClone?.(
       cloneSourceId,
       defaultCollection,
-      cloneName.trim() || `${selectedIntegration?.name ?? "Integration"} (${defaultCollection})`,
+      cloneName.trim() || `${selectedIntegration?.name ?? ui("integration")} (${defaultCollection})`,
     );
   };
 
@@ -166,7 +168,7 @@ export function SyncSourceWizard({
       <DialogContent className="max-h-[90vh] overflow-hidden p-0 sm:max-w-2xl">
         <DialogHeader className="border-foreground/10 border-b px-6 py-4">
           <DialogTitle className="font-display text-base font-semibold">
-            Add sync source
+            {ui("addSyncSource")}
           </DialogTitle>
 
           {/* Mode toggle — visible on the first step so user can switch between new/clone */}
@@ -183,7 +185,7 @@ export function SyncSourceWizard({
                 )}
               >
                 <Plus className="h-3 w-3" />
-                Create new
+                {ui("createNew")}
               </button>
               <button
                 type="button"
@@ -196,7 +198,7 @@ export function SyncSourceWizard({
                 )}
               >
                 <Copy className="h-3 w-3" />
-                Use existing
+                {ui("useExisting")}
               </button>
             </div>
           )}
@@ -225,7 +227,7 @@ export function SyncSourceWizard({
                         active || done ? "text-foreground" : "text-foreground/45",
                       )}
                     >
-                      {s.label}
+                      {ui(s.id === "source" ? "pickSource" : s.id === "configure" ? "configure" : "schedule")}
                     </span>
                     {i < STEPS.length - 1 && (
                       <span
@@ -275,7 +277,7 @@ export function SyncSourceWizard({
               className="text-foreground/65 hover:text-foreground inline-flex items-center gap-1.5 text-sm font-medium"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {ui("back")}
             </button>
           ) : (
             <button
@@ -283,7 +285,7 @@ export function SyncSourceWizard({
               onClick={() => onOpenChange(false)}
               className="text-foreground/65 hover:text-foreground text-sm font-medium"
             >
-              Cancel
+              {ui("cancel")}
             </button>
           )}
 
@@ -296,16 +298,16 @@ export function SyncSourceWizard({
             {submitting && isLastStep ? (
               <>
                 <Spinner className="h-3.5 w-3.5" />
-                {mode === "clone" ? "Cloning…" : "Creating…"}
+                {mode === "clone" ? ui("cloning") : ui("creating")}
               </>
             ) : isLastStep ? (
               <>
-                {mode === "clone" ? "Use this integration" : "Create source"}
+                {mode === "clone" ? ui("useIntegration") : ui("createSource")}
                 <Check className="h-4 w-4" />
               </>
             ) : (
               <>
-                Continue
+                {ui("continue")}
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
@@ -329,15 +331,15 @@ function CloneStep({
   cloneName: string;
   setCloneName: (name: string) => void;
 }) {
+  const ui = useTranslations("ui");
   return (
     <div className="space-y-5">
       <p className="text-foreground/65 text-sm">
-        Pick an existing org integration to use in this knowledge base. Its credentials are copied
-        independently &mdash; you can adjust the schedule separately.
+        {ui("pickExistingDesc")}
       </p>
       <div className="space-y-2">
         <Label className="text-foreground/80 text-xs font-medium tracking-wider uppercase">
-          Org integrations
+          {ui("orgIntegrations")}
         </Label>
         <div className="space-y-2">
           {integrations.map((src) => {
@@ -371,7 +373,7 @@ function CloneStep({
                   <p className="text-foreground text-sm font-semibold">{src.name}</p>
                   <p className="text-foreground/55 font-mono text-[10px] tracking-wider uppercase">
                     {src.connector_type}
-                    {src.collection_name ? ` · ${src.collection_name}` : " · unassigned"}
+                    {src.collection_name ? ` · ${src.collection_name}` : ` · ${ui("unassigned")}`}
                   </p>
                 </div>
                 {isSelected && <Check className="text-brand h-4 w-4 shrink-0" />}
@@ -387,11 +389,11 @@ function CloneStep({
             htmlFor="clone-name"
             className="text-foreground/80 text-xs font-medium tracking-wider uppercase"
           >
-            Name for this KB&apos;s copy
+            {ui("copyName")}
           </Label>
           <Input
             id="clone-name"
-            placeholder="Leave empty to auto-generate"
+            placeholder={ui("leaveEmptyAuto")}
             value={cloneName}
             onChange={(e) => setCloneName(e.target.value)}
             className="h-10 rounded-xl"
@@ -411,6 +413,7 @@ function ConnectorStep({
   form: SyncSourceCreate;
   setForm: React.Dispatch<React.SetStateAction<SyncSourceCreate>>;
 }) {
+  const ui = useTranslations("ui");
   return (
     <div className="space-y-5">
       <div className="space-y-1.5">
@@ -418,7 +421,7 @@ function ConnectorStep({
           htmlFor="source-name"
           className="text-foreground/80 text-xs font-medium tracking-wider uppercase"
         >
-          Source name
+          {ui("sourceName")}
         </Label>
         <Input
           id="source-name"
@@ -431,11 +434,11 @@ function ConnectorStep({
 
       <div className="space-y-2">
         <Label className="text-foreground/80 text-xs font-medium tracking-wider uppercase">
-          Connector
+          {ui("connector")}
         </Label>
         {connectors.length === 0 ? (
           <p className="border-foreground/10 bg-foreground/[0.03] text-foreground/65 rounded-xl border px-4 py-3 text-sm">
-            No connectors enabled.
+            {ui("noConnectorsEnabled")}
           </p>
         ) : (
           <div className="grid gap-2 sm:grid-cols-2">
@@ -492,6 +495,7 @@ function ConfigureStep({
   form: SyncSourceCreate;
   setForm: React.Dispatch<React.SetStateAction<SyncSourceCreate>>;
 }) {
+  const ui = useTranslations("ui");
   const fields = Object.entries(connector.config_schema);
 
   if (fields.length === 0) {
@@ -499,7 +503,7 @@ function ConfigureStep({
       <div className="border-foreground/10 bg-foreground/[0.03] rounded-xl border p-5 text-center">
         <Cog className="text-foreground/45 mx-auto h-6 w-6" />
         <p className="text-foreground/70 mt-3 text-sm">
-          No additional configuration needed for{" "}
+          {ui("noConfigurationNeeded")} {" "}
           <span className="text-foreground font-medium">{connector.name}</span>.
         </p>
       </div>
@@ -509,7 +513,7 @@ function ConfigureStep({
   return (
     <div className="space-y-4">
       <p className="text-foreground/65 text-sm">
-        Configure {connector.name}. Required fields are marked with{" "}
+        {ui("configureConnector")} {connector.name}。{ui("requiredFieldsMarked")} {" "}
         <span className="text-destructive">*</span>.
       </p>
       {fields.map(([key, field]) => (
@@ -593,20 +597,21 @@ function ScheduleStep({
   setForm: React.Dispatch<React.SetStateAction<SyncSourceCreate>>;
   defaultCollection?: string;
 }) {
+  const ui = useTranslations("ui");
   return (
     <div className="space-y-5">
       {/* Only show collection picker if not pre-set from KB context */}
       {!defaultCollection && (
         <div className="space-y-1.5">
           <Label className="text-foreground/80 text-xs font-medium tracking-wider uppercase">
-            Target collection
+            {ui("targetCollection")}
           </Label>
           <Select
             value={form.collection_name ?? ""}
             onValueChange={(val) => setForm((f) => ({ ...f, collection_name: val || null }))}
           >
             <SelectTrigger className="h-10 rounded-xl">
-              <SelectValue placeholder="Select collection… (optional)" />
+              <SelectValue placeholder={ui("selectCollectionOptional")} />
             </SelectTrigger>
             <SelectContent>
               {collections.map((c) => (
@@ -623,13 +628,13 @@ function ScheduleStep({
               ))}
             </SelectContent>
           </Select>
-          <p className="text-foreground/45 text-xs">Leave empty to save as org-level integration.</p>
+          <p className="text-foreground/45 text-xs">{ui("leaveEmpty")}</p>
         </div>
       )}
 
       <div className="space-y-2">
         <Label className="text-foreground/80 text-xs font-medium tracking-wider uppercase">
-          Sync mode
+          {ui("syncMode")}
         </Label>
         <div className="grid gap-2 sm:grid-cols-3">
           {SYNC_MODES.map((mode) => {
@@ -646,8 +651,8 @@ function ScheduleStep({
                     : "border-foreground/10 bg-card hover:border-foreground/30",
                 )}
               >
-                <p className="text-foreground text-sm font-semibold">{mode.label}</p>
-                <p className="text-foreground/55 mt-0.5 text-xs">{mode.description}</p>
+                <p className="text-foreground text-sm font-semibold">{ui(mode.value === "full" ? "full" : mode.value === "new_only" ? "newOnly" : "updateOnly")}</p>
+                <p className="text-foreground/55 mt-0.5 text-xs">{ui(`${mode.value}Desc`)}</p>
               </button>
             );
           })}
@@ -656,7 +661,7 @@ function ScheduleStep({
 
       <div className="space-y-2">
         <Label className="text-foreground/80 text-xs font-medium tracking-wider uppercase">
-          Schedule
+          {ui("schedule")}
         </Label>
         <div className="flex flex-wrap gap-2">
           {SCHEDULE_PRESETS.map((p) => {
@@ -682,13 +687,13 @@ function ScheduleStep({
         </div>
         <div className="flex items-center gap-2 pt-1">
           <Label htmlFor="custom-schedule" className="text-foreground/55 text-xs">
-            Custom (minutes):
+            {ui("customMinutes")}
           </Label>
           <Input
             id="custom-schedule"
             type="number"
             min={0}
-            placeholder="0 = manual"
+            placeholder={ui("zeroManual")}
             value={form.schedule_minutes ?? ""}
             onChange={(e) =>
               setForm((f) => ({

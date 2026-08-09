@@ -81,7 +81,7 @@ export function ChatEmptyState({ onPick, agentLabel = "pydantic_ai" }: ChatEmpty
         <kbd className="border-border bg-card rounded px-1.5 py-0.5 font-mono text-[10px]">/</kbd>
         <span>{t("slashCommandsHint")}</span>
         <span className="text-border">·</span>
-        <span className="text-muted-foreground/70">Powered by {agentLabel}</span>
+        <span className="text-muted-foreground/70">{t("poweredBy", { agent: agentLabel })}</span>
       </div>
     </div>
   );

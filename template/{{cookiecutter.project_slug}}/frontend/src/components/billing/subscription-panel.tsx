@@ -32,16 +32,17 @@ import { SeatSelectorDialog } from "./seat-selector-dialog";
 import type { SubscriptionRead } from "@/types";
 
 function StatusBadge({ status }: { status: SubscriptionRead["status"] }) {
+  const t = useTranslations("billing");
   const map: Record<
     string,
     { label: string; variant: "default" | "secondary" | "destructive" | "outline" }
   > = {
-    active: { label: "Active", variant: "default" },
-    trialing: { label: "Trial", variant: "secondary" },
-    past_due: { label: "Past due", variant: "destructive" },
-    canceled: { label: "Canceled", variant: "outline" },
-    unpaid: { label: "Unpaid", variant: "destructive" },
-    paused: { label: "Paused", variant: "secondary" },
+    active: { label: t("statusActive"), variant: "default" },
+    trialing: { label: t("statusTrial"), variant: "secondary" },
+    past_due: { label: t("statusPastDue"), variant: "destructive" },
+    canceled: { label: t("statusCanceled"), variant: "outline" },
+    unpaid: { label: t("statusUnpaid"), variant: "destructive" },
+    paused: { label: t("statusPaused"), variant: "secondary" },
   };
   const { label, variant } = map[status] ?? { label: status, variant: "outline" };
   return <Badge variant={variant}>{label}</Badge>;
@@ -56,6 +57,7 @@ function StatusIcon({ status }: { status: SubscriptionRead["status"] }) {
 
 export function SubscriptionPanel() {
   const t = useTranslations("billing");
+  const ui = useTranslations("ui");
   const { subscription, isLoading, cancelSubscription, reactivateSubscription, updateSeats } =
     useSubscription();
   const { isLoading: billingLoading, openPortal, startCheckout } = useBilling();
@@ -124,20 +126,20 @@ export function SubscriptionPanel() {
           </div>
           <CardDescription>
             {subscription.status === "trialing" && trialEnd
-              ? `Trial ends ${trialEnd}`
-              : `Renews ${periodEnd}`}
+              ? `${t("statusTrial")} ${t("trialEnds")} ${trialEnd}`
+              : `${t("renews")} ${periodEnd}`}
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-muted-foreground">Seats</p>
+              <p className="text-muted-foreground">{t("seats")}</p>
               <p className="font-medium">{subscription.seats_quantity}</p>
             </div>
             {subscription.price && (
               <div>
-                <p className="text-muted-foreground">Price</p>
+                <p className="text-muted-foreground">{t("amount")}</p>
                 <p className="font-medium">
                   {formatCurrency(subscription.price.amount_cents, subscription.price.currency)}{" "}
                   / {subscription.price.interval}
@@ -145,12 +147,12 @@ export function SubscriptionPanel() {
               </div>
             )}
             <div>
-              <p className="text-muted-foreground">Billing period ends</p>
+              <p className="text-muted-foreground">{ui("billingPeriodEnds")}</p>
               <p className="font-medium">{periodEnd}</p>
             </div>
             <div>
-              <p className="text-muted-foreground">Auto-renew</p>
-              <p className="font-medium">{subscription.cancel_at_period_end ? "Off" : "On"}</p>
+              <p className="text-muted-foreground">{ui("autoRenew")}</p>
+              <p className="font-medium">{subscription.cancel_at_period_end ? t("off") : t("on")}</p>
             </div>
           </div>
 
@@ -158,8 +160,7 @@ export function SubscriptionPanel() {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Your subscription will cancel on <strong>{periodEnd}</strong>. You&apos;ll retain
-                access until then.
+                {t("cancelsPeriodEnd")} <strong>{periodEnd}</strong>。
               </AlertDescription>
             </Alert>
           )}
@@ -168,7 +169,7 @@ export function SubscriptionPanel() {
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Your last payment failed. Update your payment method to avoid service interruption.
+                {t("paymentFailedDesc")}
               </AlertDescription>
             </Alert>
           )}
@@ -176,7 +177,7 @@ export function SubscriptionPanel() {
 
         <CardFooter className="flex gap-2">
           <Button variant="outline" onClick={openPortal} disabled={billingLoading}>
-            Manage Billing
+            {t("manageBilling")}
           </Button>
 
           <Button
@@ -184,30 +185,29 @@ export function SubscriptionPanel() {
             onClick={() => setSeatDialogOpen(true)}
             disabled={billingLoading}
           >
-            Change seats
+            {ui("changeSeatCount")}
           </Button>
 
           {subscription.cancel_at_period_end ? (
             <Button onClick={reactivateSubscription} disabled={billingLoading}>
-              Reactivate
+              {t("reactivate")}
             </Button>
           ) : subscription.status !== "canceled" ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="ghost" className="text-destructive hover:text-destructive">
-                  Cancel Subscription
+                  {t("cancelSubscription")}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Cancel subscription?</AlertDialogTitle>
+                  <AlertDialogTitle>{ui("cancelSubscription")}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Your subscription will remain active until <strong>{periodEnd}</strong>, then
-                    cancel automatically. You can reactivate at any time before that date.
+                    {t("cancelDescription")} <strong>{periodEnd}</strong>。
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Keep subscription</AlertDialogCancel>
+                  <AlertDialogCancel>{ui("keepSubscription")}</AlertDialogCancel>
                   <AlertDialogAction
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     onClick={async () => {
@@ -217,7 +217,7 @@ export function SubscriptionPanel() {
                     }}
                     disabled={canceling}
                   >
-                    Yes, cancel
+                    {t("yesCancel")}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

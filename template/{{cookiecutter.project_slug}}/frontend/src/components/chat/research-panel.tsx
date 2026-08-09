@@ -1,6 +1,7 @@
 {% raw %}"use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useResearchStore } from "@/stores";
 import { useChatModeStore } from "@/stores";
 import type { ResearchTodo } from "@/types";
@@ -50,6 +51,7 @@ const EMPTY_TODOS: ResearchTodo[] = [];
  * "Deep research" only when that persona is active; otherwise "Plan".
  */
 export function ResearchPanel({ turnId }: { turnId: string }) {
+  const ui = useTranslations("ui");
   const turn = useResearchStore((s) => s.byTurn[turnId]);
   const deepResearch = useChatModeStore((s) => s.deepResearch);
   const todos = turn?.todos ?? EMPTY_TODOS;
@@ -72,11 +74,11 @@ export function ResearchPanel({ turnId }: { turnId: string }) {
 
   if (todoTotal === 0) return null;
 
-  const counter = todoTotal > 0 ? `${todoDone}/${todoTotal} steps` : "Planning…";
+  const counter = todoTotal > 0 ? `${todoDone}/${todoTotal} ${ui("steps")}` : ui("planning");
   const pct = todoTotal > 0 ? Math.round((todoDone / todoTotal) * 100) : 0;
 
   const TitleIcon = deepResearch ? Telescope : Sparkles;
-  const title = deepResearch ? "Deep research" : "Plan";
+  const title = deepResearch ? ui("deepResearch") : ui("plan");
 
   return (
     <Card className="overflow-hidden py-0">
@@ -142,11 +144,12 @@ function StatusIcon({ status }: { status: ResearchTodo["status"] }) {
 }
 
 function ResearchChecklist({ todos }: { todos: ResearchTodo[] }) {
+  const ui = useTranslations("ui");
   if (todos.length === 0) {
     return (
       <div className="text-muted-foreground flex items-center gap-2 text-xs">
         <CircleDashed className="h-3.5 w-3.5 animate-spin" />
-        Planning…
+        {ui("planning")}
       </div>
     );
   }
@@ -193,7 +196,7 @@ function ResearchChecklist({ todos }: { todos: ResearchTodo[] }) {
   return (
     <div className="space-y-1">
       <div className="text-muted-foreground mb-2 flex items-center justify-between font-mono text-[10px] tracking-wider uppercase">
-        <span>Plan</span>
+        <span>{ui("plan")}</span>
         <span className="tabular-nums">
           {completedCount}/{totalCount}
         </span>

@@ -69,10 +69,10 @@ interface ChatControlsProps {
 }
 
 {%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
-const SCOPE_META: Record<KBScope, { label: string; icon: LucideIcon }> = {
-  personal: { label: "Personal", icon: Lock },
-  org: { label: "Organization", icon: Users },
-  app: { label: "App-wide", icon: Sparkles },
+const SCOPE_META: Record<KBScope, { key: "personal" | "organization" | "appWide"; icon: LucideIcon }> = {
+  personal: { key: "personal", icon: Lock },
+  org: { key: "organization", icon: Users },
+  app: { key: "appWide", icon: Sparkles },
 };
 
 const SECTION_ORDER: KBScope[] = ["personal", "org", "app"];
@@ -96,6 +96,7 @@ export function ChatControls({
   onThinkingEffortChange,
 }: ChatControlsProps) {
   const t = useTranslations("chat");
+  const ui = useTranslations("ui");
 {%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
   const [tab, setTab] = useState<Tab>("kb");
 {%- else %}
@@ -203,13 +204,13 @@ export function ChatControls({
   const triggerSummary = useMemo(() => {
     const parts: string[] = [];
 {%- if cookiecutter.enable_deep_research %}
-    if (deepResearch) parts.push("Research");
+    if (deepResearch) parts.push(ui("deepResearch"));
 {%- endif %}
 {%- if cookiecutter.enable_teams and cookiecutter.enable_rag %}
-    if (activeCount > 0) parts.push(`${activeCount} KB${activeCount === 1 ? "" : "s"}`);
+    if (activeCount > 0) parts.push(`${activeCount} ${ui("knowledgeBases")}`);
 {%- endif %}
     if (selectedModel.value) parts.push(selectedModel.value);
-    if (settingsOverridden) parts.push("Custom");
+    if (settingsOverridden) parts.push(ui("custom"));
     return parts.length ? parts.join(" · ") : t("controls");
   }, [{% if cookiecutter.enable_deep_research %}deepResearch, {% endif %}{% if cookiecutter.enable_teams and cookiecutter.enable_rag %}activeCount, {% endif %}selectedModel, settingsOverridden, t]);
 
@@ -248,7 +249,7 @@ export function ChatControls({
           {onModelChange && (
             <TabButton
               icon={Cpu}
-              label="Model"
+              label={ui("model")}
               active={tab === "model"}
               onClick={() => setTab("model")}
             />
@@ -256,7 +257,7 @@ export function ChatControls({
           {onTemperatureChange && onThinkingEffortChange && (
             <TabButton
               icon={Settings2}
-              label="Settings"
+              label={ui("settings")}
               active={tab === "settings"}
               onClick={() => setTab("settings")}
             />
@@ -264,7 +265,7 @@ export function ChatControls({
 {%- if cookiecutter.enable_mcp_client %}
           <TabButton
             icon={Plug}
-            label="Plugins"
+              label={ui("plugins")}
             active={tab === "plugins"}
             onClick={() => setTab("plugins")}
           />
@@ -320,9 +321,9 @@ export function ChatControls({
               aria-hidden
               className="bg-foreground inline-block h-1 w-1 animate-pulse rounded-full"
             />
-            {currentConversationId ? "Saved for this chat" : "Saves on send"}
+            {currentConversationId ? ui("savedForChat") : ui("savesOnSend")}
           </span>
-          <span>esc to close</span>
+          <span>{ui("escToClose")}</span>
         </div>
       </PopoverContent>
     </Popover>
@@ -376,28 +377,29 @@ function KBPanel({
   currentConversationId: string | null;
   onToggle: (kb: KnowledgeBase, checked: boolean) => void;
 }) {
+  const ui = useTranslations("ui");
   const activeCount = activeIds.size;
 
   return (
     <div>
       <div className="mb-3 flex items-baseline justify-between">
-        <p className="text-foreground text-sm font-semibold">Knowledge bases</p>
+        <p className="text-foreground text-sm font-semibold">{ui("knowledgeBases")}</p>
         <span className="text-foreground/55 font-mono text-[10px] tabular-nums">
-          {activeCount}/{kbs.length} active
+          {activeCount}/{kbs.length} {ui("active")}
         </span>
       </div>
       <p className="text-foreground/55 mb-4 text-xs leading-relaxed">
-        Picked KBs are searched on every message you send.
+        {ui("pickedKBsDesc")}
       </p>
 
       {isLoading && kbs.length === 0 ? (
-        <p className="text-foreground/55 py-3 text-xs">Loading…</p>
+        <p className="text-foreground/55 py-3 text-xs">{ui("loading")}</p>
       ) : kbs.length === 0 ? (
         <div className="border-foreground/10 bg-foreground/[0.02] rounded-xl border px-4 py-6 text-center">
           <Database className="text-foreground/30 mx-auto mb-2 h-6 w-6" />
-          <p className="text-foreground/65 text-xs">No knowledge bases yet.</p>
+          <p className="text-foreground/65 text-xs">{ui("noKnowledgeBases")}</p>
           <p className="text-foreground/45 mt-1 text-[11px]">
-            Create one on the Knowledge Bases page.
+            {ui("createKBHint")}
           </p>
         </div>
       ) : (
@@ -408,7 +410,7 @@ function KBPanel({
               <section key={scope}>
                 <div className="text-foreground/55 mb-2 flex items-center gap-1.5 font-mono text-[10px] tracking-wider uppercase">
                   <meta.icon className="h-3 w-3" />
-                  {meta.label}
+                  {ui(meta.key)}
                 </div>
                 <ul className="space-y-1">
                   {grouped[scope].map((kb) => {
@@ -451,7 +453,7 @@ function KBPanel({
 
       {!currentConversationId && kbs.length > 0 && (
         <p className="text-foreground/45 mt-4 font-mono text-[10px] tracking-wider uppercase">
-          Draft selection — saves when you send.
+          {ui("draftSelection")}
         </p>
       )}
     </div>
@@ -469,11 +471,12 @@ function ModelPanel({
   selected: { value: string; label: string };
   onPick: (m: { value: string; label: string }) => void;
 }) {
+  const ui = useTranslations("ui");
   return (
     <div>
-      <p className="text-foreground mb-1 text-sm font-semibold">Model</p>
+      <p className="text-foreground mb-1 text-sm font-semibold">{ui("model")}</p>
       <p className="text-foreground/55 mb-4 text-xs leading-relaxed">
-        Pick the model that handles this conversation.
+        {ui("modelDesc")}
       </p>
       <ul className="space-y-1">
         {models.map((m) => {
@@ -504,31 +507,32 @@ function ModelPanel({
 {%- if cookiecutter.enable_mcp_client %}
 /** Plugins panel — toggle the user's MCP servers on/off for the assistant. */
 function PluginsPanel() {
+  const ui = useTranslations("ui");
   const { connections, isLoading, update } = useMcpConnections();
 
   const handleToggle = async (connection: McpConnectionRecord, next: boolean) => {
     try {
       await update(connection.id, { is_enabled: next });
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to toggle plugin");
+      toast.error(e instanceof Error ? e.message : ui("togglePluginFailed"));
     }
   };
 
   return (
     <div>
-      <p className="text-foreground mb-1 text-sm font-semibold">Plugins</p>
+      <p className="text-foreground mb-1 text-sm font-semibold">{ui("plugins")}</p>
       <p className="text-foreground/55 mb-4 text-xs leading-relaxed">
-        MCP servers your assistant can pull tools from. Changes apply from your next message.
+        {ui("pluginsDesc")}
       </p>
 
       {connections.length === 0 ? (
         <p className="text-foreground/55 text-xs leading-relaxed">
-          No servers connected yet.{" "}
+          {ui("noServers")}{" "}
           <Link
             href={ROUTES.SETTINGS_INTEGRATIONS}
             className="text-foreground underline underline-offset-2"
           >
-            Add one in Settings → Integrations
+            {ui("addInSettings")}
           </Link>
           .
         </p>
@@ -555,8 +559,8 @@ function PluginsPanel() {
                   <p className="text-foreground truncate text-xs font-medium">{connection.name}</p>
                   <p className="text-foreground/45 text-[10px]">
                     {connection.allowed_tools === null
-                      ? "all tools"
-                      : `${connection.allowed_tools.length} tools`}
+                      ? ui("allTools")
+                      : `${connection.allowed_tools.length} ${ui("tools")}`}
                   </p>
                 </div>
                 <button
@@ -584,7 +588,7 @@ function PluginsPanel() {
             href={ROUTES.SETTINGS_INTEGRATIONS}
             className="text-foreground/55 hover:text-foreground mt-3 inline-block text-[11px] underline-offset-2 hover:underline"
           >
-            Manage servers & tools in Settings
+            {ui("manageServers")}
           </Link>
         </>
       )}
@@ -605,6 +609,7 @@ function SettingsPanel({
   onTemperatureChange: (v: number | null) => void;
   onEffortChange: (v: ThinkingEffort) => void;
 }) {
+  const ui = useTranslations("ui");
 {%- if cookiecutter.enable_deep_research %}
   const deepResearch = useChatModeStore((s) => s.deepResearch);
   const setDeepResearch = useChatModeStore((s) => s.setDeepResearch);
@@ -616,7 +621,7 @@ function SettingsPanel({
         <div className="flex items-center justify-between gap-3">
           <span className="text-foreground inline-flex items-center gap-1.5 text-sm font-semibold">
             <Telescope className="h-3.5 w-3.5" />
-            Deep research
+            {ui("deepResearch")}
           </span>
           <button
             type="button"
@@ -638,19 +643,19 @@ function SettingsPanel({
         </div>
         <p className="text-foreground/55 text-[11px] leading-relaxed">
           {deepResearch
-            ? "Plans the work, delegates to parallel subagents, then composes a cited report — asking you to clarify the scope first when the request is vague."
-            : "Answers directly in a single fast pass, with no planning or delegation."}
+            ? ui("deepResearchDesc")
+            : ui("directAnswerDesc")}
         </p>
       </div>
 {%- endif %}
       <div className="space-y-2.5">
         <div className="flex items-baseline justify-between">
           <label htmlFor="chat-temp" className="text-foreground text-sm font-semibold">
-            Temperature
+            {ui("temperature")}
           </label>
           <span className="text-foreground font-mono text-xs tabular-nums">
             {temperature === null ? (
-              <span className="text-foreground/55">default</span>
+              <span className="text-foreground/55">{ui("default")}</span>
             ) : (
               temperature.toFixed(2)
             )}
@@ -667,8 +672,8 @@ function SettingsPanel({
           className="bg-foreground/15 h-1.5 w-full cursor-pointer appearance-none rounded-full accent-[var(--color-brand)]"
         />
         <div className="text-foreground/45 flex justify-between font-mono text-[10px] tracking-wider uppercase">
-          <span>focused</span>
-          <span>creative</span>
+          <span>{ui("focused")}</span>
+          <span>{ui("creative")}</span>
         </div>
         {temperature !== null && (
           <button
@@ -676,15 +681,15 @@ function SettingsPanel({
             onClick={() => onTemperatureChange(null)}
             className="text-foreground/55 hover:text-foreground text-[11px] underline-offset-2 hover:underline"
           >
-            Reset to server default
+            {ui("resetDefault")}
           </button>
         )}
       </div>
 
       <div className="space-y-2.5">
         <div className="flex items-baseline justify-between">
-          <span className="text-foreground text-sm font-semibold">Thinking effort</span>
-          <span className="text-foreground/45 text-[10px]">model-dependent</span>
+          <span className="text-foreground text-sm font-semibold">{ui("thinkingEffort")}</span>
+          <span className="text-foreground/45 text-[10px]">{ui("modelDependent")}</span>
         </div>
         <div className="grid grid-cols-4 gap-1">
           {EFFORT_OPTIONS.map((opt) => (
@@ -709,8 +714,7 @@ function SettingsPanel({
       </div>
 
       <p className="text-foreground/45 text-[10px] leading-relaxed">
-        Settings persist for the current chat session. Some controls are no-ops on models that
-        don&apos;t support them.
+        {ui("settingsPersistDesc")}
       </p>
     </div>
   );

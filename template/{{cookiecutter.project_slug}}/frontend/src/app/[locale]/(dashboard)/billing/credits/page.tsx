@@ -151,19 +151,15 @@ export default function CreditsPage() {
       {low && balance && (
         <Alert variant="warning">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Low credit balance</AlertTitle>
+          <AlertTitle>{t("lowCreditBalance")}</AlertTitle>
           <AlertDescription>
-            Balance is below your alert threshold of{" "}
-            {balance.low_threshold.toLocaleString()} credits.
+            {t("belowThreshold", { count: balance.low_threshold.toLocaleString() })}
             {projection && (
               <>
-                {" "}
-                At the current rate (~{Math.round(projection.perDay).toLocaleString()}/day) it will
-                run out in about {projection.daysLeft.toLocaleString()}{" "}
-                {projection.daysLeft === 1 ? "day" : "days"}.
+                {" "}{t("runOutIn", { rate: Math.round(projection.perDay).toLocaleString(), days: projection.daysLeft.toLocaleString(), unit: projection.daysLeft === 1 ? t("day") : t("days") })}.
               </>
             )}{" "}
-            Top up to avoid interruptions.
+            {" "}{t("topUpToAvoid")}
           </AlertDescription>
         </Alert>
       )}
@@ -171,11 +167,9 @@ export default function CreditsPage() {
       {!low && projection && projection.daysLeft <= 14 && (
         <Alert variant="default">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Credits running low soon</AlertTitle>
+          <AlertTitle>{t("creditsLowSoon")}</AlertTitle>
           <AlertDescription>
-            At the current rate (~{Math.round(projection.perDay).toLocaleString()}/day) your balance
-            will last about {projection.daysLeft.toLocaleString()}{" "}
-            {projection.daysLeft === 1 ? "day" : "days"}.
+            {t("balanceLast", { rate: Math.round(projection.perDay).toLocaleString(), days: projection.daysLeft.toLocaleString(), unit: projection.daysLeft === 1 ? t("day") : t("days") })}.
           </AlertDescription>
         </Alert>
       )}

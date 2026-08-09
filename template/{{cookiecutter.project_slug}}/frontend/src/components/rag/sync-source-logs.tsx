@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronDown, ChevronRight, CheckCircle, XCircle, Loader2, Clock } from "lucide-react";
 import { Spinner } from "@/components/ui";
 import type { RAGSyncLog, RAGSyncLogList } from "@/lib/rag-api";
@@ -33,6 +34,7 @@ function duration(log: RAGSyncLog): string {
 }
 
 function LogRow({ log }: { log: RAGSyncLog }) {
+  const ui = useTranslations("ui");
   return (
     <div className="border-foreground/8 flex items-start gap-3 border-b py-2.5 last:border-0">
       <div className="mt-0.5 shrink-0">{statusIcon(log.status)}</div>
@@ -49,11 +51,11 @@ function LogRow({ log }: { log: RAGSyncLog }) {
         </div>
         {log.status !== "running" && log.status !== "pending" && (
           <p className="text-foreground/55 mt-0.5 text-[10px]">
-            {log.ingested > 0 && `${log.ingested} ingested`}
-            {log.updated > 0 && ` · ${log.updated} updated`}
-            {log.skipped > 0 && ` · ${log.skipped} skipped`}
-            {log.failed > 0 && ` · ${log.failed} failed`}
-            {log.total_files === 0 && log.ingested === 0 && "no files processed"}
+            {log.ingested > 0 && `${log.ingested} ${ui("ingested")}`}
+            {log.updated > 0 && ` · ${log.updated} ${ui("updated")}`}
+            {log.skipped > 0 && ` · ${log.skipped} ${ui("skipped")}`}
+            {log.failed > 0 && ` · ${log.failed} ${ui("failed")}`}
+            {log.total_files === 0 && log.ingested === 0 && ui("noFilesProcessed")}
           </p>
         )}
         {log.error_message && (
@@ -65,6 +67,7 @@ function LogRow({ log }: { log: RAGSyncLog }) {
 }
 
 export function SyncSourceLogs({ logsPath }: SyncSourceLogsProps) {
+  const ui = useTranslations("ui");
   const [open, setOpen] = useState(false);
   const [logs, setLogs] = useState<RAGSyncLog[]>([]);
   const [loading, setLoading] = useState(false);
@@ -100,7 +103,7 @@ export function SyncSourceLogs({ logsPath }: SyncSourceLogsProps) {
         )}
       >
         {open ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
-        Sync history
+        {ui("syncHistory")}
         {loaded && logs.length > 0 && (
           <span className="text-foreground/35 ml-1">({logs.length})</span>
         )}
@@ -111,10 +114,10 @@ export function SyncSourceLogs({ logsPath }: SyncSourceLogsProps) {
           {loading ? (
             <div className="flex items-center gap-2 py-2">
               <Spinner className="h-3.5 w-3.5" />
-              <span className="text-foreground/45 text-xs">Loading…</span>
+              <span className="text-foreground/45 text-xs">{ui("loading")}</span>
             </div>
           ) : logs.length === 0 ? (
-            <p className="text-foreground/40 py-2 text-xs">No sync runs yet.</p>
+            <p className="text-foreground/40 py-2 text-xs">{ui("noSyncRuns")}</p>
           ) : (
             logs.map((log) => <LogRow key={log.id} log={log} />)
           )}

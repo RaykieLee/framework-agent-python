@@ -1,6 +1,7 @@
 {% raw %}"use client";
 
 import { use, useState } from "react";
+import { useTranslations } from "next-intl";
 import { AlertCircle, Database, Plug, PlayCircle, RefreshCw, Trash2, Unplug } from "lucide-react";
 import { toast } from "sonner";
 
@@ -61,6 +62,7 @@ function IntegrationCard({
   onDelete: (id: string) => void;
   onTrigger: (id: string) => void;
 }) {
+  const ui = useTranslations("ui");
   const brand = CONNECTOR_BRAND[source.connector_type];
   const isUnassigned = !source.collection_name;
 
@@ -81,7 +83,7 @@ function IntegrationCard({
             {isUnassigned ? (
               <Badge variant="outline" className="text-[10px]">
                 <Unplug className="mr-1 h-2.5 w-2.5" />
-                Unassigned
+                {ui("unassigned")}
               </Badge>
             ) : (
               <Badge variant="secondary" className="font-mono text-[10px]">
@@ -99,10 +101,10 @@ function IntegrationCard({
           </div>
           <p className="text-foreground/55 font-mono text-xs tracking-wide uppercase">
             {source.connector_type}
-            {source.schedule_minutes ? ` · every ${source.schedule_minutes}m` : " · manual"}
+            {source.schedule_minutes ? ` · ${ui("everyMinutes", { minutes: source.schedule_minutes })}` : ` · ${ui("manual")}`}
           </p>
           {source.last_sync_at && (
-            <p className="text-foreground/45 text-xs">Last sync {timeAgo(source.last_sync_at)}</p>
+            <p className="text-foreground/45 text-xs">{ui("lastSync")} {timeAgo(source.last_sync_at)}</p>
           )}
           {source.last_error && (
             <p className="text-destructive flex items-start gap-1 text-xs">
@@ -117,7 +119,7 @@ function IntegrationCard({
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            title="Trigger sync"
+            title={ui("triggerSync")}
             onClick={() => onTrigger(source.id)}
             disabled={isUnassigned}
           >
@@ -132,18 +134,18 @@ function IntegrationCard({
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Remove integration?</AlertDialogTitle>
+                <AlertDialogTitle>{ui("removeIntegration")}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will permanently delete &ldquo;{source.name}&rdquo; and stop all scheduled syncs.
+                  {ui("removeIntegrationDesc")} “{source.name}”。
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>{ui("cancel")}</AlertDialogCancel>
                 <AlertDialogAction
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   onClick={() => onDelete(source.id)}
                 >
-                  Remove
+                  {ui("remove")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -156,6 +158,7 @@ function IntegrationCard({
 }
 
 export default function OrgIntegrationsPage({ params }: PageProps) {
+  const ui = useTranslations("ui");
   const { id } = use(params);
   const { orgs } = useOrganizations();
   const org = orgs.find((o) => o.id === id);
@@ -176,13 +179,13 @@ export default function OrgIntegrationsPage({ params }: PageProps) {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow={org?.name ?? "Organization"}
-        title="Integrations"
-        description="Manage data source integrations for this organization. Unassigned integrations can be reused across multiple knowledge bases."
+        eyebrow={org?.name ?? ui("organization")}
+        title={ui("integrations")}
+        description={ui("integrationsDesc")}
         actions={
           <Button onClick={() => setWizardOpen(true)}>
             <Plug className="h-4 w-4" />
-            Add integration
+            {ui("addIntegration")}
           </Button>
         }
       />
@@ -192,16 +195,16 @@ export default function OrgIntegrationsPage({ params }: PageProps) {
       ) : sources.length === 0 ? (
         <EmptyState
           icon={Plug}
-          title="No integrations yet"
-          description="Add a Google Drive or S3 integration to start syncing documents into knowledge bases."
-          cta={{ label: "Add integration", onClick: () => setWizardOpen(true) }}
+          title={ui("noIntegrations")}
+          description={ui("noIntegrationsDesc")}
+          cta={{ label: ui("addIntegration"), onClick: () => setWizardOpen(true) }}
         />
       ) : (
         <div className="space-y-6">
           {unassigned.length > 0 && (
             <section className="space-y-3">
               <h2 className="text-foreground/70 text-xs font-semibold tracking-wider uppercase">
-                Org-level (unassigned)
+                {ui("orgLevelUnassigned")}
               </h2>
               <div className="space-y-3">
                 {unassigned.map((s) => (
@@ -220,7 +223,7 @@ export default function OrgIntegrationsPage({ params }: PageProps) {
           {assigned.length > 0 && (
             <section className="space-y-3">
               <h2 className="text-foreground/70 text-xs font-semibold tracking-wider uppercase">
-                Assigned to knowledge bases
+                {ui("assignedToKBs")}
               </h2>
               <div className="space-y-3">
                 {assigned.map((s) => (

@@ -1,6 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
+import { useTranslations } from "next-intl";
 import { Download, ExternalLink, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,23 +19,19 @@ const statusVariant: Record<InvoiceStatus, "default" | "secondary" | "destructiv
   uncollectible: "destructive",
 };
 
-const statusLabel: Record<InvoiceStatus, string> = {
-  paid: "Paid",
-  open: "Open",
-  draft: "Draft",
-  void: "Void",
-  uncollectible: "Uncollectible",
-};
-
-
 export function InvoicesPanel() {
+  const t = useTranslations("billing");
   const { invoices, isLoading } = useInvoices();
+  const statusLabel: Record<InvoiceStatus, string> = {
+    paid: t("statusPaid"), open: t("statusOpen"), draft: t("statusDraft"),
+    void: t("statusVoid"), uncollectible: t("statusUncollectible"),
+  };
 
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Invoices</CardTitle>
+          <CardTitle>{t("tabInvoices")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {Array.from({ length: 4 }, (_, i) => (
@@ -50,13 +47,13 @@ export function InvoicesPanel() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="h-5 w-5" />
-          Invoices
+          {t("tabInvoices")}
         </CardTitle>
-        <CardDescription>Your billing history and downloadable invoices.</CardDescription>
+        <CardDescription>{t("invoiceHistoryDesc")}</CardDescription>
       </CardHeader>
       <CardContent>
         {invoices.length === 0 ? (
-          <p className="text-muted-foreground py-6 text-center text-sm">No invoices yet.</p>
+          <p className="text-muted-foreground py-6 text-center text-sm">{t("noInvoices")}</p>
         ) : (
           <div className="divide-y">
             {invoices.map((inv) => (
@@ -90,7 +87,7 @@ export function InvoicesPanel() {
                       <Button variant="ghost" size="sm" className="h-6 gap-1 px-2 text-xs" asChild>
                         <a href={inv.hosted_invoice_url} target="_blank" rel="noopener noreferrer">
                           <ExternalLink className="h-3 w-3" />
-                          View
+                          {t("viewAll")}
                         </a>
                       </Button>
                     )}
