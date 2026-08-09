@@ -20,6 +20,9 @@ import { Button } from "@/components/ui";
 import { apiClient } from "@/lib/api-client";
 import { ROUTES } from "@/lib/constants";
 import { formatCurrency, timeAgo } from "@/lib/utils";
+import { localizedPath } from "@/lib/locale-path";
+import { useLocale } from "next-intl";
+import type { Locale } from "@/i18n";
 
 interface AdminStats {
   total_users?: number;
@@ -47,6 +50,7 @@ const EVENT_ICON: Record<RecentEvent["type"], LucideIcon> = {
 
 
 export default function AdminOverviewPage() {
+  const locale = useLocale() as Locale;
   const statsQuery = useQuery({
     queryKey: ["admin", "stats"],
     queryFn: async (): Promise<AdminStats> => {
@@ -133,24 +137,24 @@ export default function AdminOverviewPage() {
       )}
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <QuickLink href={ROUTES.ADMIN_USERS} icon={Users} title="Manage users" description="Search, suspend, impersonate" />
+        <QuickLink href={localizedPath(locale, ROUTES.ADMIN_USERS)} icon={Users} title="Manage users" description="Search, suspend, impersonate" />
 {%- if cookiecutter.use_ai %}
         <QuickLink
-          href={ROUTES.ADMIN_CONVERSATIONS}
+          href={localizedPath(locale, ROUTES.ADMIN_CONVERSATIONS)}
           icon={MessageSquare}
           title="Browse chats"
           description="All conversations across users"
         />
 {%- endif %}
         <QuickLink
-          href={ROUTES.ADMIN_STRIPE_EVENTS}
+          href={localizedPath(locale, ROUTES.ADMIN_STRIPE_EVENTS)}
           icon={CreditCard}
           title="Stripe events"
           description="Replay webhooks, debug billing"
         />
-        <QuickLink href={ROUTES.ADMIN_SYSTEM} icon={Activity} title="System health" description="Per-service status & uptime" />
+        <QuickLink href={localizedPath(locale, ROUTES.ADMIN_SYSTEM)} icon={Activity} title="System health" description="Per-service status & uptime" />
 {%- if cookiecutter.use_ai %}
-        <QuickLink href={ROUTES.ADMIN_RATINGS} icon={Star} title="Response ratings" description="Quality signals from users" />
+        <QuickLink href={localizedPath(locale, ROUTES.ADMIN_RATINGS)} icon={Star} title="Response ratings" description="Quality signals from users" />
 {%- endif %}
       </section>
 

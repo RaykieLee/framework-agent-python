@@ -88,8 +88,7 @@ export function ChatInput({
     [attachedFiles, onSend, slashContext],
   );
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitMessage = () => {
     if (showPalette && filteredCommands[paletteIndex]) {
       runSlashCommand(filteredCommands[paletteIndex]);
       return;
@@ -103,6 +102,11 @@ export function ChatInput({
     onSend(trimmed || "Analyze the attached file(s)", fileIds, files);
     setMessage("");
     setAttachedFiles([]);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    submitMessage();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -391,6 +395,12 @@ export function ChatInput({
           ) : (
             <Button
               type="submit"
+              onClick={(e) => {
+                // Keep pointer/touch submission explicit. Some embedded browser
+                // shells do not synthesize a form submit for a button click.
+                e.preventDefault();
+                submitMessage();
+              }}
               size="icon"
               disabled={disabled || isUploading || (!message.trim() && attachedFiles.length === 0)}
               className="h-9 w-9 rounded-lg"

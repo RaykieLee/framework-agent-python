@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 {%- if cookiecutter.enable_i18n %}
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 {%- endif %}
 import {
   Activity,
@@ -49,6 +49,8 @@ import { useActiveRoute } from "@/lib/active-route";
 import { APP_NAME, ROUTES } from "@/lib/constants";
 import { cn, isAppAdmin } from "@/lib/utils";
 import { useAuthStore, useSidebarStore } from "@/stores";
+import { localizedPath } from "@/lib/locale-path";
+import type { Locale } from "@/i18n";
 
 type NavLeaf = { labelKey: string; href: string; icon: LucideIcon; descKey?: string };
 type NavEntry =
@@ -100,7 +102,7 @@ const NAV: NavEntry[] = [
   },
 ];
 
-function NavMenu({ entry }: { entry: Extract<NavEntry, { kind: "menu" }> }) {
+function NavMenu({ entry, locale }: { entry: Extract<NavEntry, { kind: "menu" }>; locale: Locale }) {
   const isActive = useActiveRoute();
 {%- if cookiecutter.enable_i18n %}
   const t = useTranslations("nav");
@@ -129,7 +131,7 @@ function NavMenu({ entry }: { entry: Extract<NavEntry, { kind: "menu" }> }) {
       <DropdownMenuContent align="start" className="w-60">
         {entry.items.map((item) => (
           <DropdownMenuItem key={item.href} asChild>
-            <Link href={item.href} className="flex items-start gap-2.5">
+            <Link href={localizedPath(locale, item.href)} className="flex items-start gap-2.5">
               <item.icon className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
               <span className="flex flex-col">
 {%- if cookiecutter.enable_i18n %}
@@ -157,6 +159,7 @@ export function Header() {
 {%- if cookiecutter.enable_i18n %}
   const t = useTranslations("nav");
   const tc = useTranslations("common");
+  const locale = useLocale() as Locale;
 {%- endif %}
   const isAdmin = isAppAdmin(user);
 
@@ -176,7 +179,7 @@ export function Header() {
           </Button>
 
           <Link
-            href={ROUTES.DASHBOARD}
+            href={localizedPath(locale, ROUTES.DASHBOARD)}
             className="flex items-center gap-2 pr-1 text-sm font-bold tracking-tight sm:text-base"
           >
             <span
@@ -193,7 +196,7 @@ export function Header() {
               entry.kind === "link" ? (
                 <Link
                   key={entry.href}
-                  href={entry.href}
+                  href={localizedPath(locale, entry.href)}
                   aria-current={isActive(entry.href) ? "page" : undefined}
                   className={cn(
                     "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
@@ -210,7 +213,7 @@ export function Header() {
 {%- endif %}
                 </Link>
               ) : (
-                <NavMenu key={entry.labelKey} entry={entry} />
+                <NavMenu key={entry.labelKey} entry={entry} locale={locale} />
               ),
             )}
           </nav>
@@ -275,7 +278,7 @@ export function Header() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href={ROUTES.PROFILE}>
+                  <Link href={localizedPath(locale, ROUTES.PROFILE)}>
                     <UserCircle className="mr-2 h-4 w-4" />
 {%- if cookiecutter.enable_i18n %}
                     {t("profile")}
@@ -285,7 +288,7 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href={ROUTES.SETTINGS}>
+                  <Link href={localizedPath(locale, ROUTES.SETTINGS)}>
                     <Settings className="mr-2 h-4 w-4" />
 {%- if cookiecutter.enable_i18n %}
                     {t("settings")}
@@ -296,7 +299,7 @@ export function Header() {
                 </DropdownMenuItem>
 {%- if cookiecutter.enable_billing %}
                 <DropdownMenuItem asChild>
-                  <Link href={ROUTES.BILLING}>
+                  <Link href={localizedPath(locale, ROUTES.BILLING)}>
                     <CreditCard className="mr-2 h-4 w-4" />
 {%- if cookiecutter.enable_i18n %}
                     {t("billing")}
@@ -321,14 +324,14 @@ export function Header() {
             <div className="ml-1 flex items-center gap-1.5">
               <Button variant="ghost" size="sm" asChild className="h-9 rounded-lg">
 {%- if cookiecutter.enable_i18n %}
-                <Link href={ROUTES.LOGIN}>{t("login")}</Link>
+                <Link href={localizedPath(locale, ROUTES.LOGIN)}>{t("login")}</Link>
 {%- else %}
                 <Link href={ROUTES.LOGIN}>Login</Link>
 {%- endif %}
               </Button>
               <Button size="sm" asChild className="h-9 rounded-lg">
 {%- if cookiecutter.enable_i18n %}
-                <Link href={ROUTES.REGISTER}>{t("register")}</Link>
+                <Link href={localizedPath(locale, ROUTES.REGISTER)}>{t("register")}</Link>
 {%- else %}
                 <Link href={ROUTES.REGISTER}>Register</Link>
 {%- endif %}

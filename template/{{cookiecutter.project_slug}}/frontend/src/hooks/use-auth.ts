@@ -2,12 +2,15 @@
 
 import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import { toast } from "sonner";
 import { useAuthStore } from "@/stores";
 import { apiClient, ApiError } from "@/lib/api-client";
 import type { User, LoginRequest, RegisterRequest } from "@/types";
 import { ROUTES } from "@/lib/constants";
 import { isAppAdmin } from "@/lib/utils";
+import { localizedPath } from "@/lib/locale-path";
+import type { Locale } from "@/i18n";
 
 // Session-level singletons so /auth/me runs ONCE per page load no matter how
 // many components mount useAuth(). Concurrent mounts share the in-flight
@@ -68,6 +71,7 @@ function runAuthCheck(setUser: (u: User | null) => void): Promise<void> {
 
 export function useAuth() {
   const router = useRouter();
+  const locale = useLocale() as Locale;
   const { user, isAuthenticated, isLoading, setUser, setLoading, logout } = useAuthStore();
 
   // Check auth status once per session. /auth/me returns the access_token in
@@ -89,13 +93,13 @@ export function useAuth() {
         setUser(response.user);
         useAuthStore.getState().setAccessToken(response.access_token);
         authChecked = true; // login already populated user + token; skip /auth/me
-        router.push(isAppAdmin(response.user) ? ROUTES.DASHBOARD : ROUTES.CHAT);
+        router.push(localizedPath(locale, isAppAdmin(response.user) ? ROUTES.DASHBOARD : ROUTES.CHAT));
         return response;
       } finally {
         setLoading(false);
       }
     },
-    [router, setUser, setLoading],
+    [locale, router, setUser, setLoading],
   );
 
   const register = useCallback(async (data: RegisterRequest) => {
@@ -114,9 +118,9 @@ export function useAuth() {
       stopTokenRefresh();
       logout();
       toast.success("Logged out");
-      router.push(ROUTES.LOGIN);
+      router.push(localizedPath(locale, ROUTES.LOGIN));
     }
-  }, [logout, router]);
+  }, [locale, logout, router]);
 
   const refreshToken = useCallback(async () => {
     try {
@@ -130,11 +134,11 @@ export function useAuth() {
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
         logout();
-        router.push(ROUTES.LOGIN);
+        router.push(localizedPath(locale, ROUTES.LOGIN));
       }
       return false;
     }
-  }, [logout, router, setUser]);
+  }, [locale, logout, router, setUser]);
 
   return {
     user,

@@ -4,6 +4,9 @@ import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 
 import { useActiveRoute } from "@/lib/active-route";
+import { localizedPath } from "@/lib/locale-path";
+import type { Locale } from "@/i18n";
+import { useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export interface PageTab {
@@ -23,6 +26,7 @@ export interface PageTab {
  */
 export function PageTabs({ tabs, className }: { tabs: PageTab[]; className?: string }) {
   const isActive = useActiveRoute();
+  const locale = useLocale() as Locale;
   return (
     <div className={cn("border-border border-b", className)}>
       <nav className="-mb-px flex gap-0.5 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -31,7 +35,7 @@ export function PageTabs({ tabs, className }: { tabs: PageTab[]; className?: str
           return (
             <Link
               key={tab.href}
-              href={tab.href}
+              href={localizedPath(locale, tab.href)}
               aria-current={active ? "page" : undefined}
               className={cn(
                 "inline-flex shrink-0 items-center gap-1.5 border-b-2 px-3.5 py-2.5 text-sm font-medium whitespace-nowrap transition-colors",

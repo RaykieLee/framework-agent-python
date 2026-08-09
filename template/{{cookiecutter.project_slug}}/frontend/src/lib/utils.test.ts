@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { cn } from "./utils";
+import { localizedPath } from "./locale-path";
 
 describe("cn utility function", () => {
   it("should merge class names", () => {
@@ -35,5 +36,19 @@ describe("cn utility function", () => {
     const result = cn(["class1", "class2"]);
     expect(result).toContain("class1");
     expect(result).toContain("class2");
+  });
+});
+
+describe("localizedPath", () => {
+  it("prefixes non-default locales while preserving query strings", () => {
+    expect(localizedPath("zh", "/admin/users?skip=0")).toBe("/zh/admin/users?skip=0");
+  });
+
+  it("keeps the default locale unprefixed", () => {
+    expect(localizedPath("en", "/dashboard")).toBe("/dashboard");
+  });
+
+  it("localizes the root path", () => {
+    expect(localizedPath("zh", "/")).toBe("/zh/");
   });
 });

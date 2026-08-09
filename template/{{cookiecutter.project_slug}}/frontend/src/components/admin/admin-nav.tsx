@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLocale } from "next-intl";
 import {
   Activity,
   CreditCard,
@@ -16,6 +17,8 @@ import type { LucideIcon } from "lucide-react";
 
 import { ROUTES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { localizedPath } from "@/lib/locale-path";
+import type { Locale } from "@/i18n";
 
 interface NavItem {
   label: string;
@@ -37,6 +40,7 @@ const ITEMS: NavItem[] = [
 
 export function AdminNav() {
   const pathname = usePathname();
+  const locale = useLocale() as Locale;
   const stripped = pathname.replace(/^\/[a-z]{2}/, "");
 
   return (
@@ -53,7 +57,7 @@ export function AdminNav() {
             return (
               <li key={item.href}>
                 <Link
-                  href={item.href}
+                  href={localizedPath(locale, item.href)}
                   className={cn(
                     "group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
                     active
@@ -85,7 +89,7 @@ export function AdminNav() {
           return (
             <Link
               key={item.href}
-              href={item.href}
+              href={localizedPath(locale, item.href)}
               className={cn(
                 "border-foreground/15 inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
                 active

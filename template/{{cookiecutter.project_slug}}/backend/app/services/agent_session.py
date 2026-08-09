@@ -3,6 +3,7 @@
 import asyncio
 import contextlib
 import logging
+import logging
 from datetime import datetime
 from typing import Any
 from uuid import UUID
@@ -2787,6 +2788,8 @@ from app.services.agentscope_runtime import (
     AgentScopeTenantContext,
     validate_conversation_tenant,
 )
+
+logger = logging.getLogger(__name__)
 {%- else %}
 AgentScopeRuntimeWiring = Any
 AgentScopeTenantContext = Any
@@ -2967,8 +2970,11 @@ class AgentSession:
     def _on_turn_done(self, task: asyncio.Task[None]) -> None:
         if self._turn_task is task:
             self._turn_task = None
-        if not task.cancelled() and task.exception() is not None:
-            task.exception()  # mark the exception retrieved for asyncio
+        if not task.cancelled() and (exc := task.exception()) is not None:
+            logger.error(
+                "Agent turn failed",
+                exc_info=(type(exc), exc, exc.__traceback__),
+            )
 
     async def _run_turn(self, data: dict[str, Any], continuation: bool = False) -> None:
         try:

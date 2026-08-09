@@ -25,16 +25,25 @@ AgentFactory = Callable[[], Agent]
 
 def _build_model(model_name: str) -> OpenAIChatModel:
     """Build an OpenAI-compatible AgentScope model from environment settings."""
+    if not settings.OPENAI_API_KEY:
+        raise RuntimeError(
+            "No model API key configured. Set OPENAI_API_KEY in the backend environment."
+        )
     parameters = OpenAIChatModel.Parameters(
         temperature=settings.AI_TEMPERATURE,
         thinking_enable=settings.AI_THINKING_ENABLED,
         reasoning_effort=(settings.AI_THINKING_EFFORT if settings.AI_THINKING_ENABLED else None),
     )
     return OpenAIChatModel(
-        credential=OpenAICredential(api_key=settings.OPENAI_API_KEY),
+        credential=OpenAICredential(
+            api_key=settings.OPENAI_API_KEY,
+            base_url=settings.AI_BASE_URL or None,
+        ),
         model=model_name,
         parameters=parameters,
         stream=True,
+        max_retries=1,
+        retry_delay=0.5,
     )
 
 

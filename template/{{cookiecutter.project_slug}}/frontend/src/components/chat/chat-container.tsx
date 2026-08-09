@@ -299,7 +299,7 @@ function ChatUI({
       <div className="mx-auto flex h-full max-w-5xl min-w-0 flex-1 flex-col">
         <div
           ref={scrollContainerRef}
-          className="flex-1 scrollbar-thin overflow-y-auto px-2 py-4 sm:px-4 sm:py-6"
+          className="min-h-0 flex-1 scrollbar-thin overflow-y-auto px-2 py-4 sm:px-4 sm:py-6"
         >
           {isLoadingConversation ? (
             <ConversationSkeleton />

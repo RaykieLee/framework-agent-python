@@ -2,14 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import { useAuthStore } from "@/stores";
 import { apiClient } from "@/lib/api-client";
 import { ROUTES } from "@/lib/constants";
 import type { User } from "@/types";
 import { Spinner } from "@/components/ui";
+import { localizedPath } from "@/lib/locale-path";
+import type { Locale } from "@/i18n";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const locale = useLocale() as Locale;
   const { isAuthenticated, setUser } = useAuthStore();
   const [checking, setChecking] = useState(!isAuthenticated);
 
@@ -21,14 +25,14 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         const user = await apiClient.get<User>("/auth/me");
         setUser(user);
       } catch {
-        router.replace(ROUTES.LOGIN);
+        router.replace(localizedPath(locale, ROUTES.LOGIN));
       } finally {
         setChecking(false);
       }
     };
 
     verify();
-  }, [isAuthenticated, router, setUser]);
+  }, [isAuthenticated, locale, router, setUser]);
 
   if (checking && !isAuthenticated) {
     return (

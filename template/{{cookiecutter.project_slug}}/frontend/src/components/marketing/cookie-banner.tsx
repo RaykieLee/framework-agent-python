@@ -91,9 +91,9 @@ export function CookieBanner() {
     <div
       role="dialog"
       aria-labelledby="cookie-banner-title"
-      className="fixed inset-x-0 bottom-0 z-[55] p-4 md:right-4 md:bottom-4 md:left-auto md:max-w-md"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-[55] p-4 md:right-4 md:bottom-4 md:left-auto md:max-w-md"
     >
-      <div className="border-foreground/15 bg-card text-foreground rounded-2xl border shadow-2xl">
+      <div className="border-foreground/15 bg-card text-foreground pointer-events-none rounded-2xl border shadow-2xl [&_a]:pointer-events-auto [&_button]:pointer-events-auto [&_label]:pointer-events-auto">
         <div className="flex items-start gap-3 p-5">
           <span className="bg-brand/15 text-foreground inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
             <Cookie className="h-4 w-4" />

@@ -305,6 +305,8 @@ class Settings(BaseSettings):
 
 {%- if cookiecutter.use_openai %}
     OPENAI_API_KEY: str = ""
+    # Optional OpenAI-compatible endpoint (for example, GLM or a local gateway).
+    AI_BASE_URL: str | None = None
 {%- endif %}
 {%- if cookiecutter.use_anthropic %}
     ANTHROPIC_API_KEY: str = ""

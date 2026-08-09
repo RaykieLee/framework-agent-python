@@ -162,8 +162,8 @@ export function useChat(options: UseChatOptions = {}) {
           // Append to the ordered parts timeline (extends the trailing
           // text part or starts a new one after a thinking/tool part).
           if (currentMessageIdRef.current) {
-            const content = (wsEvent.data as { index: number; content: string }).content;
-            appendTextDelta(currentMessageIdRef.current, content);
+            const data = wsEvent.data as { content?: string; delta?: string };
+            appendTextDelta(currentMessageIdRef.current, data.content ?? data.delta ?? "");
           }
           break;
         }
@@ -175,8 +175,8 @@ export function useChat(options: UseChatOptions = {}) {
             createNewMessage("");
           }
           if (currentMessageIdRef.current) {
-            const content = (wsEvent.data as { index: number; content: string }).content;
-            appendThinkingDelta(currentMessageIdRef.current, content);
+            const data = wsEvent.data as { content?: string; delta?: string };
+            appendThinkingDelta(currentMessageIdRef.current, data.content ?? data.delta ?? "");
           }
           break;
         }
@@ -246,15 +246,15 @@ export function useChat(options: UseChatOptions = {}) {
 
         case "error": {
           // Handle error
-          if (currentMessageIdRef.current) {
-            const id = currentMessageIdRef.current;
-            const { message } = wsEvent.data as { message: string };
-            const errText = `\n\n❌ Error: ${message || "Unknown error"}`;
+          const { message } = (wsEvent.data ?? {}) as { message?: string };
+          const errText = `❌ Error: ${message || "Unknown error"}`;
+          const id = currentMessageIdRef.current ?? createNewMessage("");
+          if (id) {
             const cur = useChatStore.getState().messages.find((m) => m.id === id);
             if (cur?.parts) {
-              appendTextDelta(id, errText);
+              appendTextDelta(id, `\n\n${errText}`);
             } else {
-              updateMessage(id, (msg) => ({ ...msg, content: msg.content + errText }));
+              updateMessage(id, (msg) => ({ ...msg, content: msg.content ? `${msg.content}\n\n${errText}` : errText }));
             }
             updateMessage(id, (msg) => ({ ...msg, isStreaming: false }));
           }

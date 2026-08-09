@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn, isAppAdmin } from "@/lib/utils";
 import { APP_NAME, ROUTES } from "@/lib/constants";
 import {
@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import { useSidebarStore, useAuthStore } from "@/stores";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui";
+import { localizedPath } from "@/lib/locale-path";
+import type { Locale } from "@/i18n";
 
 const navigation = [
   { nameKey: "dashboard", href: ROUTES.DASHBOARD, icon: LayoutDashboard },
@@ -40,17 +42,19 @@ const navigation = [
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
+  const locale = useLocale() as Locale;
   const { user } = useAuthStore();
   const t = useTranslations("nav");
 
   return (
     <nav className="flex-1 space-y-1 p-4">
       {navigation.map((item) => {
-        const isActive = pathname === item.href;
+        const href = localizedPath(locale, item.href);
+        const isActive = pathname === href;
         return (
           <Link
             key={item.nameKey}
-            href={item.href}
+            href={href}
             onClick={onNavigate}
             className={cn(
               "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors",
@@ -67,12 +71,12 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
       })}
       {isAppAdmin(user) && (
         <Link
-          href={ROUTES.ADMIN}
+          href={localizedPath(locale, ROUTES.ADMIN)}
           onClick={onNavigate}
           className={cn(
             "flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors",
             "min-h-[44px]",
-            pathname.startsWith("/admin")
+            pathname.startsWith(localizedPath(locale, ROUTES.ADMIN))
               ? "bg-secondary text-secondary-foreground"
               : "text-muted-foreground hover:bg-secondary/50 hover:text-secondary-foreground",
           )}

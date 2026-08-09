@@ -6,6 +6,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from agentscope.event import ReplyEndEvent, TextBlockDeltaEvent
 from agentscope.message import Msg, TextBlock
+from app.agents.agentscope_assistant import _build_model
+from app.core.config import settings
 
 from app.services.agent_session import (
     ActiveTenantError,
@@ -51,6 +53,12 @@ def test_viewer_and_cross_tenant_execution_are_rejected():
         authorize_execution(active_tenant_role="viewer")
     with pytest.raises(ActiveTenantError, match="active tenant"):
         authorize_execution(active_tenant_id="tenant-a", conversation_tenant_id="tenant-b")
+
+
+def test_model_requires_a_provider_key(monkeypatch):
+    monkeypatch.setattr(settings, "OPENAI_API_KEY", "")
+    with pytest.raises(RuntimeError, match="OPENAI_API_KEY"):
+        _build_model("test-model")
 
 
 @pytest.mark.anyio
