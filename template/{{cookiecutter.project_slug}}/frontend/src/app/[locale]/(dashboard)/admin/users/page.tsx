@@ -28,6 +28,7 @@ import {
 import { useAdminUsers } from "@/hooks";
 import type { AdminUserRead } from "@/hooks/use-admin-users";
 import { cn, formatDate } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100] as const;
 type SortDir = "asc" | "desc";
@@ -44,6 +45,7 @@ function getInitials(nameOrEmail: string): string {
 }
 
 export default function AdminUsersPage() {
+  const t = useTranslations("admin");
   const { users, total, isLoading, fetchUsers, updateUser, deleteUser, impersonateUser } =
     useAdminUsers();
   const [search, setSearch] = useState("");
@@ -107,7 +109,7 @@ export default function AdminUsersPage() {
         key: "email",
         header: (
           <SortHeader active={sort.by === "email"} dir={sort.dir} onClick={() => toggleSort("email")}>
-            User
+            {t("user")}
           </SortHeader>
         ),
         cell: (u) => (
@@ -130,7 +132,7 @@ export default function AdminUsersPage() {
       {
         key: "role",
         hideBelow: "md",
-        header: "Role",
+        header: t("role"),
         cell: (u) => (
           <div className="flex items-center gap-1.5">
             <span className="text-sm capitalize">{u.role}</span>
@@ -146,21 +148,21 @@ export default function AdminUsersPage() {
       {
         key: "is_active",
         hideBelow: "sm",
-        header: "Status",
+        header: t("status"),
         cell: (u) =>
           u.is_active ? (
             <Badge
               variant="outline"
               className="border-border bg-foreground/5 text-foreground font-normal"
             >
-              Active
+              {t("active")}
             </Badge>
           ) : (
             <Badge
               variant="outline"
               className="border-border text-muted-foreground font-normal"
             >
-              Suspended
+              {t("suspended")}
             </Badge>
           ),
       },
@@ -173,7 +175,7 @@ export default function AdminUsersPage() {
             dir={sort.dir}
             onClick={() => toggleSort("created_at")}
           >
-            Joined
+            {t("joined")}
           </SortHeader>
         ),
         cell: (u) => (
@@ -196,12 +198,12 @@ export default function AdminUsersPage() {
               handleOpenUser(u);
             }}
           >
-            Inspect
+            {t("inspect")}
           </Button>
         ),
       },
     ],
-    [sort.by, sort.dir, handleOpenUser],
+    [sort.by, sort.dir, handleOpenUser, t],
   );
 
   const start = total === 0 ? 0 : page * pageSize + 1;
@@ -213,7 +215,7 @@ export default function AdminUsersPage() {
         <div className="relative min-w-[240px] flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
-            placeholder="Search by email or name…"
+            placeholder={t("searchUsers")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
@@ -227,14 +229,14 @@ export default function AdminUsersPage() {
           <SelectContent>
             {PAGE_SIZE_OPTIONS.map((n) => (
               <SelectItem key={n} value={String(n)}>
-                {n} / page
+                {t("perPage", { count: n })}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <span className="text-muted-foreground ml-auto text-xs">
-          {total.toLocaleString()} total
+          {t("total", { count: total })}
         </span>
       </div>
 
@@ -244,13 +246,13 @@ export default function AdminUsersPage() {
         getRowKey={(u) => u.id}
         loading={isLoading && users.length === 0}
         onRowClick={handleOpenUser}
-        empty={search ? `No users match "${search}".` : "No users yet."}
+        empty={search ? t("noUsersMatch", { search }) : t("noUsersYet")}
       />
 
       {total > 0 && (
         <div className="border-border bg-card flex items-center justify-between rounded-xl border px-4 py-3">
           <span className="text-muted-foreground text-sm">
-            {start}–{end} of {total.toLocaleString()}
+            {t("rangeOfTotal", { start, end, total })}
           </span>
           <div className="flex items-center gap-1">
             <Button
@@ -258,7 +260,7 @@ export default function AdminUsersPage() {
               size="sm"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={page === 0 || isLoading}
-              aria-label="Previous page"
+              aria-label={t("previousPage")}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -270,7 +272,7 @@ export default function AdminUsersPage() {
               size="sm"
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={page >= totalPages - 1 || isLoading}
-              aria-label="Next page"
+              aria-label={t("nextPage")}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

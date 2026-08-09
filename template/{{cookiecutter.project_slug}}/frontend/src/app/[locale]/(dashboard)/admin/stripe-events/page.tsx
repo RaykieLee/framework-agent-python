@@ -30,6 +30,7 @@ import {
 } from "@/components/ui";
 import { apiClient } from "@/lib/api-client";
 import { cn, formatCurrency } from "@/lib/utils";
+import { useLocale } from "next-intl";
 
 interface StripeEvent {
   id: string;
@@ -133,6 +134,7 @@ const STUB_EVENTS: StripeEvent[] = [
 ];
 
 export default function StripeEventsPage() {
+  const zh = useLocale() === "zh";
   const [events, setEvents] = useState<StripeEvent[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -196,16 +198,16 @@ export default function StripeEventsPage() {
 
   const handleReplay = async (evt: StripeEvent) => {
     if (usingStub) {
-      toast.info("Demo mode — backend wiring required (POST /admin/stripe-events/{id}/replay)");
+      toast.info(zh ? "演示模式：需要接通后端接口（POST /admin/stripe-events/{id}/replay）" : "Demo mode — backend wiring required (POST /admin/stripe-events/{id}/replay)");
       return;
     }
     setReplaying(evt.id);
     try {
       await apiClient.post(`/admin/stripe-events/${evt.id}/replay`);
-      toast.success(`Replayed ${evt.type}`);
+      toast.success(zh ? `已重放 ${evt.type}` : `Replayed ${evt.type}`);
       await load();
     } catch {
-      toast.error("Replay failed");
+      toast.error(zh ? "重放失败" : "Replay failed");
     } finally {
       setReplaying(null);
     }
@@ -214,7 +216,7 @@ export default function StripeEventsPage() {
   const columns: Column<StripeEvent>[] = [
     {
       key: "type",
-      header: "Event",
+      header: zh ? "事件" : "Event",
       cell: (e) => (
         <div className="min-w-0">
           <p className="text-foreground truncate font-medium">{e.type}</p>
@@ -224,13 +226,13 @@ export default function StripeEventsPage() {
     },
     {
       key: "customer",
-      header: "Customer",
+      header: zh ? "客户" : "Customer",
       hideBelow: "md",
       cell: (e) => <span className="text-muted-foreground">{e.customer_email ?? "—"}</span>,
     },
     {
       key: "amount",
-      header: "Amount",
+      header: zh ? "金额" : "Amount",
       align: "right",
       hideBelow: "sm",
       className: "tabular-nums",
@@ -238,12 +240,12 @@ export default function StripeEventsPage() {
     },
     {
       key: "status",
-      header: "Status",
-      cell: (e) => <StatusBadge status={e.status} attempts={e.attempts} />,
+      header: zh ? "状态" : "Status",
+      cell: (e) => <StatusBadge status={e.status} attempts={e.attempts} zh={zh} />,
     },
     {
       key: "created",
-      header: "Time",
+      header: zh ? "时间" : "Time",
       hideBelow: "lg",
       cell: (e) => (
         <span className="text-muted-foreground text-xs whitespace-nowrap">
@@ -265,7 +267,7 @@ export default function StripeEventsPage() {
             ev.stopPropagation();
             handleReplay(e);
           }}
-          aria-label="Replay event"
+          aria-label={zh ? "重放事件" : "Replay event"}
         >
           <RefreshCw className={cn("h-3.5 w-3.5", replaying === e.id && "animate-spin")} />
         </Button>
@@ -279,9 +281,9 @@ export default function StripeEventsPage() {
         <div className="border-border bg-muted flex items-start gap-3 rounded-xl border p-3">
           <Filter className="text-muted-foreground mt-0.5 h-4 w-4 shrink-0" />
           <div className="min-w-0 flex-1 text-xs">
-            <p className="text-foreground font-medium">Demo data</p>
+            <p className="text-foreground font-medium">{zh ? "演示数据" : "Demo data"}</p>
             <p className="text-muted-foreground mt-0.5">
-              Backend wiring required. Expected: <code className="font-mono">GET /admin/stripe-events</code>,{" "}
+              {zh ? "需要接通后端接口：" : "Backend wiring required. Expected: "}<code className="font-mono">GET /admin/stripe-events</code>,{" "}
               <code className="font-mono">POST /admin/stripe-events/&#123;id&#125;/replay</code>.
             </p>
           </div>
@@ -292,7 +294,7 @@ export default function StripeEventsPage() {
         <div className="relative min-w-[240px] flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
-            placeholder="Search id, type, customer…"
+            placeholder={zh ? "搜索 ID、类型或客户…" : "Search id, type, customer…"}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
@@ -304,10 +306,10 @@ export default function StripeEventsPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="processed">Processed</SelectItem>
-            <SelectItem value="failed">Failed</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="all">{zh ? "全部状态" : "All statuses"}</SelectItem>
+            <SelectItem value="processed">{zh ? "已处理" : "Processed"}</SelectItem>
+            <SelectItem value="failed">{zh ? "失败" : "Failed"}</SelectItem>
+            <SelectItem value="pending">{zh ? "待处理" : "Pending"}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -318,7 +320,7 @@ export default function StripeEventsPage() {
           <SelectContent>
             {PAGE_SIZE_OPTIONS.map((n) => (
               <SelectItem key={n} value={String(n)}>
-                {n} / page
+                {zh ? `每页 ${n} 条` : `${n} / page`}
               </SelectItem>
             ))}
           </SelectContent>
@@ -326,11 +328,11 @@ export default function StripeEventsPage() {
 
         <Button size="sm" variant="outline" onClick={load} disabled={loading}>
           <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
-          Refresh
+          {zh ? "刷新" : "Refresh"}
         </Button>
       </div>
 
-      <div className="text-muted-foreground text-xs">{total} total</div>
+      <div className="text-muted-foreground text-xs">{zh ? `共 ${total} 条` : `${total} total`}</div>
 
       <DataTable
         columns={columns}
@@ -338,13 +340,13 @@ export default function StripeEventsPage() {
         getRowKey={(e) => e.id}
         loading={loading && events === null}
         onRowClick={(e) => setSelected(e)}
-        empty="No events match."
+        empty={zh ? "没有匹配的事件。" : "No events match."}
       />
 
       {total > 0 && (
         <div className="border-border bg-card flex items-center justify-between rounded-xl border px-4 py-3">
           <span className="text-muted-foreground text-sm">
-            {page * pageSize + 1}–{Math.min(total, (page + 1) * pageSize)} of {total}
+            {zh ? `第 ${page * pageSize + 1}–${Math.min(total, (page + 1) * pageSize)} 条，共 ${total} 条` : `${page * pageSize + 1}–${Math.min(total, (page + 1) * pageSize)} of ${total}`}
           </span>
           <div className="flex items-center gap-1">
             <Button
@@ -352,7 +354,7 @@ export default function StripeEventsPage() {
               size="sm"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={page === 0 || loading}
-              aria-label="Previous page"
+              aria-label={zh ? "上一页" : "Previous page"}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -364,7 +366,7 @@ export default function StripeEventsPage() {
               size="sm"
               onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
               disabled={page >= totalPages - 1 || loading}
-              aria-label="Next page"
+              aria-label={zh ? "下一页" : "Next page"}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -377,19 +379,20 @@ export default function StripeEventsPage() {
         replaying={selected ? replaying === selected.id : false}
         onReplay={handleReplay}
         onClose={() => setSelected(null)}
+        zh={zh}
       />
     </div>
   );
 }
 
-function StatusBadge({ status, attempts }: { status: StripeEvent["status"]; attempts: number }) {
+function StatusBadge({ status, attempts, zh }: { status: StripeEvent["status"]; attempts: number; zh: boolean }) {
   const suffix = attempts > 1 ? ` · ${attempts}×` : "";
   const styles: Record<StripeEvent["status"], string> = {
     processed: "border-border bg-muted text-foreground",
     failed: "border-destructive/30 bg-destructive/10 text-destructive",
     pending: "border-border bg-muted text-muted-foreground",
   };
-  const label = { processed: "Processed", failed: "Failed", pending: "Pending" }[status];
+  const label = zh ? { processed: "已处理", failed: "失败", pending: "待处理" }[status] : { processed: "Processed", failed: "Failed", pending: "Pending" }[status];
   return (
     <span
       className={cn(
@@ -408,11 +411,13 @@ function EventDetailDialog({
   replaying,
   onReplay,
   onClose,
+  zh,
 }: {
   event: StripeEvent | null;
   replaying: boolean;
   onReplay: (e: StripeEvent) => void;
   onClose: () => void;
+  zh: boolean;
 }) {
   return (
     <Dialog open={event !== null} onOpenChange={(open) => !open && onClose()}>
@@ -427,22 +432,22 @@ function EventDetailDialog({
             </DialogHeader>
 
             <dl className="grid gap-3 text-xs sm:grid-cols-2">
-              <KV label="Mode" value={event.livemode ? "live" : "test"} />
-              <KV label="Status" value={event.status} />
-              <KV label="Attempts" value={String(event.attempts)} />
-              <KV label="Created" value={formatDateTime(event.created_at)} />
-              {event.customer_email && <KV label="Customer" value={event.customer_email} />}
+              <KV label={zh ? "模式" : "Mode"} value={event.livemode ? "live" : "test"} />
+              <KV label={zh ? "状态" : "Status"} value={event.status} />
+              <KV label={zh ? "尝试次数" : "Attempts"} value={String(event.attempts)} />
+              <KV label={zh ? "创建时间" : "Created"} value={formatDateTime(event.created_at)} />
+              {event.customer_email && <KV label={zh ? "客户" : "Customer"} value={event.customer_email} />}
               {typeof event.amount_cents === "number" && (
-                <KV label="Amount" value={formatAmount(event.amount_cents, event.currency)} />
+                <KV label={zh ? "金额" : "Amount"} value={formatAmount(event.amount_cents, event.currency)} />
               )}
               {event.last_error && (
-                <KV label="Last error" value={event.last_error} accent="danger" />
+                <KV label={zh ? "最近错误" : "Last error"} value={event.last_error} accent="danger" />
               )}
             </dl>
 
             <div className="space-y-1.5">
               <p className="text-muted-foreground font-mono text-[10px] tracking-wider uppercase">
-                Payload
+                {zh ? "载荷" : "Payload"}
               </p>
               <pre className="bg-muted border-border text-foreground max-h-64 overflow-auto rounded-xl border p-3 font-mono text-xs leading-relaxed">
                 {JSON.stringify(event, null, 2)}
@@ -456,12 +461,12 @@ function EventDetailDialog({
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-xs"
               >
-                Open in Stripe
+                {zh ? "在 Stripe 中打开" : "Open in Stripe"}
                 <ExternalLink className="h-3 w-3" />
               </a>
               <Button size="sm" variant="outline" disabled={replaying} onClick={() => onReplay(event)}>
                 <RefreshCw className={cn("h-3.5 w-3.5", replaying && "animate-spin")} />
-                Replay
+                {zh ? "重放" : "Replay"}
               </Button>
             </DialogFooter>
           </>

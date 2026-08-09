@@ -1,14 +1,5 @@
 import { getRequestConfig } from "next-intl/server";
-
-{%- if cookiecutter.enable_i18n %}
 export const locales = ["en", "pl", "zh"] as const;
-{%- else %}
-// i18n disabled at generation time — locked to a single locale.
-// To re-enable multi-language: regenerate with --i18n, or extend this list and
-// add `messages/<code>.json`, then re-render the LanguageSwitcher import in
-// `components/layout/header.tsx`.
-export const locales = ["en"] as const;
-{%- endif %}
 export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = "en";
@@ -20,19 +11,24 @@ export default getRequestConfig(async ({ requestLocale }) => {
     locale = defaultLocale;
   }
 
+  const messages = (await import(`../messages/${locale}.json`)).default;
+
   return {
     locale,
-    messages: (await import(`../messages/${locale}.json`)).default,
+    messages: {
+      ...messages,
+      // Admin copy extends the shared navigation vocabulary while keeping
+      // page-specific translations in the admin namespace.
+      admin: { ...messages.nav, ...messages.admin },
+    },
   };
 });
 
 export function getLocaleLabel(locale: Locale): string {
   const labels: Record<Locale, string> = {
     en: "English",
-{%- if cookiecutter.enable_i18n %}
     pl: "Polski",
     zh: "中文",
-{%- endif %}
   };
   return labels[locale];
 }
@@ -40,10 +36,8 @@ export function getLocaleLabel(locale: Locale): string {
 export function getLocaleFlag(locale: Locale): string {
   const flags: Record<Locale, string> = {
     en: "🇬🇧",
-{%- if cookiecutter.enable_i18n %}
     pl: "🇵🇱",
     zh: "🇨🇳",
-{%- endif %}
   };
   return flags[locale];
 }

@@ -96,6 +96,7 @@ function SortButton({
 }
 
 function DemoToggle({ conv, onToggle }: { conv: Conversation; onToggle: (id: string, isDemo: boolean) => void }) {
+  const t = useTranslations("admin");
   const [busy, setBusy] = useState(false);
   const toggle = async () => {
     setBusy(true);
@@ -106,13 +107,13 @@ function DemoToggle({ conv, onToggle }: { conv: Conversation; onToggle: (id: str
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        toast.error(body?.detail ?? `Failed (${res.status})`);
+        toast.error(body?.detail ?? t("requestFailed", { status: res.status }));
         return;
       }
       onToggle(conv.id, next);
-      toast.success(next ? "Added to demos" : "Removed from demos");
+      toast.success(next ? t("addedToDemos") : t("removedFromDemos"));
     } catch {
-      toast.error("Network error — could not update demo status");
+      toast.error(t("demoNetworkError"));
     } finally {
       setBusy(false);
     }
@@ -123,7 +124,7 @@ function DemoToggle({ conv, onToggle }: { conv: Conversation; onToggle: (id: str
         type="button"
         disabled={busy}
         onClick={toggle}
-        title={conv.is_demo ? "Remove from demos" : "Add to demos"}
+        title={conv.is_demo ? t("removeFromDemos") : t("addToDemos")}
         className={cn(
           "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium transition-colors",
           conv.is_demo
@@ -133,13 +134,13 @@ function DemoToggle({ conv, onToggle }: { conv: Conversation; onToggle: (id: str
         )}
       >
         <Play className="h-2.5 w-2.5" />
-        {conv.is_demo ? "In demos" : "Add demo"}
+        {conv.is_demo ? t("inDemos") : t("addDemo")}
       </button>
       {conv.is_demo && (
         <Link
           href={`/demo/${conv.id}`}
           target="_blank"
-          title="Watch demo"
+          title={t("watchDemo")}
           className="text-brand/70 hover:text-brand transition-colors"
         >
           <ExternalLink className="h-3 w-3" />
@@ -276,16 +277,16 @@ export default function AdminConversationsPage() {
         header: t("status"),
         cell: (conv) =>
           conv.is_archived ? (
-            <Badge variant="secondary">Archived</Badge>
+            <Badge variant="secondary">{t("archived")}</Badge>
           ) : (
-            <Badge variant="default">Active</Badge>
+            <Badge variant="default">{t("active")}</Badge>
           ),
       },
       {
         key: "demo",
         align: "right",
         hideBelow: "sm",
-        header: "Demo",
+        header: t("demo"),
         cell: (conv) => <DemoToggle conv={conv} onToggle={handleDemoToggle} />,
       },
       {
@@ -324,9 +325,9 @@ export default function AdminConversationsPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="archived">Archived</SelectItem>
-            <SelectItem value="all">All</SelectItem>
+            <SelectItem value="active">{t("active")}</SelectItem>
+            <SelectItem value="archived">{t("archived")}</SelectItem>
+            <SelectItem value="all">{t("all")}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -335,10 +336,10 @@ export default function AdminConversationsPage() {
           onValueChange={(v) => setSelectedUserId(v === "all" ? null : v)}
         >
           <SelectTrigger className="w-[260px]">
-            <SelectValue placeholder="All owners" />
+            <SelectValue placeholder={t("allOwners")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All owners</SelectItem>
+            <SelectItem value="all">{t("allOwners")}</SelectItem>
             {userOptions.map((u) => (
               <SelectItem key={u.id} value={u.id}>
                 <span className="flex items-center gap-2">
@@ -357,14 +358,14 @@ export default function AdminConversationsPage() {
           <SelectContent>
             {PAGE_SIZE_OPTIONS.map((n) => (
               <SelectItem key={n} value={String(n)}>
-                {n} / page
+                {t("perPage", { count: n })}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
-      <div className="text-muted-foreground text-xs">{conversationsTotal} total</div>
+      <div className="text-muted-foreground text-xs">{t("total", { count: conversationsTotal })}</div>
 
       <DataTable<Conversation>
         columns={columns}
@@ -405,13 +406,14 @@ function PaginationBar({
   onPrev: () => void;
   onNext: () => void;
 }) {
+  const t = useTranslations("admin");
   if (total === 0) return null;
   const start = page * pageSize + 1;
   const end = Math.min(total, (page + 1) * pageSize);
   return (
     <div className="flex items-center justify-between">
       <span className="text-muted-foreground text-sm">
-        {start}–{end} of {total}
+        {t("rangeOfTotal", { start, end, total })}
       </span>
       <div className="flex items-center gap-1">
         <Button
@@ -419,7 +421,7 @@ function PaginationBar({
           size="sm"
           onClick={onPrev}
           disabled={page === 0 || isLoading}
-          aria-label="Previous page"
+          aria-label={t("previousPage")}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -431,7 +433,7 @@ function PaginationBar({
           size="sm"
           onClick={onNext}
           disabled={page >= totalPages - 1 || isLoading}
-          aria-label="Next page"
+          aria-label={t("nextPage")}
         >
           <ChevronRight className="h-4 w-4" />
         </Button>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { ArrowRight } from "lucide-react";
 
@@ -12,9 +12,12 @@ import { useAuth } from "@/hooks";
 import { ApiError } from "@/lib/api-client";
 import { ROUTES } from "@/lib/constants";
 import { EMAIL_RE } from "@/lib/utils";
+import { localizedPath } from "@/lib/locale-path";
+import type { Locale } from "@/i18n";
 
 export function LoginForm() {
   const t = useTranslations("auth");
+  const locale = useLocale() as Locale;
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +36,7 @@ export function LoginForm() {
       await login({ email, password });
       toast.success(t("loginSuccess"));
     } catch (err) {
-      const message = err instanceof ApiError ? err.message : "Login failed. Please try again.";
+      const message = err instanceof ApiError ? err.message : t("loginFailed");
       setError(message);
       toast.error(message);
       setIsLoading(false);
@@ -45,12 +48,12 @@ export function LoginForm() {
       <div className="space-y-2">
         <span className="eyebrow text-foreground/55">{t("welcomeBack")}</span>
         <h1 className="text-display-md text-foreground [&_em]:font-accent [&_em]:font-normal [&_em]:italic">
-          Sign in to <em>your workspace.</em>
+          {t.rich("loginHeading", { emphasis: (chunks) => <em>{chunks}</em> })}
         </h1>
         <p className="text-foreground/65 text-sm">
           {t("noAccount")}{" "}
           <Link
-            href={ROUTES.REGISTER}
+            href={localizedPath(locale, ROUTES.REGISTER)}
             className="text-foreground hover:text-foreground/80 font-medium underline-offset-4 hover:underline"
           >
             {t("register")}
@@ -92,7 +95,7 @@ export function LoginForm() {
               {t("password")}
             </Label>
             <Link
-              href={ROUTES.FORGOT_PASSWORD}
+              href={localizedPath(locale, ROUTES.FORGOT_PASSWORD)}
               className="text-foreground/55 hover:text-foreground text-xs font-medium underline-offset-4 hover:underline"
             >
               {t("forgotShort")}

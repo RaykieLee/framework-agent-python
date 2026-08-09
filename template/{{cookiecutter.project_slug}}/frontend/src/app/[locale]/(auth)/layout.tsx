@@ -1,15 +1,12 @@
-{% raw %}import Link from "next/link";
+import Link from "next/link";
 import { Sparkles } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 import { APP_NAME, ROUTES } from "@/lib/constants";
 
-const HIGHLIGHTS = [
-  "Streaming chat with tool calls",
-  "Knowledge base over your docs",
-  "Stripe billing & teams in a click",
-];
-
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+export default async function AuthLayout({ children }: { children: React.ReactNode }) {
+  const t = await getTranslations("auth.marketing");
+  const highlights = [t("highlightChat"), t("highlightKnowledge"), t("highlightBilling")];
   return (
     <div className="bg-background text-foreground min-h-screen lg:grid lg:grid-cols-[1.1fr_minmax(0,560px)]">
       <main id="main" className="theme-light bg-background text-foreground relative flex flex-col">
@@ -43,21 +40,20 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="relative z-10">
             <span className="eyebrow-badge inline-flex items-center gap-2">
               <Sparkles className="h-3 w-3" aria-hidden />
-              An AI assistant that knows your team&apos;s work
+              {t("badge")}
             </span>
           </div>
 
           <div className="relative z-10 max-w-[28rem]">
             <h2 className="text-display-lg text-foreground [&_em]:font-accent mb-6 leading-[1.05] [&_em]:font-normal [&_em]:italic">
-              Ship the AI feature <em>your team</em> actually wants.
+              {t.rich("heading", { emphasis: (chunks) => <em>{chunks}</em> })}
             </h2>
             <p className="text-foreground/65 max-w-md text-base leading-relaxed">
-              Auth, billing, vector search, agents — already wired. You ship the product, not the
-              plumbing.
+              {t("description")}
             </p>
 
             <ul className="mt-10 space-y-3">
-              {HIGHLIGHTS.map((line) => (
+              {highlights.map((line) => (
                 <li key={line} className="text-foreground/85 flex items-center gap-3 text-sm">
                   <span aria-hidden className="bg-brand h-1.5 w-1.5 shrink-0 rounded-full" />
                   {line}
@@ -68,7 +64,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
           <figure className="border-foreground/10 bg-card/40 relative z-10 max-w-md rounded-2xl border p-5 backdrop-blur-xl">
             <blockquote className="text-foreground/90 text-sm leading-relaxed">
-              &ldquo;Replaced four SaaS tools and shipped our first AI feature in two weeks.&rdquo;
+              &ldquo;{t("quote")}&rdquo;
             </blockquote>
             <figcaption className="mt-4 flex items-center gap-3">
               <span
@@ -78,8 +74,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
                 EP
               </span>
               <div>
-                <p className="text-foreground text-sm font-semibold">Eli Park</p>
-                <p className="text-foreground/55 text-xs">Founder · Vellum Labs</p>
+                <p className="text-foreground text-sm font-semibold">{t("quoteName")}</p>
+                <p className="text-foreground/55 text-xs">{t("quoteRole")}</p>
               </div>
             </figcaption>
           </figure>
@@ -88,4 +84,3 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     </div>
   );
 }
-{% endraw %}

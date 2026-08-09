@@ -21,7 +21,7 @@ import { apiClient } from "@/lib/api-client";
 import { ROUTES } from "@/lib/constants";
 import { formatCurrency, timeAgo } from "@/lib/utils";
 import { localizedPath } from "@/lib/locale-path";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import type { Locale } from "@/i18n";
 
 interface AdminStats {
@@ -51,6 +51,7 @@ const EVENT_ICON: Record<RecentEvent["type"], LucideIcon> = {
 
 export default function AdminOverviewPage() {
   const locale = useLocale() as Locale;
+  const t = useTranslations("admin");
   const statsQuery = useQuery({
     queryKey: ["admin", "stats"],
     queryFn: async (): Promise<AdminStats> => {
@@ -80,8 +81,8 @@ export default function AdminOverviewPage() {
       return convs.items.map((c) => ({
         id: c.id,
         type: "conversation_created" as const,
-        title: c.title || "New conversation",
-        description: c.user_email ? `by ${c.user_email}` : "",
+        title: c.title || t("newConversation"),
+        description: c.user_email ? t("byUser", { email: c.user_email }) : "",
         timestamp: c.created_at,
       }));
     },
@@ -103,7 +104,7 @@ export default function AdminOverviewPage() {
           }}
         >
           <RefreshCw className={refreshing ? "h-3.5 w-3.5 animate-spin" : "h-3.5 w-3.5"} />
-          Refresh
+          {t("refresh")}
         </Button>
       </div>
 
@@ -111,19 +112,17 @@ export default function AdminOverviewPage() {
         <LoadingState variant="stats" rows={4} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="Total users" value={(stats?.total_users ?? 0).toLocaleString()} icon={Users} />
+          <StatCard label={t("totalUsers")} value={(stats?.total_users ?? 0).toLocaleString()} icon={Users} />
           <StatCard
-            label="Active 24h"
+            label={t("active24h")}
             value={(stats?.active_users_24h ?? 0).toLocaleString()}
             icon={Activity}
           />
-{%- if cookiecutter.use_ai %}
           <StatCard
-            label="Conversations"
+            label={t("conversations")}
             value={(stats?.total_conversations ?? 0).toLocaleString()}
             icon={MessageSquare}
           />
-{%- endif %}
           <StatCard
             label="MRR"
             value={
@@ -137,38 +136,34 @@ export default function AdminOverviewPage() {
       )}
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <QuickLink href={localizedPath(locale, ROUTES.ADMIN_USERS)} icon={Users} title="Manage users" description="Search, suspend, impersonate" />
-{%- if cookiecutter.use_ai %}
+        <QuickLink href={localizedPath(locale, ROUTES.ADMIN_USERS)} icon={Users} title={t("manageUsers")} description={t("manageUsersDesc")} />
         <QuickLink
           href={localizedPath(locale, ROUTES.ADMIN_CONVERSATIONS)}
           icon={MessageSquare}
-          title="Browse chats"
-          description="All conversations across users"
+          title={t("browseChats")}
+          description={t("browseChatsDesc")}
         />
-{%- endif %}
         <QuickLink
           href={localizedPath(locale, ROUTES.ADMIN_STRIPE_EVENTS)}
           icon={CreditCard}
-          title="Stripe events"
-          description="Replay webhooks, debug billing"
+          title={t("stripeEvents")}
+          description={t("stripeEventsDesc")}
         />
-        <QuickLink href={localizedPath(locale, ROUTES.ADMIN_SYSTEM)} icon={Activity} title="System health" description="Per-service status & uptime" />
-{%- if cookiecutter.use_ai %}
-        <QuickLink href={localizedPath(locale, ROUTES.ADMIN_RATINGS)} icon={Star} title="Response ratings" description="Quality signals from users" />
-{%- endif %}
+        <QuickLink href={localizedPath(locale, ROUTES.ADMIN_SYSTEM)} icon={Activity} title={t("systemHealth")} description={t("systemHealthDesc")} />
+        <QuickLink href={localizedPath(locale, ROUTES.ADMIN_RATINGS)} icon={Star} title={t("responseRatings")} description={t("responseRatingsDesc")} />
       </section>
 
       <section className="border-border bg-card rounded-xl border">
         <div className="border-border border-b px-5 py-4">
-          <h2 className="text-foreground text-sm font-semibold">Recent activity</h2>
-          <p className="text-muted-foreground text-xs">Workspace-wide events across all users.</p>
+          <h2 className="text-foreground text-sm font-semibold">{t("recentActivity")}</h2>
+          <p className="text-muted-foreground text-xs">{t("recentActivityDesc")}</p>
         </div>
         {events === undefined ? (
           <div className="p-5">
             <LoadingState variant="skeleton-list" rows={5} />
           </div>
         ) : events.length === 0 ? (
-          <div className="text-muted-foreground px-5 py-12 text-center text-sm">No recent events.</div>
+          <div className="text-muted-foreground px-5 py-12 text-center text-sm">{t("noRecentEvents")}</div>
         ) : (
           <ul className="divide-border divide-y">
             {events.map((e) => {
