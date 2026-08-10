@@ -1,6 +1,7 @@
 {% raw %}import { Bot, FileText, Search, TrendingUp, User, Wrench } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useLocale } from "next-intl";
 
 type MockupKind = "agents" | "rag" | "billing";
 
@@ -35,12 +36,13 @@ function MockFrame({ children, className }: { children: React.ReactNode; classNa
 }
 
 function AgentMockup({ className }: { className?: string }) {
+  const zh = useLocale() === "zh";
   return (
     <MockFrame className={className}>
       <div className="space-y-3 p-4">
         <div className="flex justify-end">
           <div className="bg-foreground text-background flex max-w-[80%] items-center gap-2 rounded-2xl rounded-tr-sm px-3 py-2 text-xs">
-            <span>Find churn signals in last quarter.</span>
+            <span>{zh ? "查找上季度的流失信号。" : "Find churn signals in last quarter."}</span>
             <User className="h-3 w-3 opacity-60" />
           </div>
         </div>
@@ -56,16 +58,16 @@ function AgentMockup({ className }: { className?: string }) {
           <div className="bg-card border-foreground/10 max-w-[88%] rounded-2xl rounded-tl-sm border p-3">
             <div className="text-foreground/55 mb-1.5 flex items-center gap-1.5">
               <Bot className="h-3 w-3" />
-              <span className="font-mono text-[10px] tracking-wider uppercase">Assistant</span>
+              <span className="font-mono text-[10px] tracking-wider uppercase">{zh ? "助手" : "Assistant"}</span>
             </div>
             <p className="text-foreground text-xs leading-relaxed">
-              137 sessions. Top friction: setup confusion (58%), Stripe webhooks (22%)…
+              {zh ? "137 场会话。主要阻碍：配置困惑（58%）、Stripe Webhook（22%）……" : "137 sessions. Top friction: setup confusion (58%), Stripe webhooks (22%)…"}
             </p>
           </div>
         </div>
 
         <div className="border-foreground/10 mt-2 flex items-center gap-2 rounded-lg border px-3 py-2">
-          <span className="text-foreground/40 flex-1 text-xs">Ask anything…</span>
+          <span className="text-foreground/40 flex-1 text-xs">{zh ? "问任何问题……" : "Ask anything…"}</span>
           <kbd className="border-foreground/15 text-foreground/50 inline-flex items-center gap-0.5 rounded border px-1.5 py-0.5 font-mono text-[10px]">
             ⌘ ↵
           </kbd>
@@ -76,6 +78,7 @@ function AgentMockup({ className }: { className?: string }) {
 }
 
 function RagMockup({ className }: { className?: string }) {
+  const zh = useLocale() === "zh";
   const RESULTS = [
     {
       title: "onboarding-feedback-q1.pdf",
@@ -98,7 +101,7 @@ function RagMockup({ className }: { className?: string }) {
       <div className="p-4">
         <div className="border-foreground/10 mb-3 flex items-center gap-2 rounded-lg border px-3 py-2">
           <Search className="text-foreground/40 h-3.5 w-3.5" />
-          <span className="text-foreground text-xs">churn signals</span>
+          <span className="text-foreground text-xs">{zh ? "流失信号" : "churn signals"}</span>
         </div>
         <ul className="space-y-2.5">
           {RESULTS.map((r) => (
@@ -122,6 +125,7 @@ function RagMockup({ className }: { className?: string }) {
 }
 
 function BillingMockup({ className }: { className?: string }) {
+  const zh = useLocale() === "zh";
   const bars = [22, 28, 32, 30, 38, 42, 48, 45, 52, 58, 64, 72];
   const max = Math.max(...bars);
   return (
@@ -129,14 +133,14 @@ function BillingMockup({ className }: { className?: string }) {
       <div className="space-y-4 p-4">
         <div>
           <p className="text-foreground/55 font-mono text-[10px] tracking-wider uppercase">
-            Monthly recurring
+            {zh ? "月度经常性收入" : "Monthly recurring"}
           </p>
           <p className="text-foreground font-display mt-1 text-3xl font-bold tracking-tight">
             $2,840
           </p>
           <p className="text-brand mt-0.5 flex items-center gap-1 text-xs font-medium">
             <TrendingUp className="h-3 w-3" />
-            +18% vs last month
+            {zh ? "较上月 +18%" : "+18% vs last month"}
           </p>
         </div>
 
@@ -157,15 +161,15 @@ function BillingMockup({ className }: { className?: string }) {
 
         <div className="border-foreground/10 grid grid-cols-3 gap-2 border-t pt-3">
           <div>
-            <p className="text-foreground/45 font-mono text-[10px] uppercase">Active</p>
+            <p className="text-foreground/45 font-mono text-[10px] uppercase">{zh ? "活跃" : "Active"}</p>
             <p className="text-foreground font-mono text-sm font-medium">186</p>
           </div>
           <div>
-            <p className="text-foreground/45 font-mono text-[10px] uppercase">Trials</p>
+            <p className="text-foreground/45 font-mono text-[10px] uppercase">{zh ? "试用" : "Trials"}</p>
             <p className="text-foreground font-mono text-sm font-medium">42</p>
           </div>
           <div>
-            <p className="text-foreground/45 font-mono text-[10px] uppercase">Churn</p>
+            <p className="text-foreground/45 font-mono text-[10px] uppercase">{zh ? "流失" : "Churn"}</p>
             <p className="text-foreground font-mono text-sm font-medium">2.1%</p>
           </div>
         </div>

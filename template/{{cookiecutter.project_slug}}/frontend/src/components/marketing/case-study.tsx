@@ -1,4 +1,5 @@
 {% raw %}import { Quote } from "lucide-react";
+import { useLocale } from "next-intl";
 
 import { AnimatedNumber } from "./animated-number";
 
@@ -11,6 +12,7 @@ interface CaseStudyProps {
 }
 
 export function CaseStudy({ quote, name, role, company, metrics }: CaseStudyProps) {
+  const zh = useLocale() === "zh";
   return (
     <div className="border-foreground/12 bg-foreground/[0.02] relative isolate overflow-hidden rounded-3xl border p-8 md:p-14">
       <div
@@ -25,7 +27,7 @@ export function CaseStudy({ quote, name, role, company, metrics }: CaseStudyProp
 
       <div className="grid gap-12 md:grid-cols-[1.5fr_1fr] md:items-center">
         <div>
-          <span className="eyebrow-badge mb-8">Case study</span>
+          <span className="eyebrow-badge mb-8">{zh ? "案例研究" : "Case study"}</span>
           <Quote className="text-brand mb-5 h-9 w-9" />
           <blockquote className="text-display-md text-foreground/90 [&_em]:font-accent [&_em]:font-normal [&_em]:italic">
             &ldquo;{quote}&rdquo;

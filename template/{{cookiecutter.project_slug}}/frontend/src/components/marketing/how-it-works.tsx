@@ -1,4 +1,5 @@
 {% raw %}import { ChevronRight, MessageSquare, UploadCloud, UserPlus } from "lucide-react";
+import { useLocale } from "next-intl";
 
 const STEPS = [
   {
@@ -19,9 +20,17 @@ const STEPS = [
 ];
 
 export function HowItWorks() {
+  const zh = useLocale() === "zh";
+  const steps = zh
+    ? [
+        { icon: UserPlus, title: "几秒完成注册", body: "创建账号、邀请团队并选择合适的套餐。试用期无需信用卡。" },
+        { icon: UploadCloud, title: "连接你的数据", body: "上传文档或同步 Google Drive、S3、Notion，助手会学习你带来的内容。" },
+        { icon: MessageSquare, title: "开始用 AI 工作", body: "提问、运行工作流，让 Agent 在网页、移动端和聊天工具中执行任务。" },
+      ]
+    : STEPS;
   return (
     <div className="grid gap-6 md:grid-cols-3 md:gap-8">
-      {STEPS.map((step, i) => (
+      {steps.map((step, i) => (
         <div
           key={step.title}
           className="group border-foreground/15 bg-card lift hover:border-brand/40 relative overflow-hidden rounded-2xl border p-8 transition-colors"
@@ -44,7 +53,7 @@ export function HowItWorks() {
           <h3 className="text-foreground font-display mt-6 text-xl font-bold">{step.title}</h3>
           <p className="text-foreground/65 mt-3 text-sm leading-relaxed">{step.body}</p>
 
-          {i < STEPS.length - 1 && (
+          {i < steps.length - 1 && (
             <div
               aria-hidden
               className="border-border bg-card text-foreground/40 absolute top-1/2 right-[-15px] z-10 hidden h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full border md:flex"

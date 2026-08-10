@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
 import { BrandIcon } from "./brand-icon";
+import { useLocale } from "next-intl";
 
 type BrandName = Parameters<typeof BrandIcon>[0]["name"];
 
@@ -25,18 +26,18 @@ const TOOLS: { name: string; brand: BrandName }[] = [
 ];
 
 export function IntegrationsGrid({ cta }: IntegrationsGridProps) {
+  const zh = useLocale() === "zh";
   return (
     <>
       <div className="mb-14 max-w-2xl">
         <div className="mb-5">
-          <span className="eyebrow-badge">Integrations</span>
+          <span className="eyebrow-badge">{zh ? "集成" : "Integrations"}</span>
         </div>
         <h2 className="text-display-lg text-foreground [&_em]:font-accent [&_em]:font-normal [&_em]:italic">
-          Works with <em>your stack.</em>
+          {zh ? "适配" : "Works with "}<em>{zh ? "你的技术栈。" : "your stack."}</em>
         </h2>
         <p className="text-foreground/70 mt-5 max-w-xl text-lg leading-relaxed">
-          Connect the tools your team already lives in. New integrations ship every month — and the
-          REST API covers the rest.
+          {zh ? "连接团队日常使用的工具。每月持续发布新集成，REST API 覆盖更多场景。" : "Connect the tools your team already lives in. New integrations ship every month — and the REST API covers the rest."}
         </p>
       </div>
 

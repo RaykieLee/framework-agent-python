@@ -1,6 +1,7 @@
 {% raw %}import Link from "next/link";
 import { ArrowUpRight, Database, MessageSquare, Sparkles, Star, Wrench } from "lucide-react";
 import type { ReactNode } from "react";
+import { useLocale } from "next-intl";
 
 import { cn } from "@/lib/utils";
 
@@ -70,6 +71,10 @@ export function Hero({
   stats,
   theme = "dark",
 }: HeroProps) {
+  const zh = useLocale() === "zh";
+  const floatPills = zh
+    ? FLOAT_PILLS.map((pill, i) => ({ ...pill, label: ["实时对话", "连接你的数据", "代表你执行", "始终在线"][i] }))
+    : FLOAT_PILLS;
   return (
     <Section
       theme={theme}
@@ -157,7 +162,7 @@ export function Hero({
           <HeroDemo />
         </div>
 
-        {FLOAT_PILLS.map((pill) => (
+        {floatPills.map((pill) => (
           <div
             key={pill.label}
             className={cn(

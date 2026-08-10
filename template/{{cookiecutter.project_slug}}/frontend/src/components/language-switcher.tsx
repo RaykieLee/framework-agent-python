@@ -41,6 +41,7 @@ export function LanguageSwitcher() {
   const pathname = usePathname();
 
   const handleChange = (newLocale: Locale) => {
+    document.cookie = `NEXT_LOCALE=${newLocale}; Path=/; Max-Age=31536000; SameSite=Lax`;
     router.push(buildLocalizedPath(pathname, newLocale));
   };
 
@@ -96,6 +97,7 @@ export function LanguageSwitcherCompact() {
   }, [open]);
 
   const handleChange = (newLocale: Locale) => {
+    document.cookie = `NEXT_LOCALE=${newLocale}; Path=/; Max-Age=31536000; SameSite=Lax`;
     router.push(buildLocalizedPath(pathname, newLocale));
     setOpen(false);
   };

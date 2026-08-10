@@ -153,7 +153,9 @@ export async function generateMetadata({
   });
 }
 
-export default async function HomePage() {
+export default async function HomePage({ params }: { params: Promise<{ locale: Locale }> }) {
+  const { locale } = await params;
+  const c = (zh: string, en: string) => (locale === "zh" ? zh : en);
   const t = await getTranslations("marketing.landing");
   const tNav = await getTranslations("marketing");
 
@@ -202,17 +204,17 @@ export default async function HomePage() {
 
         <Section theme="light" padding="py-16 md:py-20">
           <Reveal>
-            <LogosStrip label="Trusted by teams across industries" logos={LOGOS} />
+            <LogosStrip label={c("受到各行各业团队的信赖", "Trusted by teams across industries")} logos={LOGOS} />
           </Reveal>
         </Section>
 
         <Section theme="dark" id="how">
           <div className="mb-14 max-w-2xl">
             <div className="mb-5">
-              <span className="eyebrow-badge">How it works</span>
+              <span className="eyebrow-badge">{c("工作原理", "How it works")}</span>
             </div>
             <h2 className="text-display-lg text-foreground [&_em]:font-accent [&_em]:font-normal [&_em]:italic">
-              Get started in <em>three steps.</em>
+              {c("三步开始使用", "Get started in ")}<em>{c("更聪明的团队。", "three steps.")}</em>
             </h2>
           </div>
           <Reveal>
@@ -229,32 +231,32 @@ export default async function HomePage() {
         <Section theme="dark" id="features">
           <Reveal>
             <FeatureBento
-              eyebrow="Connected knowledge"
+              eyebrow={c("连接知识", "Connected knowledge")}
               title={
                 <>
-                  All your data, <em>one assistant.</em>
+                  {c("所有数据，", "All your data, ")}<em>{c("一个助手。", "one assistant.")}</em>
                 </>
               }
-              description="Sync from Google Drive, Notion, Slack, S3 and more. Files stay where they are — we keep them indexed and ready to answer."
-              cta={{ label: "See connected sources", href: ROUTES.RAG }}
+              description={c("同步 Google Drive、Notion、Slack、S3 等数据源。文件保留在原处，我们负责持续索引并随时提供回答。", "Sync from Google Drive, Notion, Slack, S3 and more. Files stay where they are — we keep them indexed and ready to answer.")}
+              cta={{ label: c("查看已连接数据源", "See connected sources"), href: ROUTES.RAG }}
               mockup={<FeatureMockup kind="rag" className="max-w-none" />}
               mockupSide="left"
-              stat={{ value: "20+", label: "connected data sources" }}
+              stat={{ value: "20+", label: c("已连接数据源", "connected data sources") }}
               bullets={[
                 {
                   icon: RefreshCw,
-                  title: "Always up to date",
-                  body: "Documents re-index automatically when they change at the source.",
+                  title: c("始终保持最新", "Always up to date"),
+                  body: c("源文件发生变化时，文档会自动重新索引。", "Documents re-index automatically when they change at the source."),
                 },
                 {
                   icon: Lock,
-                  title: "Granular permissions",
-                  body: "Each user only sees what they're allowed to see. Nothing leaks.",
+                  title: c("细粒度权限", "Granular permissions"),
+                  body: c("每个用户只能看到获授权的内容，信息不会泄露。", "Each user only sees what they're allowed to see. Nothing leaks."),
                 },
                 {
                   icon: Search,
-                  title: "Built-in search",
-                  body: "Find anything across every connected source from one box.",
+                  title: c("内置搜索", "Built-in search"),
+                  body: c("在一个搜索框中查找所有已连接数据源的内容。", "Find anything across every connected source from one box."),
                 },
               ]}
             />
@@ -264,32 +266,32 @@ export default async function HomePage() {
         <Section theme="light">
           <Reveal>
             <FeatureBento
-              eyebrow="AI Chat"
+              eyebrow={c("AI 对话", "AI Chat")}
               title={
                 <>
-                  Answers grounded in <em>your own work.</em>
+                  {c("回答基于", "Answers grounded in ")}<em>{c("你的工作。", "your own work.")}</em>
                 </>
               }
-              description="Ask questions in plain English and get answers with citations. Your assistant remembers context and adapts as your work evolves."
-              cta={{ label: "Try the chat", href: ROUTES.CHAT }}
+              description={c("用自然语言提问，获得带引用的回答。助手会记住上下文，并随着工作变化不断适应。", "Ask questions in plain English and get answers with citations. Your assistant remembers context and adapts as your work evolves.")}
+              cta={{ label: c("试用对话", "Try the chat"), href: ROUTES.CHAT }}
               mockup={<FeatureMockup kind="agents" className="max-w-none" />}
               mockupSide="right"
               stat={{ value: "100%", label: "answers cite their sources" }}
               bullets={[
                 {
                   icon: Quote,
-                  title: "Cites sources, every time",
-                  body: "Every answer links back to the document or ticket it came from.",
+                  title: c("每次回答都引用来源", "Cites sources, every time"),
+                  body: c("每个回答都会链接回对应的文档或工单。", "Every answer links back to the document or ticket it came from."),
                 },
                 {
                   icon: Workflow,
-                  title: "Multi-step reasoning",
-                  body: "Breaks complex requests into steps and acts on each.",
+                  title: c("多步推理", "Multi-step reasoning"),
+                  body: c("将复杂请求拆分为多个步骤并逐一执行。", "Breaks complex requests into steps and acts on each."),
                 },
                 {
                   icon: Smartphone,
-                  title: "Works on web and mobile",
-                  body: "Identical across devices, plus Slack and Teams integrations.",
+                  title: c("支持网页和移动端", "Works on web and mobile"),
+                  body: c("跨设备体验一致，并支持 Slack 和 Teams 集成。", "Identical across devices, plus Slack and Teams integrations."),
                 },
               ]}
             />
@@ -299,32 +301,32 @@ export default async function HomePage() {
         <Section theme="dark">
           <Reveal>
             <FeatureBento
-              eyebrow="Insights"
+              eyebrow={c("洞察", "Insights")}
               title={
                 <>
-                  Know what your team <em>is asking.</em>
+                  {c("了解团队", "Know what your team ")}<em>{c("正在问什么。", "is asking.")}</em>
                 </>
               }
-              description="A live dashboard of every question asked, answer rated, and workflow run. Spot gaps, find power users, and prove the ROI."
-              cta={{ label: "Explore the dashboard", href: ROUTES.DASHBOARD }}
+              description={c("实时查看所有问题、回答评分和工作流运行情况，发现知识缺口与高频用户，证明 AI 的投入回报。", "A live dashboard of every question asked, answer rated, and workflow run. Spot gaps, find power users, and prove the ROI.")}
+              cta={{ label: c("查看控制面板", "Explore the dashboard"), href: ROUTES.DASHBOARD }}
               mockup={<FeatureMockup kind="billing" className="max-w-none" />}
               mockupSide="left"
               stat={{ value: "+18%", label: "avg. monthly engagement" }}
               bullets={[
                 {
                   icon: Users,
-                  title: "Usage by team or person",
-                  body: "Drill down to see who's getting value and where questions concentrate.",
+                  title: c("按团队或个人查看用量", "Usage by team or person"),
+                  body: c("深入了解谁在获得价值，以及问题集中在哪里。", "Drill down to see who's getting value and where questions concentrate."),
                 },
                 {
                   icon: ThumbsUp,
-                  title: "Quality feedback loop",
-                  body: "Users rate answers; you see what's working and what to improve.",
+                  title: c("质量反馈闭环", "Quality feedback loop"),
+                  body: c("用户评价回答，你可以了解哪些有效、哪些需要改进。", "Users rate answers; you see what's working and what to improve."),
                 },
                 {
                   icon: Download,
-                  title: "Export to your warehouse",
-                  body: "Stream events to BigQuery, Snowflake or your tools via the API.",
+                  title: c("导出到数据仓库", "Export to your warehouse"),
+                  body: c("通过 API 将事件流式传输到 BigQuery、Snowflake 或其他工具。", "Stream events to BigQuery, Snowflake or your tools via the API."),
                 },
               ]}
             />
@@ -335,14 +337,13 @@ export default async function HomePage() {
           <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 -z-10" />
           <div className="mb-14 max-w-2xl">
             <div className="mb-5">
-              <span className="eyebrow-badge">How it connects</span>
+              <span className="eyebrow-badge">{c("连接方式", "How it connects")}</span>
             </div>
             <h2 className="text-display-lg text-foreground [&_em]:font-accent [&_em]:font-normal [&_em]:italic">
-              Your data flows in. <em>Answers come back.</em>
+              {c("数据流入，", "Your data flows in. ")}<em>{c("答案返回。", "Answers come back.")}</em>
             </h2>
             <p className="text-foreground/70 mt-5 max-w-xl text-lg leading-relaxed">
-              Source documents, conversations, and cloud files are continuously indexed. Every
-              answer is grounded in your own work — with citations back to the source.
+              {c("源文档、对话和云端文件会持续建立索引。每个回答都基于你的工作，并附带返回原始来源的引用。", "Source documents, conversations, and cloud files are continuously indexed. Every answer is grounded in your own work — with citations back to the source.")}
             </p>
           </div>
           <Reveal>
@@ -352,27 +353,27 @@ export default async function HomePage() {
 
         <Section theme="dark" id="security">
           <Reveal>
-            <EnterpriseSecurity cta={{ label: "Read our security overview", href: ROUTES.SECURITY }} />
+            <EnterpriseSecurity cta={{ label: c("阅读安全概览", "Read our security overview"), href: ROUTES.SECURITY }} />
           </Reveal>
         </Section>
 
         <Section theme="light">
           <Reveal>
-            <IntegrationsGrid cta={{ label: "Browse all integrations", href: ROUTES.HELP }} />
+            <IntegrationsGrid cta={{ label: c("浏览全部集成", "Browse all integrations"), href: ROUTES.HELP }} />
           </Reveal>
         </Section>
 
         <Section theme="dark">
           <Reveal>
             <CaseStudy
-              quote="We replaced three internal tools and cut answer time from hours to seconds. Onboarding a new hire used to take a month — now it's a week."
+              quote={c("我们替换了三个内部工具，把回答时间从数小时缩短到几秒。新人入职过去要一个月，现在只需一周。", "We replaced three internal tools and cut answer time from hours to seconds. Onboarding a new hire used to take a month — now it's a week.")}
               name="Marta Kowal"
               role="COO"
               company="Northwind Labs"
               metrics={[
-                { value: "−68%", label: "time to first answer" },
-                { value: "3×", label: "faster onboarding" },
-                { value: "12 hrs", label: "saved per person / week" },
+                { value: "−68%", label: c("首次回答耗时", "time to first answer") },
+                { value: "3×", label: c("入职更快", "faster onboarding") },
+                { value: "12 hrs", label: c("每人每周节省", "saved per person / week") },
               ]}
             />
           </Reveal>
@@ -394,18 +395,18 @@ export default async function HomePage() {
           <Reveal>
             <ComparisonTable
               brand={APP_NAME}
-              alternatives={["Generic AI chat", "DIY / in-house"]}
+              alternatives={[c("通用 AI 对话", "Generic AI chat"), c("自建 / 内部开发", "DIY / in-house")]}
               rows={[
-                { feature: "Grounded in your own data", cells: ["yes", "no", "partial"] },
-                { feature: "Citations on every answer", cells: ["yes", "no", "partial"] },
-                { feature: "Connects to your tools", cells: ["yes", "partial", "partial"] },
+                { feature: c("基于你的数据回答", "Grounded in your own data"), cells: ["yes", "no", "partial"] },
+                { feature: c("每个回答附带引用", "Citations on every answer"), cells: ["yes", "no", "partial"] },
+                { feature: c("连接你的工具", "Connects to your tools"), cells: ["yes", "partial", "partial"] },
                 {
-                  feature: "Enterprise security (SSO, audit)",
+                  feature: c("企业安全（SSO、审计）", "Enterprise security (SSO, audit)"),
                   cells: ["yes", "partial", "partial"],
                 },
-                { feature: "Usage analytics & ROI", cells: ["yes", "no", "partial"] },
-                { feature: "Live in minutes", cells: ["yes", "yes", "no"] },
-                { feature: "Dedicated support", cells: ["yes", "no", "partial"] },
+                { feature: c("用量分析与 ROI", "Usage analytics & ROI"), cells: ["yes", "no", "partial"] },
+                { feature: c("几分钟内上线", "Live in minutes"), cells: ["yes", "yes", "no"] },
+                { feature: c("专属支持", "Dedicated support"), cells: ["yes", "no", "partial"] },
               ]}
             />
           </Reveal>

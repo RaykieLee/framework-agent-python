@@ -2,6 +2,7 @@
 
 import { Bot, FileText, Sparkles, User } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 
 import { cn } from "@/lib/utils";
 
@@ -25,15 +26,19 @@ const SCRIPT = [
  *  message in sequentially (opacity + transform don't affect layout), so the
  *  page never jumps as the loop plays. */
 export function HeroDemo() {
+  const zh = useLocale() === "zh";
+  const script = zh
+    ? SCRIPT.map((m, i) => ({ ...m, text: ["总结本季度客户入职反馈。", "rag.search · 4 个文档 · 12 个片段", "在 137 场入职会话中，主要阻碍是：数据库配置困惑（58%）、Stripe Webhook 配置（22%）和缺少示例项目。" ][i] }))
+    : SCRIPT;
   // SSR + no-JS render everything visible; the loop starts after mount.
-  const [revealed, setRevealed] = useState(SCRIPT.length);
+  const [revealed, setRevealed] = useState(script.length);
 
   useEffect(() => {
     const id = setInterval(() => {
-      setRevealed((r) => (r >= SCRIPT.length ? 1 : r + 1));
+      setRevealed((r) => (r >= script.length ? 1 : r + 1));
     }, 1600);
     return () => clearInterval(id);
-  }, []);
+  }, [script.length]);
 
   return (
     <div className="border-foreground/15 bg-card mx-auto w-full max-w-5xl overflow-hidden rounded-2xl border shadow-2xl">
@@ -47,7 +52,7 @@ export function HeroDemo() {
       </div>
 
       <div className="space-y-4 p-5 md:p-8">
-        {SCRIPT.map((msg, i) => {
+        {script.map((msg, i) => {
           const shown = i < revealed;
           const reveal = cn(
             "transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
@@ -78,7 +83,7 @@ export function HeroDemo() {
               <div className="bg-card border-foreground/10 max-w-[85%] rounded-2xl rounded-tl-sm border p-5">
                 <div className="text-foreground/55 mb-2.5 flex items-center gap-2 text-xs">
                   <Bot className="h-3.5 w-3.5" />
-                  <span className="eyebrow">Assistant</span>
+                  <span className="eyebrow">{zh ? "助手" : "Assistant"}</span>
                   {shown && i === revealed - 1 && (
                     <span className="bg-brand ml-auto inline-block h-2 w-2 animate-pulse rounded-full" />
                   )}
@@ -92,7 +97,7 @@ export function HeroDemo() {
 
       <div className="border-foreground/10 bg-background flex items-center gap-3 border-t px-5 py-4">
         <Sparkles className="text-foreground/40 h-4 w-4" />
-        <span className="text-foreground/40 flex-1 text-sm">Ask anything…</span>
+        <span className="text-foreground/40 flex-1 text-sm">{zh ? "问任何问题……" : "Ask anything…"}</span>
         <kbd className="border-foreground/15 text-foreground/50 inline-flex items-center gap-1 rounded border px-2 py-1 font-mono text-xs">
           ⌘ ↵
         </kbd>

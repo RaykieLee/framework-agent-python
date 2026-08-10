@@ -1,4 +1,5 @@
 {% raw %}import { Star } from "lucide-react";
+import { useLocale } from "next-intl";
 
 interface Testimonial {
   quote: string;
@@ -21,6 +22,7 @@ const INITIALS = (name: string) =>
     .toUpperCase();
 
 export function TestimonialGrid({ items }: TestimonialGridProps) {
+  const zh = useLocale() === "zh";
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {items.map((t, i) => (
@@ -28,7 +30,7 @@ export function TestimonialGrid({ items }: TestimonialGridProps) {
           key={`${t.name}-${i}`}
           className="border-foreground/15 bg-card lift hover:border-foreground/25 flex flex-col gap-5 rounded-2xl border p-7 transition-colors"
         >
-          <div className="flex items-center gap-0.5" aria-label="Rated 5 out of 5">
+          <div className="flex items-center gap-0.5" aria-label={zh ? "五星评价" : "Rated 5 out of 5"}>
             {Array.from({ length: 5 }).map((_, s) => (
               <Star key={s} className="fill-brand text-brand h-4 w-4" />
             ))}

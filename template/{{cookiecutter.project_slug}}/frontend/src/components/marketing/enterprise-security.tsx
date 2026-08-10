@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useLocale } from "next-intl";
 
 interface EnterpriseSecurityProps {
   cta?: { label: string; href: string };
@@ -44,6 +45,10 @@ const FEATURES: { icon: LucideIcon; title: string; body: string }[] = [
 const COMPLIANCE = ["SOC 2 Type II", "GDPR", "ISO 27001", "HIPAA"];
 
 export function EnterpriseSecurity({ cta }: EnterpriseSecurityProps) {
+  const zh = useLocale() === "zh";
+  const features = zh
+    ? FEATURES.map((f, i) => ({ ...f, title: ["SSO 与 SAML", "基于角色的访问", "端到端加密", "审计日志"][i], body: ["使用 Okta、Google、Azure AD 和任意 SAML 提供商一键登录。", "细粒度角色和权限，确保每个人只看到应有内容。", "静态 AES-256 加密，传输 TLS 1.3。密钥和数据都属于你。", "记录每项操作，可导出用于合规审查。"][i] }))
+    : FEATURES;
   return (
     <div className="grid grid-cols-1 gap-4 md:auto-rows-[200px] md:grid-cols-4">
       <div className={cn(CARD, "md:col-span-2 md:row-span-2", "flex flex-col p-8")}>
@@ -53,13 +58,12 @@ export function EnterpriseSecurity({ cta }: EnterpriseSecurityProps) {
           style={{ background: "oklch(from var(--color-brand) l c h / 0.18)" }}
         />
         <div className="relative z-10 flex h-full flex-col">
-          <span className="eyebrow-badge mb-6 self-start">Enterprise-ready</span>
+          <span className="eyebrow-badge mb-6 self-start">{zh ? "企业级能力" : "Enterprise-ready"}</span>
           <h2 className="text-display-md text-foreground [&_em]:font-accent [&_em]:text-foreground/85 [&_em]:font-normal [&_em]:italic">
-            Security and control, <em>built in.</em>
+            {zh ? "安全与控制，" : "Security and control, "}<em>{zh ? "开箱即用。" : "built in."}</em>
           </h2>
           <p className="text-foreground/70 mt-4 max-w-md text-base leading-relaxed">
-            From day one your data is encrypted, access-controlled and audited. Enterprise teams get
-            SSO, data residency and a dedicated success manager.
+            {zh ? "从第一天起，你的数据就受到加密、访问控制和审计保护。企业团队还可获得 SSO、数据驻留和专属客户成功经理。" : "From day one your data is encrypted, access-controlled and audited. Enterprise teams get SSO, data residency and a dedicated success manager."}
           </p>
 
           <div className="mt-auto pt-8">
@@ -87,7 +91,7 @@ export function EnterpriseSecurity({ cta }: EnterpriseSecurityProps) {
         </div>
       </div>
 
-      {FEATURES.map((f) => (
+      {features.map((f) => (
         <div key={f.title} className={cn(CARD, "flex flex-col justify-center p-6")}>
           <span
             aria-hidden
