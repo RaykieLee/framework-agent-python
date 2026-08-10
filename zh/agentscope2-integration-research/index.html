@@ -1,0 +1,1755 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Production-Ready AI/LLM Applications — In Minutes, Not Weeks">
+      
+      
+      
+        <link rel="canonical" href="https://vstorm-co.github.io/framework-agent-python/zh/agentscope2-integration-research/">
+      
+      
+      
+      
+        
+          <link rel="alternate" href="/framework-agent-python/" hreflang="en">
+        
+          <link rel="alternate" href="./" hreflang="zh">
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>AgentScope 2 集成研究：从 Python Agent 模板到多 Agent、多知识库和多租户平台 - Full-Stack AI Agent Template</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+  
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+    
+      
+      
+    
+  
+  
+  <style>:root{--md-admonition-icon--note:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M1%207.775V2.75C1%201.784%201.784%201%202.75%201h5.025c.464%200%20.91.184%201.238.513l6.25%206.25a1.75%201.75%200%200%201%200%202.474l-5.026%205.026a1.75%201.75%200%200%201-2.474%200l-6.25-6.25A1.75%201.75%200%200%201%201%207.775m1.5%200c0%20.066.026.13.073.177l6.25%206.25a.25.25%200%200%200%20.354%200l5.025-5.025a.25.25%200%200%200%200-.354l-6.25-6.25a.25.25%200%200%200-.177-.073H2.75a.25.25%200%200%200-.25.25ZM6%205a1%201%200%201%201%200%202%201%201%200%200%201%200-2%22/%3E%3C/svg%3E');--md-admonition-icon--abstract:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M2.5%201.75v11.5c0%20.138.112.25.25.25h3.17a.75.75%200%200%201%200%201.5H2.75A1.75%201.75%200%200%201%201%2013.25V1.75C1%20.784%201.784%200%202.75%200h8.5C12.216%200%2013%20.784%2013%201.75v7.736a.75.75%200%200%201-1.5%200V1.75a.25.25%200%200%200-.25-.25h-8.5a.25.25%200%200%200-.25.25m13.274%209.537zl-4.557%204.45a.75.75%200%200%201-1.055-.008l-1.943-1.95a.75.75%200%200%201%201.062-1.058l1.419%201.425%204.026-3.932a.75.75%200%201%201%201.048%201.074M4.75%204h4.5a.75.75%200%200%201%200%201.5h-4.5a.75.75%200%200%201%200-1.5M4%207.75A.75.75%200%200%201%204.75%207h2a.75.75%200%200%201%200%201.5h-2A.75.75%200%200%201%204%207.75%22/%3E%3C/svg%3E');--md-admonition-icon--info:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M0%208a8%208%200%201%201%2016%200A8%208%200%200%201%200%208m8-6.5a6.5%206.5%200%201%200%200%2013%206.5%206.5%200%200%200%200-13M6.5%207.75A.75.75%200%200%201%207.25%207h1a.75.75%200%200%201%20.75.75v2.75h.25a.75.75%200%200%201%200%201.5h-2a.75.75%200%200%201%200-1.5h.25v-2h-.25a.75.75%200%200%201-.75-.75M8%206a1%201%200%201%201%200-2%201%201%200%200%201%200%202%22/%3E%3C/svg%3E');--md-admonition-icon--tip:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M3.499.75a.75.75%200%200%201%201.5%200v.996C5.9%202.903%206.793%203.65%207.662%204.376l.24.202c-.036-.694.055-1.422.426-2.163C9.1.873%2010.794-.045%2012.622.26%2014.408.558%2016%201.94%2016%204.25c0%201.278-.954%202.575-2.44%202.734l.146.508.065.22c.203.701.412%201.455.476%202.226.142%201.707-.4%203.03-1.487%203.898C11.714%2014.671%2010.27%2015%208.75%2015h-6a.75.75%200%200%201%200-1.5h1.376a4.5%204.5%200%200%201-.563-1.191%203.84%203.84%200%200%201-.05-2.063%204.65%204.65%200%200%201-2.025-.293.75.75%200%200%201%20.525-1.406c1.357.507%202.376-.006%202.698-.318l.009-.01a.747.747%200%200%201%201.06%200%20.75.75%200%200%201-.012%201.074c-.912.92-.992%201.835-.768%202.586.221.74.745%201.337%201.196%201.621H8.75c1.343%200%202.398-.296%203.074-.836.635-.507%201.036-1.31.928-2.602-.05-.603-.216-1.224-.422-1.93l-.064-.221c-.12-.407-.246-.84-.353-1.29a2.4%202.4%200%200%201-.507-.441%203.1%203.1%200%200%201-.633-1.248.75.75%200%200%201%201.455-.364c.046.185.144.436.31.627.146.168.353.305.712.305.738%200%201.25-.615%201.25-1.25%200-1.47-.95-2.315-2.123-2.51-1.172-.196-2.227.387-2.706%201.345-.46.92-.27%201.774.019%203.062l.042.19.01.05c.348.443.666.949.94%201.553a.75.75%200%201%201-1.365.62c-.553-1.217-1.32-1.94-2.3-2.768L6.7%205.527c-.814-.68-1.75-1.462-2.692-2.619a3.7%203.7%200%200%200-1.023.88c-.406.495-.663%201.036-.722%201.508.116.122.306.21.591.239.388.038.797-.06%201.032-.19a.75.75%200%200%201%20.728%201.31c-.515.287-1.23.439-1.906.373-.682-.067-1.473-.38-1.879-1.193L.75%205.677V5.5c0-.984.48-1.94%201.077-2.664.46-.559%201.05-1.055%201.673-1.353z%22/%3E%3C/svg%3E');--md-admonition-icon--success:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M13.78%204.22a.75.75%200%200%201%200%201.06l-7.25%207.25a.75.75%200%200%201-1.06%200L2.22%209.28a.75.75%200%200%201%20.018-1.042.75.75%200%200%201%201.042-.018L6%2010.94l6.72-6.72a.75.75%200%200%201%201.06%200%22/%3E%3C/svg%3E');--md-admonition-icon--question:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M0%208a8%208%200%201%201%2016%200A8%208%200%200%201%200%208m8-6.5a6.5%206.5%200%201%200%200%2013%206.5%206.5%200%200%200%200-13M6.92%206.085h.001a.749.749%200%201%201-1.342-.67c.169-.339.436-.701.849-.977C6.845%204.16%207.369%204%208%204a2.76%202.76%200%200%201%201.637.525c.503.377.863.965.863%201.725%200%20.448-.115.83-.329%201.15-.205.307-.47.513-.692.662-.109.072-.22.138-.313.195l-.006.004a6%206%200%200%200-.26.16%201%201%200%200%200-.276.245.75.75%200%200%201-1.248-.832c.184-.264.42-.489.692-.661q.154-.1.313-.195l.007-.004c.1-.061.182-.11.258-.161a1%201%200%200%200%20.277-.245C8.96%206.514%209%206.427%209%206.25a.61.61%200%200%200-.262-.525A1.27%201.27%200%200%200%208%205.5c-.369%200-.595.09-.74.187a1%201%200%200%200-.34.398M9%2011a1%201%200%201%201-2%200%201%201%200%200%201%202%200%22/%3E%3C/svg%3E');--md-admonition-icon--warning:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M6.457%201.047c.659-1.234%202.427-1.234%203.086%200l6.082%2011.378A1.75%201.75%200%200%201%2014.082%2015H1.918a1.75%201.75%200%200%201-1.543-2.575Zm1.763.707a.25.25%200%200%200-.44%200L1.698%2013.132a.25.25%200%200%200%20.22.368h12.164a.25.25%200%200%200%20.22-.368Zm.53%203.996v2.5a.75.75%200%200%201-1.5%200v-2.5a.75.75%200%200%201%201.5%200M9%2011a1%201%200%201%201-2%200%201%201%200%200%201%202%200%22/%3E%3C/svg%3E');--md-admonition-icon--failure:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M2.344%202.343za8%208%200%200%201%2011.314%2011.314A8.002%208.002%200%200%201%20.234%2010.089a8%208%200%200%201%202.11-7.746m1.06%2010.253a6.5%206.5%200%201%200%209.108-9.275%206.5%206.5%200%200%200-9.108%209.275M6.03%204.97%208%206.94l1.97-1.97a.749.749%200%200%201%201.275.326.75.75%200%200%201-.215.734L9.06%208l1.97%201.97a.749.749%200%200%201-.326%201.275.75.75%200%200%201-.734-.215L8%209.06l-1.97%201.97a.749.749%200%200%201-1.275-.326.75.75%200%200%201%20.215-.734L6.94%208%204.97%206.03a.75.75%200%200%201%20.018-1.042.75.75%200%200%201%201.042-.018%22/%3E%3C/svg%3E');--md-admonition-icon--danger:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M9.504.43a1.516%201.516%200%200%201%202.437%201.713L10.415%205.5h2.123c1.57%200%202.346%201.909%201.22%203.004l-7.34%207.142a1.25%201.25%200%200%201-.871.354h-.302a1.25%201.25%200%200%201-1.157-1.723L5.633%2010.5H3.462c-1.57%200-2.346-1.909-1.22-3.004zm1.047%201.074L3.286%208.571A.25.25%200%200%200%203.462%209H6.75a.75.75%200%200%201%20.694%201.034l-1.713%204.188%206.982-6.793A.25.25%200%200%200%2012.538%207H9.25a.75.75%200%200%201-.683-1.06l2.008-4.418.003-.006-.004-.009-.006-.006-.008-.001q-.005%200-.009.004%22/%3E%3C/svg%3E');--md-admonition-icon--bug:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M4.72.22a.75.75%200%200%201%201.06%200l1%20.999a3.5%203.5%200%200%201%202.441%200l.999-1a.748.748%200%200%201%201.265.332.75.75%200%200%201-.205.729l-.775.776c.616.63.995%201.493.995%202.444v.327q0%20.15-.025.292c.408.14.764.392%201.029.722l1.968-.787a.75.75%200%200%201%20.556%201.392L13%207.258V9h2.25a.75.75%200%200%201%200%201.5H13v.5q-.002.615-.141%201.186l2.17.868a.75.75%200%200%201-.557%201.392l-2.184-.873A5%205%200%200%201%208%2016a5%205%200%200%201-4.288-2.427l-2.183.873a.75.75%200%200%201-.558-1.392l2.17-.868A5%205%200%200%201%203%2011v-.5H.75a.75.75%200%200%201%200-1.5H3V7.258L.971%206.446a.75.75%200%200%201%20.558-1.392l1.967.787c.265-.33.62-.583%201.03-.722a1.7%201.7%200%200%201-.026-.292V4.5c0-.951.38-1.814.995-2.444L4.72%201.28a.75.75%200%200%201%200-1.06m.53%206.28a.75.75%200%200%200-.75.75V11a3.5%203.5%200%201%200%207%200V7.25a.75.75%200%200%200-.75-.75ZM6.173%205h3.654A.17.17%200%200%200%2010%204.827V4.5a2%202%200%201%200-4%200v.327c0%20.096.077.173.173.173%22/%3E%3C/svg%3E');--md-admonition-icon--example:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M5%205.782V2.5h-.25a.75.75%200%200%201%200-1.5h6.5a.75.75%200%200%201%200%201.5H11v3.282l3.666%205.76C15.619%2013.04%2014.543%2015%2012.767%2015H3.233c-1.776%200-2.852-1.96-1.899-3.458Zm-2.4%206.565a.75.75%200%200%200%20.633%201.153h9.534a.75.75%200%200%200%20.633-1.153L12.225%2010.5h-8.45ZM9.5%202.5h-3V6c0%20.143-.04.283-.117.403L4.73%209h6.54L9.617%206.403A.75.75%200%200%201%209.5%206Z%22/%3E%3C/svg%3E');--md-admonition-icon--quote:url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M1.75%202.5h10.5a.75.75%200%200%201%200%201.5H1.75a.75.75%200%200%201%200-1.5m4%205h8.5a.75.75%200%200%201%200%201.5h-8.5a.75.75%200%200%201%200-1.5m0%205h8.5a.75.75%200%200%201%200%201.5h-8.5a.75.75%200%200%201%200-1.5M2.5%207.75v6a.75.75%200%200%201-1.5%200v-6a.75.75%200%200%201%201.5%200%22/%3E%3C/svg%3E');}</style>
+
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config",""),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="pink" data-md-color-accent="pink">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#agentscope-2-python-agent-agent" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+              <button class="md-banner__button md-icon" aria-label="不再显示此消息">
+                
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+              </button>
+            
+            
+<a href="https://github.com/vstorm-co/full-stack-ai-agent-template">
+  <span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg></span>
+  <strong>Star us on GitHub</strong> — Help us reach more developers!
+</a>
+
+          </div>
+          
+            <script>var el=document.querySelector("[data-md-component=announce]");if(el){var content=el.querySelector(".md-typeset");__md_hash(content.innerHTML)===__md_get("__announce")&&(el.hidden=!0)}</script>
+          
+        </aside>
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../" title="Full-Stack AI Agent Template" class="md-header__button md-logo" aria-label="Full-Stack AI Agent Template" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Full-Stack AI Agent Template
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              AgentScope 2 集成研究：从 Python Agent 模板到多 Agent、多知识库和多租户平台
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="pink" data-md-color-accent="pink"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+      <div class="md-header__option">
+  <div class="md-select">
+    
+    <button class="md-header__button md-icon" aria-label="选择当前语言">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.5 17.5 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2zm-2.62 7 1.62-4.33L19.12 17z"/></svg>
+    </button>
+    <div class="md-select__inner">
+      <ul class="md-select__list">
+        
+          <li class="md-select__item">
+            <a href="/framework-agent-python/" hreflang="en" class="md-select__link">
+              English
+            </a>
+          </li>
+        
+          <li class="md-select__item">
+            <a href="./" hreflang="zh" class="md-select__link">
+              中文
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</div>
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="分享" aria-label="分享" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/vstorm-co/framework-agent-python" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vstorm-co/framework-agent-python
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../" title="Full-Stack AI Agent Template" class="md-nav__button md-logo" aria-label="Full-Stack AI Agent Template" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Full-Stack AI Agent Template
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/vstorm-co/framework-agent-python" title="前往仓库" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    vstorm-co/framework-agent-python
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    安装
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    界面展示
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-help/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    获取帮助
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../concepts/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    核心概念
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    核心概念
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    架构
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ai-agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI 智能体
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RAG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frontend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    前端
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../guides/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    指南
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    指南
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    快速开始
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guides/version-upgrade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    版本升级
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    部署
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../observability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    可观测性
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    开发
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../CHANGELOG.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    更新日志
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        结论先行
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-framework-agent-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. framework-agent-python 到底是什么
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. framework-agent-python 到底是什么">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 生成器层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 运行时层
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 已有多租户和知识库能力
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-agentscope-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. AgentScope 2 源码结构与能力
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. AgentScope 2 源码结构与能力">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Agent 与事件模型
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-servicesession" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Service、Session 与消息总线
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 多 Agent 团队
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-rag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 知识库与 RAG
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 长期记忆
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-agentscope" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 AgentScope 自身的多租户边界
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 推荐目标架构
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 分阶段实施路线
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 分阶段实施路线">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 0：固定边界与威胁模型
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-runtime-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1：第六种 runtime，先达到单 Agent 功能对等
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2：持久化 Session 与分布式执行
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3：组织级多 Agent 团队
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-kbrag-adapter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4：原生 KB/RAG adapter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5：长期记忆与远程工作区
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 关键接口建议
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 关键接口建议">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-runtime-adapter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Runtime adapter（首轮暂缓）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-organization-resource-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Organization resource policy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-kb-adapter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 KB adapter
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 高风险点
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 必须补充的测试
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 建议的第一个可交付切片
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-agile-school" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 关于“Agile School”的假设
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="agentscope-2-python-agent-agent">AgentScope 2 集成研究：从 Python Agent 模板到多 Agent、多知识库和多租户平台<a class="headerlink" href="#agentscope-2-python-agent-agent" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>研究基线：<code>framework-agent-python@b57dece92bf5ca3fc8f17722cd9799ca42fb7001</code>，<code>agentscope@9edf84602c3af9399808afa448cd222f8fe1f7f9</code>（AgentScope <code>2.0.5</code>）。</p>
+</blockquote>
+<h2 id="_1">结论先行<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>这两个项目不是互相替换的关系。<code>framework-agent-python</code> 已经具备一个 SaaS Agent 应用所需的大部分控制面：认证、组织和成员角色、按组织隔离的会话、知识库权限、计费、渠道接入及前后端产品骨架；AgentScope 2 更适合作为执行面，提供 Agent 运行时、事件流、团队创建与通信、消息总线、工作区、权限中间件及可扩展 RAG。</p>
+<p>推荐的演进路线是：</p>
+<ol>
+<li>先把 AgentScope 加成模板中的第六种可选 <abbr title="Artificial Intelligence">AI</abbr> runtime，并兼容现有单 Agent <abbr title="Full-duplex communication protocol">WebSocket</abbr> 协议。</li>
+<li>再把 AgentScope session、Redis 消息总线和团队能力接进来。</li>
+<li>知识库先复用模板现有的数据和权限模型，通过适配器供 AgentScope 查询；不要同时维护两套摄取链路。</li>
+<li>最后实现组织级资源授权、长期记忆、分布式工作区和数据库级隔离。</li>
+</ol>
+<p>不建议第一步就直接把 AgentScope 的 FastAPI 子应用公开挂载出来。其当前默认身份依赖临时的 <code>X-User-ID</code> 请求头，源码明确写明未来才会替换为 <abbr title="JSON Web Token">JWT</abbr>；若直接暴露，会绕过模板现有认证边界（<a href="../../agentscope/src/agentscope/app/deps.py#L26-L48">AgentScope deps.py</a>）。</p>
+<h2 id="1-framework-agent-python">1. <code>framework-agent-python</code> 到底是什么<a class="headerlink" href="#1-framework-agent-python" title="Permanent link">&para;</a></h2>
+<p>它不是一个简单的单 Agent demo，而是一个会生成完整 FastAPI + Next.js 应用的项目生成器。</p>
+<h3 id="11">1.1 生成器层<a class="headerlink" href="#11" title="Permanent link">&para;</a></h3>
+<p>当前支持 PydanticAI、Pydantic Deep、LangChain、LangGraph 和 DeepAgents 五种框架（<a href="../fastapi_gen/config.py#L76-L84">config.py</a>）。<abbr title="Artificial Intelligence">AI</abbr> 框架选择会经过下列链路：</p>
+<ul>
+<li><code>ProjectConfig</code> 保存框架、RAG、MCP、subagent、team、tenancy 和 billing 等开关（<a href="../fastapi_gen/config.py#L252-L380">config.py</a>）。</li>
+<li>配置被转换成 Cookiecutter 布尔上下文（<a href="../fastapi_gen/config.py#L798-L835">config.py</a>）。</li>
+<li>Cookiecutter 生成完整应用，并由 post-generation hook 删除未选框架和功能的文件（<a href="../template/hooks/post_gen_project.py#L130-L140">post_gen_project.py</a>）。</li>
+<li>生成结果通过多组合集成测试矩阵验证（<a href="../tests/test_template_integration.py#L191-L204">test_template_integration.py</a>）。</li>
+</ul>
+<p>因此，加入 AgentScope 不能只新增一个 <code>assistant.py</code>；<abbr title="Command Line Interface">CLI</abbr>、配置、Cookiecutter、依赖、清理 hook、运行时分支、文档和生成测试都要一起变化。</p>
+<h3 id="12">1.2 运行时层<a class="headerlink" href="#12" title="Permanent link">&para;</a></h3>
+<p>浏览器通过 <abbr title="Full-duplex communication protocol">WebSocket</abbr> 进入 <code>AgentSession</code>。路由负责认证和连接生命周期，逐轮执行、停止、HITL、历史、知识库和持久化都在 session service 内完成（<a href="../template/%7B%7Bcookiecutter.project_slug%7D%7D/backend/app/api/routes/v1/agent.py#L66-L102">agent.py</a>，<a href="../template/%7B%7Bcookiecutter.project_slug%7D%7D/backend/app/services/agent_session.py#L92-L120">agent_session.py</a>）。</p>
+<p>一次典型调用包括：</p>
+<ol>
+<li>服务端持久化用户消息并确认用户对会话的访问权。</li>
+<li>根据会话保存的 active KB IDs 与当前用户可访问 KB 取交集。</li>
+<li>组装框架 Agent、MCP、subagent 和运行上下文。</li>
+<li>把框架事件翻译成模板统一的 <abbr title="Full-duplex communication protocol">WebSocket</abbr> 事件。</li>
+<li>持久化助手消息、tool call 和 usage，并触发计费。</li>
+</ol>
+<p>除 <abbr title="Full-duplex communication protocol">WebSocket</abbr> 外，渠道调用使用 <code>AgentInvocationService</code>，它也包含各框架的分支（<a href="../template/%7B%7Bcookiecutter.project_slug%7D%7D/backend/app/services/agent_invocation.py#L77-L117">agent_invocation.py</a>）。AgentScope 接入必须同时覆盖这两个入口，否则 Slack/Telegram 与网页行为会不一致。</p>
+<p>当前 <code>agent_session.py</code> 已经按框架复制了大量执行流程。首轮集成接受这一现状，直接新增 AgentScope 专用分支，不同时重构其他五个 runtime，以缩小回归面。AgentScope 分支仍应使用独立 <code>AgentScopeEventAdapter</code> 隔离事件协议，并通过契约测试证明租户、KB、消息和计费行为与现有入口一致；统一 <code>AgentRuntimeAdapter</code> 延后到 AgentScope 功能对等且运行稳定后再评估。</p>
+<h3 id="13">1.3 已有多租户和知识库能力<a class="headerlink" href="#13" title="Permanent link">&para;</a></h3>
+<p>模板目前支持 <code>single</code>、<code>multi_org</code>、<code>platform</code> 三种 tenancy mode；后两者要求启用 teams（<a href="../fastapi_gen/config.py#L203-L208">config.py</a>，<a href="../fastapi_gen/config.py#L528-L533">config.py</a>）。</p>
+<p>已有模型包含：</p>
+<ul>
+<li>Organization 与 owner/admin/member/viewer 角色，以及同一组织内唯一成员关系（<a href="../template/%7B%7Bcookiecutter.project_slug%7D%7D/backend/app/db/models/organization.py#L214-L301">organization.py</a>）。</li>
+<li>Conversation 同时记录 <code>user_id</code>、<code>organization_id</code> 和 active KB IDs（<a href="../template/%7B%7Bcookiecutter.project_slug%7D%7D/backend/app/db/models/conversation.py#L233-L267">conversation.py</a>）。</li>
+<li>Knowledge Base 支持 PERSONAL、ORG、APP 三种 scope，并记录 owner 与 organization（<a href="../template/%7B%7Bcookiecutter.project_slug%7D%7D/backend/app/db/models/knowledge_base.py#L76-L104">knowledge_base.py</a>）。</li>
+<li>KB 查询把个人、应用和当前组织可访问资源组合起来（<a href="../template/%7B%7Bcookiecutter.project_slug%7D%7D/backend/app/repositories/knowledge_base.py#L17-L35">knowledge_base.py repository</a>）。</li>
+<li>Agent 调用前再次将会话所选 KB 与可访问 KB 求交集，阻止客户端伪造跨组织 KB ID（<a href="../template/%7B%7Bcookiecutter.project_slug%7D%7D/backend/app/services/agent_invocation.py#L369-L405">agent_invocation.py</a>）。</li>
+</ul>
+<p>这个隔离目前主要由 service/repository 查询条件保证。源码中未发现 PostgreSQL Row-Level Security 策略，因此它不是数据库强制的租户隔离。现有测试覆盖角色矩阵和 KB scope，但部分 tenancy 测试使用 mock repository，不能等价于真实数据库、缓存和向量库的端到端防泄漏验证。</p>
+<h2 id="2-agentscope-2">2. AgentScope 2 源码结构与能力<a class="headerlink" href="#2-agentscope-2" title="Permanent link">&para;</a></h2>
+<p>AgentScope 2.0.5 要求 Python 3.11+。核心包保持相对精简，FastAPI service、Redis、SQL、workspace、向量数据库、Mem0 和 ReMe 通过 extras 安装（<a href="../../agentscope/pyproject.toml#L21-L160">pyproject.toml</a>）。</p>
+<h3 id="21-agent">2.1 Agent 与事件模型<a class="headerlink" href="#21-agent" title="Permanent link">&para;</a></h3>
+<p><code>Agent</code> 构造器接受 model、toolkit、middleware、state、permission engine 和 background offloader（<a href="../../agentscope/src/agentscope/agent/_agent.py#L110-L172">_agent.py</a>），<code>reply_stream()</code> 产出强类型事件（<a href="../../agentscope/src/agentscope/agent/_agent.py#L250-L315">_agent.py</a>）。事件覆盖文本增量、thinking、tool 调用、HITL、interrupt 和 custom event（<a href="../../agentscope/src/agentscope/event/_event.py#L26-L67">_event.py</a>）。</p>
+<p>这与模板现有 <abbr title="Full-duplex communication protocol">WebSocket</abbr> 协议可以一一适配：</p>
+<table>
+<thead>
+<tr>
+<th>AgentScope 事件</th>
+<th>模板事件/动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TextEvent</code> / delta</td>
+<td>token/text delta</td>
+</tr>
+<tr>
+<td><code>ToolCallEvent</code></td>
+<td>tool-call start/args/result</td>
+</tr>
+<tr>
+<td><code>HumanInTheLoopEvent</code></td>
+<td>ask-user 请求并等待客户端响应</td>
+</tr>
+<tr>
+<td><code>InterruptEvent</code></td>
+<td>stopped/error/final 状态</td>
+</tr>
+<tr>
+<td>model call end/usage</td>
+<td>模板 usage 与 billing service</td>
+</tr>
+<tr>
+<td>custom/team event</td>
+<td>新增 team roster、worker status、message 事件</td>
+</tr>
+</tbody>
+</table>
+<p>这里应建立显式 <code>AgentScopeEventAdapter</code>，而不是让 UI 直接依赖 AgentScope 的事件类。这样框架升级不会扩散到前端和持久化层。</p>
+<h3 id="22-servicesession">2.2 Service、Session 与消息总线<a class="headerlink" href="#22-servicesession" title="Permanent link">&para;</a></h3>
+<p><code>create_app()</code> 可独立运行，也可以作为 <code>/agentscope</code> 子应用挂到现有 FastAPI；它接收 storage、message bus、workspace manager、KB manager、hub、subagent template 和资源访问策略（<a href="../../agentscope/src/agentscope/app/_app.py#L77-L123">_app.py</a>）。</p>
+<p>AgentScope 把调用和事件订阅分离：<code>POST /chat/</code> 触发后台运行，事件从 session <abbr title="Server-Sent Events">SSE</abbr> 流读取（<a href="../../agentscope/src/agentscope/app/_router/_chat.py#L49-L160">_chat.py router</a>，<a href="../../agentscope/src/agentscope/app/_router/_session.py#L710-L866">_session.py router</a>）。MessageBus 负责队列、回放、发布订阅和分布式锁，生产环境应使用 Redis，而不是示例中的进程内实现。</p>
+<p>模板现有 <abbr title="Full-duplex communication protocol">WebSocket</abbr> 可以保留为外部协议，并在内部调用 AgentScope ChatService/Agent；不需要迫使前端同时维护 <abbr title="Full-duplex communication protocol">WebSocket</abbr> 和 <abbr title="Server-Sent Events">SSE</abbr> 两种协议。</p>
+<h3 id="23-agent">2.3 多 Agent 团队<a class="headerlink" href="#23-agent" title="Permanent link">&para;</a></h3>
+<p>AgentScope 的团队不是静态 prompt 技巧，而是一组持久化工具和运行时约束：</p>
+<ul>
+<li><code>TeamCreate</code> 创建 team record，并把 leader session 绑定到该 team。</li>
+<li><code>AgentCreate</code> 只允许 leader 创建 worker，为 worker 创建 agent/session，套用 subagent template 和 permission，然后通过 inbox/message bus 唤醒。</li>
+<li><code>TeamSay</code> 根据实时 roster 向单个成员或全体成员发消息。</li>
+<li><code>AgentInvite</code> 可把已有 agent 的新 session 借入团队。</li>
+<li>worker 默认只获得 TeamSay；leader 或非团队 Agent 才获得创建、邀请和删除等管理工具（<a href="../../agentscope/src/agentscope/app/_service/_toolkit.py#L194-L228">_toolkit.py</a>）。</li>
+</ul>
+<p><code>SubAgentTemplate</code> 可以定义角色说明、system prompt、context、ReAct、permission、task 以及是否继承 leader 的 model/workspace 等（<a href="../../agentscope/src/agentscope/app/_types.py#L83-L132">_types.py</a>）。这正是模板中“团队角色模板”的合适落点。</p>
+<p>关键限制：AgentScope 当前 session 和 team tools 都按调用时的同一个 <code>user_id</code> 读写；它不原生区分“当前操作人”和“组织资源 owner”。ChatService 虽然能通过 ResourceAccessPolicy 运行跨 owner 共享的 Agent/KB，但 session、workspace、消息和新创建的 team 仍属于当前调用人（<a href="../../agentscope/src/agentscope/app/_service/_chat.py#L495-L528">_chat.py service</a>）。因此要区分两种产品语义：</p>
+<ul>
+<li><strong>成员自己的执行团队（建议先做）</strong>：传真实用户 ID。组织 Agent/KB 由 org namespace 持有并通过 policy 分享，但每名成员拥有自己的 session、临时 team、消息和 workspace。原生 AgentScope 模型可以支持。</li>
+<li><strong>组织所有成员共享的持久团队</strong>：在模板完成 <abbr title="JSON Web Token">JWT</abbr>/RBAC 校验后，以 <code>org:{org_uuid}</code> 服务身份调用 AgentScope，同时单独记录真实 <code>actor_user_id</code>。此时 AgentScope 把所有组织成员视为同一 owner，不能再替模板区分 owner/admin/member/viewer；所有变更权限必须在模板入口强制检查。更长期的方案是扩展 AgentScope service/storage <abbr title="Application Programming Interface">API</abbr>，显式拆分 actor 与 owner。</li>
+</ul>
+<p>资源 namespace 建议为：</p>
+<ul>
+<li>个人 Agent：<code>user:{user_uuid}</code></li>
+<li>组织 Agent/Team/KB：<code>org:{org_uuid}</code></li>
+</ul>
+<p>不能只通过改写一个 <code>user_id</code> 同时解决共享和授权。否则，同一组织不同成员会意外得到各自不同的团队，或者为了共享而被 AgentScope 当作同一个可编辑 owner。</p>
+<h3 id="24-rag">2.4 知识库与 RAG<a class="headerlink" href="#24-rag" title="Permanent link">&para;</a></h3>
+<p>AgentScope 同时提供底层 <code>KnowledgeBase</code>、应用层 KB manager 和 <code>RAGMiddleware</code>。底层知识库支持强制 metadata filter，并明确把它作为多租户的纵深防御：写入时强制覆盖 metadata，检索时始终应用过滤器（<a href="../../agentscope/src/agentscope/rag/_knowledge.py#L25-L30">_knowledge.py</a>，<a href="../../agentscope/src/agentscope/rag/_knowledge.py#L288-L333">_knowledge.py</a>）。</p>
+<p>示例 service 使用 <code>CollectionPerKbManager</code>，每个 KB 一个向量 collection。ChatService 先通过 resource access service 找出可见 KB，再为 Agent 注入 RAG middleware（<a href="../../agentscope/src/agentscope/app/_service/_chat.py#L582-L634">_chat.py service</a>）。RAG middleware 支持 agentic search tool 或预先注入上下文两种方式（<a href="../../agentscope/src/agentscope/middleware/_rag.py#L456-L520">_rag.py</a>）。</p>
+<p>模板已经有 KB 元数据、scope、摄取状态和检索工具。第一阶段不应再启动一套 AgentScope KB <abbr title="Create, Read, Update, Delete">CRUD</abbr> 和摄取流程。推荐顺序：</p>
+<ol>
+<li>把模板现有 <code>search_knowledge_base</code> 封装为 AgentScope Tool，快速得到单一数据源的 RAG。</li>
+<li>再实现一个 <code>KnowledgeBaseManagerBase</code>/RAG adapter，从模板 KB repository 解析权限并连接现有向量 collection。</li>
+<li>向量记录同时带 <code>org_id</code>、<code>kb_id</code>、<code>document_id</code>，检索时强制 tenant + KB filter；即使 collection 路由配置错误也不能跨租户返回。</li>
+<li>只有迁移完成后，才考虑让 AgentScope manager 成为唯一摄取入口。</li>
+</ol>
+<h3 id="25">2.5 长期记忆<a class="headerlink" href="#25" title="Permanent link">&para;</a></h3>
+<p>AgentScope 可选 Mem0 和 ReMe。Mem0 示例中同一 <code>user_id</code> 会跨 session 共享记忆；ReMe 更依赖共享 workspace。接入时必须把记忆空间与当前 TenantContext 绑定：个人空间用 user namespace，组织共享空间用 org namespace，并按 Agent/成员需要再分层。ReMe 的 workspace 不能跨租户共用。</p>
+<p>长期记忆应在 KB 集成之后实施，因为它还需要单独解决用户授权、保留期限、导出、删除和“组织成员离开后如何处理记忆”等产品与合规问题。</p>
+<h3 id="26-agentscope">2.6 AgentScope 自身的多租户边界<a class="headerlink" href="#26-agentscope" title="Permanent link">&para;</a></h3>
+<p>AgentScope SQL 表在 Agent、Credential、Session、Team 和 KB 上保存并索引 <code>user_id</code>；Message 表则以 <code>(session_id, msg_id)</code> 为复合主键（<a href="../../agentscope/src/agentscope/app/storage/_sql/_tables.py#L118-L226">_tables.py</a>，<a href="../../agentscope/src/agentscope/app/storage/_sql/_tables.py#L338-L364">_tables.py</a>）。访问服务把 owner 的资源和 policy 允许的跨 owner 引用合并。</p>
+<p>默认 <code>DenyAllResourceAccessPolicy</code> 拒绝跨 owner 访问。抽象 policy 只负责资源引用，不负责组织或成员管理，源码明确要求调用方实现这一层（<a href="../../agentscope/src/agentscope/app/access/_policy.py#L79-L112">_policy.py</a>）。这是接入模板组织 RBAC 的正确扩展点。</p>
+<p>也就是说，AgentScope 提供了 owner 隔离机制和授权接口，但不是开箱即用的组织级 SaaS tenancy。其 SQL schema 同样没有展示数据库 RLS；隔离依赖 owner-scoped service、全局唯一 ID、访问策略和正确的 key/collection namespace。模板仍应是最终身份和组织权限权威。</p>
+<h2 id="3">3. 推荐目标架构<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><span class="filename">Text Only</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Browser / Slack / Telegram
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>            |
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>   Template API + WebSocket
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>   JWT -&gt; TenantContext -&gt; RBAC
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>            |
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>   Framework-specific execution branch
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>            |
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>      AgentScopeRuntime
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>      |       |        |
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>   Agent    Team    EventAdapter
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>      |       |        |
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>   Tools/RAG |     template WS events
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>      |       |
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a> Template KB repositories
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>      |
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a> tenant-filtered vector store
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>Shared infrastructure:
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>PostgreSQL (business + execution state), Redis MessageBus/locks,
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>tenant-scoped workspace, audit/usage/billing
+</span></code></pre></div>
+<p>职责边界：</p>
+<table>
+<thead>
+<tr>
+<th>领域</th>
+<th>权威系统</th>
+<th>AgentScope 的作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>登录/<abbr title="JSON Web Token">JWT</abbr>/IdP</td>
+<td>模板</td>
+<td>接收服务端解析后的 TenantContext，不读取外部伪造 header</td>
+</tr>
+<tr>
+<td>Organization/RBAC</td>
+<td>模板</td>
+<td>custom ResourceAccessPolicy 查询模板成员与角色</td>
+</tr>
+<tr>
+<td>产品会话与消息</td>
+<td>模板</td>
+<td>session 作为执行 checkpoint；事件回投模板持久化</td>
+</tr>
+<tr>
+<td>Agent/Team runtime</td>
+<td>AgentScope</td>
+<td>Agent、worker、roster、inbox、message bus、permission</td>
+</tr>
+<tr>
+<td>KB 元数据与摄取</td>
+<td>初期为模板</td>
+<td>AgentScope tool/middleware adapter</td>
+</tr>
+<tr>
+<td>向量隔离</td>
+<td>两层共同保证</td>
+<td>collection namespace + 强制 metadata filter</td>
+</tr>
+<tr>
+<td>计费/配额</td>
+<td>模板</td>
+<td>从 AgentScope model events 上报 usage</td>
+</tr>
+<tr>
+<td>工作区</td>
+<td>AgentScope manager</td>
+<td>每租户/Agent/session 独立路径或远程 workspace</td>
+</tr>
+</tbody>
+</table>
+<p>建议定义统一上下文，所有 runtime、tool 和数据访问都显式接收：</p>
+<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">TenantContext</span><span class="p">:</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">actor_user_id</span><span class="p">:</span> <span class="n">UUID</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">resource_owner</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># user:{id} 或 org:{id}</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">organization_id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">|</span> <span class="kc">None</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">conversation_id</span><span class="p">:</span> <span class="n">UUID</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">role</span><span class="p">:</span> <span class="n">OrgRole</span> <span class="o">|</span> <span class="kc">None</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span>
+</span></code></pre></div>
+<p>不要只传 <code>user_id</code>。<code>actor_user_id</code> 表示谁执行了操作，<code>resource_owner</code> 表示资源属于哪个隔离域，两者在组织场景中不同。</p>
+<h2 id="4">4. 分阶段实施路线<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
+<h3 id="phase-0">Phase 0：固定边界与威胁模型<a class="headerlink" href="#phase-0" title="Permanent link">&para;</a></h3>
+<ul>
+<li>定义 TenantContext、ID 映射、审计字段和个人/组织 owner namespace。</li>
+<li>决定模板 conversation 与 AgentScope session 是 1:1，建议保存显式 mapping，而不是把一个 ID 到处隐式复用。</li>
+<li>列出所有数据面：SQL、Redis key、消息队列、workspace path、向量 collection/filter、MCP credential、长期记忆。</li>
+<li>写跨租户负面测试：知道别人的 UUID 也不能读取、订阅、检索、编辑或唤醒其资源。</li>
+</ul>
+<p>完成标准：在引入 AgentScope 前，身份、资源 owner、actor 和组织角色的语义没有歧义。</p>
+<h3 id="phase-1-runtime-agent">Phase 1：第六种 runtime，先达到单 Agent 功能对等<a class="headerlink" href="#phase-1-runtime-agent" title="Permanent link">&para;</a></h3>
+<p>生成器修改面：</p>
+<ul>
+<li><code>AIFrameworkType.AGENTSCOPE</code>、<abbr title="Command Line Interface">CLI</abbr> prompt 和配置验证。</li>
+<li><code>cookiecutter.json</code> 的 <code>use_agentscope</code>。</li>
+<li>post-generation hook 的 AgentScope 文件保留/删除逻辑。</li>
+<li>backend <code>pyproject.toml</code> 的 AgentScope 依赖和需要的 extras。</li>
+<li>AgentScope assistant/runtime 文件。</li>
+<li><abbr title="Full-duplex communication protocol">WebSocket</abbr> <code>AgentSession</code> 和 channel <code>AgentInvocationService</code> 的 AgentScope 专用分支；不在首轮迁移其他 runtime。</li>
+<li>文档、快照和生成矩阵测试。</li>
+</ul>
+<p>运行时范围：普通对话、流式文本、tool calls、取消、错误、HITL、历史、usage 和现有 KB search tool。暂不公开 AgentScope service <abbr title="Application Programming Interface">API</abbr>，也暂不开 teams。</p>
+<p>完成标准：选择 AgentScope 生成的项目可安装、启动并通过与其他框架相同的聊天/RAG/渠道契约测试。</p>
+<h3 id="phase-2-session">Phase 2：持久化 Session 与分布式执行<a class="headerlink" href="#phase-2-session" title="Permanent link">&para;</a></h3>
+<ul>
+<li>使用 SQL/Redis storage 保存 AgentScope execution state。</li>
+<li>生产环境启用 Redis MessageBus、事件 replay 和分布式 session lock。</li>
+<li>建立 conversation-session mapping 和幂等 request/turn ID。</li>
+<li>模板消息仍是产品记录的唯一权威；AgentScope state 是可恢复的执行状态。</li>
+<li>对“AgentScope 已完成但模板消息写入失败”等双写场景增加 outbox/reconciliation。</li>
+</ul>
+<p>完成标准：多进程部署、重连和进程崩溃后不会重复执行一轮，也不会丢失最终消息或计费记录。</p>
+<h3 id="phase-3-agent">Phase 3：组织级多 Agent 团队<a class="headerlink" href="#phase-3-agent" title="Permanent link">&para;</a></h3>
+<ul>
+<li>配置团队角色的 <code>SubAgentTemplate</code>，初始建议仅开放研究员、执行员、审阅员三类受控角色。</li>
+<li>第一版采用“成员自己的执行团队”：session/team/workspace 属于真实用户，组织 Agent/KB 由 org namespace 持有并经 policy 分享。</li>
+<li>实现 template-backed <code>OrganizationResourceAccessPolicy</code>：把 owner/admin/member/viewer 映射为跨 owner 的 AgentScope read/edit 权限。</li>
+<li>若后续要求组织共享一个持久 team，新增受保护的 org service-principal 执行路径，并在模板层对每次 team 变更重新校验 actor role；不要直接复用普通 AgentScope router。</li>
+<li>前端增加 roster、worker state、任务分派、TeamSay 消息、取消和 HITL 投影；外部协议仍走模板 <abbr title="Full-duplex communication protocol">WebSocket</abbr>。</li>
+<li>MCP credential 与 tool permission 按 worker 最小权限发放，不能因为 leader 可用就自动让所有 worker 可用。</li>
+<li>每个 Execution Team 最多同时存在 6 个 worker；Tenant 管理员可以调低但不能突破平台上限。团队仍需限制并发、递归深度、token/tool budget，并接入现有 billing/quotas。</li>
+</ul>
+<p>完成标准：同组织授权成员可协作，不同组织即使知道 agent/team/session ID 也无法看到事件、消息、workspace 或 tool credential。</p>
+<h3 id="phase-4-kbrag-adapter">Phase 4：原生 KB/RAG adapter<a class="headerlink" href="#phase-4-kbrag-adapter" title="Permanent link">&para;</a></h3>
+<ul>
+<li>实现 AgentScope KB manager 或 RAG middleware adapter，复用模板 KB repository 和摄取状态。</li>
+<li>将 personal/org/app scope 映射到 resource owner 与 ResourceAccessPolicy。</li>
+<li>collection routing 与 metadata filter 双重隔离。</li>
+<li>文档删除、KB 删除和组织删除要同步清理向量、缓存及 AgentScope resource record。</li>
+<li>对 attachment、agentic RAG、引用来源和重排进行行为契约测试。</li>
+</ul>
+<p>完成标准：只有一条摄取链路、一个 KB 元数据权威，且 SQL 权限测试与真实向量检索测试都能证明隔离。</p>
+<h3 id="phase-5">Phase 5：长期记忆与远程工作区<a class="headerlink" href="#phase-5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Mem0 key 加 resource owner、agent 和可选 member 维度。</li>
+<li>ReMe/workspace 采用 tenant-scoped root；生产环境使用隔离的 Docker/Kubernetes workspace manager。</li>
+<li>增加记忆查看、删除、保留期限和成员退出策略。</li>
+<li>workspace file、skill、MCP credential 和代码执行遵循同一 access policy。</li>
+</ul>
+<p>完成标准：跨 session 有用、跨 tenant 不可见，且用户能解释和删除系统保存的长期记忆。</p>
+<h2 id="5">5. 关键接口建议<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
+<h3 id="51-runtime-adapter">5.1 Runtime adapter（首轮暂缓）<a class="headerlink" href="#51-runtime-adapter" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">AgentRuntimeAdapter</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stream</span><span class="p">(</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>        <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="n">tenant</span><span class="p">:</span> <span class="n">TenantContext</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Message</span><span class="p">],</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="n">kb_handles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">KnowledgeBaseHandle</span><span class="p">],</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">cancellation</span><span class="p">:</span> <span class="n">CancellationToken</span><span class="p">,</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncIterator</span><span class="p">[</span><span class="n">RuntimeEvent</span><span class="p">]:</span> <span class="o">...</span>
+</span></code></pre></div>
+<p>首轮不会为了 AgentScope 改造全部现有 runtime；上述接口作为后续去重方向保留。当前 AgentScope 专用分支同样不得自行决定组织、KB 和 conversation 权限，只能使用上游已解析的 handle，并让 tool 再做 server-side tenant 校验。</p>
+<h3 id="52-organization-resource-policy">5.2 Organization resource policy<a class="headerlink" href="#52-organization-resource-policy" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><span class="filename">Python</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">OrganizationResourceAccessPolicy</span><span class="p">(</span><span class="n">ResourceAccessPolicyBase</span><span class="p">):</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_accessible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">viewer_id</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">storage</span><span class="p">):</span> <span class="o">...</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">can_edit</span><span class="p">(</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>        <span class="bp">self</span><span class="p">,</span> <span class="n">viewer_id</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">owner_id</span><span class="p">,</span> <span class="n">resource_id</span><span class="p">,</span> <span class="n">storage</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="p">):</span> <span class="o">...</span>
+</span></code></pre></div>
+<p>建议映射：owner/admin 可编辑组织 Agent/Team/KB；member 默认可读和运行，但不能改 credential/共享 Agent 配置；viewer 只读，是否能发起运行由产品策略单独决定。个人资源始终只对本人开放，除非用户显式分享。</p>
+<h3 id="53-kb-adapter">5.3 KB adapter<a class="headerlink" href="#53-kb-adapter" title="Permanent link">&para;</a></h3>
+<p>Adapter 输出不可伪造的 <code>KnowledgeBaseHandle</code>，其中包含内部 collection name 和强制 metadata filter；客户端只提交公开 KB UUID，不能提交 collection 名或任意 filter。</p>
+<h2 id="6">6. 高风险点<a class="headerlink" href="#6" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>身份混淆</strong>：把 AgentScope <code>user_id</code> 同时当 actor 和 organization owner，会破坏组织共享或审计。</li>
+<li><strong>直接暴露临时 header auth</strong>：<code>X-User-ID</code> 可伪造，必须由模板 <abbr title="JSON Web Token">JWT</abbr> server-side 注入。</li>
+<li><strong>双套消息权威</strong>：模板 conversation 与 AgentScope message 都作为产品记录会产生删除、编辑、重放和计费不一致。</li>
+<li><strong>双套 KB 摄取</strong>：同一文件进入两套 collection 后，删除和权限变更很容易只作用于一边。</li>
+<li><strong>仅靠 UI 隔离</strong>：team/session/KB <abbr title="Application Programming Interface">API</abbr>、<abbr title="Server-Sent Events">SSE</abbr>/WS 订阅、Redis key、workspace 和向量检索都必须独立校验 owner。</li>
+<li><strong>共享 workspace</strong>：尤其是 ReMe、skills 和代码执行，路径配置错误会直接泄露其他租户文件。</li>
+<li><strong>无限团队扇出</strong>：worker 可并行唤醒，必须有并发、深度、工具和预算限制。</li>
+<li><strong>复制第六份 session 流程</strong>：短期快，长期会让修复和安全检查只落在部分框架；应抽 runtime seam。</li>
+</ol>
+<h2 id="7">7. 必须补充的测试<a class="headerlink" href="#7" title="Permanent link">&para;</a></h2>
+<ul>
+<li>生成器：AgentScope × RAG × teams × PostgreSQL/Redis 的最小有效矩阵，以及不支持组合的 validation。</li>
+<li>Runtime contract：每个 adapter 对 text/tool/HITL/error/cancel/usage 的统一事件契约。</li>
+<li>SQL 隔离：真实数据库中两个 org 使用相同公开资源名和已知 UUID 的负面测试。</li>
+<li>事件隔离：用户不能订阅其他 tenant session <abbr title="Server-Sent Events">SSE</abbr>/WS 或收到其 TeamSay。</li>
+<li>Redis 隔离：queue、lock、replay buffer 的 key 不能碰撞。</li>
+<li>向量隔离：故意错误指定 KB ID/filter 时仍不得返回另一 org chunk。</li>
+<li>Workspace 隔离：相对路径、软链接、共享 skill 和 agent worker 场景。</li>
+<li>权限：owner/admin/member/viewer 对 agent/team/KB/credential 的读、运行、编辑、删除矩阵。</li>
+<li>故障恢复：worker 崩溃、Redis 重连、双写中断、重复 request id、客户端重连。</li>
+<li>资源生命周期：组织/成员/KB/Agent/Team 删除后的 SQL、向量、workspace、memory 清理。</li>
+</ul>
+<h2 id="8">8. 建议的第一个可交付切片<a class="headerlink" href="#8" title="Permanent link">&para;</a></h2>
+<p>第一轮实现应严格限制在以下范围：</p>
+<ul>
+<li><abbr title="Command Line Interface">CLI</abbr> 可以选择 AgentScope。</li>
+<li>生成的项目能用 AgentScope 完成单 Agent 流式聊天。</li>
+<li>支持现有 KB search tool、HITL、取消、消息持久化和 usage。</li>
+<li>AgentScope 只在内部运行，不公开其原生 <code>/chat</code> 与 <code>/sessions/.../stream</code>。</li>
+<li>新增 runtime contract tests 和两租户 KB 负面测试。</li>
+</ul>
+<p>这一步完成后再打开 team 能力。这样可以先验证事件协议、会话生命周期、计费与权限边界，避免在基础调用链未稳定时同时引入消息总线、worker session 和共享 workspace。</p>
+<h2 id="9-agile-school">9. 关于“Agile School”的假设<a class="headerlink" href="#9-agile-school" title="Permanent link">&para;</a></h2>
+<p>两个仓库和源码中均未出现名为 “Agile School” 的组件。结合上下文，本报告暂按语音/输入误差，将其理解为 <strong>AgentScope 2</strong>，其中“团队、多 Agent、知识库、多租户”都对应 AgentScope 2 的现有能力。如果这里实际指另一个独立项目，需要补充其仓库地址后再做第三方能力映射。</p>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/vstorm-co/framework-agent-python" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://pypi.org/project/framework-agent-python/" target="_blank" rel="noopener" title="PyPI" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.instant.prefetch", "navigation.instant.progress", "navigation.tracking", "navigation.path", "navigation.top", "navigation.footer", "navigation.indexes", "search.suggest", "search.highlight", "search.share", "content.tabs.link", "content.code.copy", "content.code.select", "content.code.annotate", "content.tooltips", "toc.follow", "announce.dismiss"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

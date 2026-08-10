@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/ai-agent/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/ai-agent/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/ai-agent/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/architecture/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/architecture/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/architecture/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/deployment/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/deployment/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/deployment/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/development/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/development/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/development/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/frontend/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/frontend/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/frontend/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/gallery/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/gallery/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/gallery/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/getting-help/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/getting-help/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/getting-help/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/installation/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/installation/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/installation/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/observability/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/observability/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/observability/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/rag/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/rag/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/rag/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0001-template-control-plane-agentscope-execution-runtime/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0001-template-control-plane-agentscope-execution-runtime/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0001-template-control-plane-agentscope-execution-runtime/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0002-agentscope-as-a-mutually-exclusive-runtime/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0002-agentscope-as-a-mutually-exclusive-runtime/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0002-agentscope-as-a-mutually-exclusive-runtime/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0003-control-plane-owns-knowledge-lifecycle/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0003-control-plane-owns-knowledge-lifecycle/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0003-control-plane-owns-knowledge-lifecycle/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0004-defense-in-depth-between-organization-tenants/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0004-defense-in-depth-between-organization-tenants/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0004-defense-in-depth-between-organization-tenants/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0005-bind-each-execution-to-one-tenant/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0005-bind-each-execution-to-one-tenant/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0005-bind-each-execution-to-one-tenant/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0006-follow-agentscope-worker-permission-inheritance/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0006-follow-agentscope-worker-permission-inheritance/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0006-follow-agentscope-worker-permission-inheritance/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0007-bind-personal-connections-to-one-tenant/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0007-bind-personal-connections-to-one-tenant/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0007-bind-personal-connections-to-one-tenant/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0008-scope-long-term-memory-by-tenant-user-and-agent/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0008-scope-long-term-memory-by-tenant-user-and-agent/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0008-scope-long-term-memory-by-tenant-user-and-agent/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0009-use-mem0-as-the-first-memory-backend/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0009-use-mem0-as-the-first-memory-backend/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0009-use-mem0-as-the-first-memory-backend/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0010-aggregate-team-usage-into-one-run/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0010-aggregate-team-usage-into-one-run/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0010-aggregate-team-usage-into-one-run/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0011-isolate-worker-failures-and-propagate-team-stops/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0011-isolate-worker-failures-and-propagate-team-stops/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0011-isolate-worker-failures-and-propagate-team-stops/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0012-require-production-infrastructure-for-agentscope/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0012-require-production-infrastructure-for-agentscope/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0012-require-production-infrastructure-for-agentscope/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0013-clean-private-state-when-members-leave/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0013-clean-private-state-when-members-leave/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0013-clean-private-state-when-members-leave/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/adr/0014-integrate-without-forking-agentscope/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0014-integrate-without-forking-agentscope/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0014-integrate-without-forking-agentscope/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/agents/domain/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/agents/domain/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/agents/domain/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/agents/issue-tracker/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/agents/issue-tracker/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/agents/issue-tracker/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/agents/triage-labels/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/agents/triage-labels/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/agents/triage-labels/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/concepts/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/concepts/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/concepts/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/guides/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/guides/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/guides/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/guides/agentscope-release-gate/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/guides/agentscope-release-gate/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/guides/agentscope-release-gate/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/guides/configuration/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/guides/configuration/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/guides/configuration/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/guides/quick-start/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/guides/quick-start/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/guides/quick-start/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/guides/version-upgrade/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/guides/version-upgrade/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/guides/version-upgrade/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/includes/abbreviations/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/includes/abbreviations/"/>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/includes/abbreviations/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/agentscope2-integration-research/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/agentscope2-integration-research/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/ai-agent/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/ai-agent/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/ai-agent/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/architecture/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/architecture/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/architecture/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/deployment/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/deployment/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/deployment/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/development/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/development/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/development/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/frontend/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/frontend/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/frontend/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/gallery/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/gallery/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/gallery/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/getting-help/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/getting-help/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/getting-help/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/installation/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/installation/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/installation/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/observability/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/observability/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/observability/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/rag/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/rag/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/rag/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0001-template-control-plane-agentscope-execution-runtime/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0001-template-control-plane-agentscope-execution-runtime/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0001-template-control-plane-agentscope-execution-runtime/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0002-agentscope-as-a-mutually-exclusive-runtime/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0002-agentscope-as-a-mutually-exclusive-runtime/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0002-agentscope-as-a-mutually-exclusive-runtime/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0003-control-plane-owns-knowledge-lifecycle/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0003-control-plane-owns-knowledge-lifecycle/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0003-control-plane-owns-knowledge-lifecycle/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0004-defense-in-depth-between-organization-tenants/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0004-defense-in-depth-between-organization-tenants/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0004-defense-in-depth-between-organization-tenants/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0005-bind-each-execution-to-one-tenant/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0005-bind-each-execution-to-one-tenant/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0005-bind-each-execution-to-one-tenant/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0006-follow-agentscope-worker-permission-inheritance/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0006-follow-agentscope-worker-permission-inheritance/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0006-follow-agentscope-worker-permission-inheritance/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0007-bind-personal-connections-to-one-tenant/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0007-bind-personal-connections-to-one-tenant/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0007-bind-personal-connections-to-one-tenant/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0008-scope-long-term-memory-by-tenant-user-and-agent/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0008-scope-long-term-memory-by-tenant-user-and-agent/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0008-scope-long-term-memory-by-tenant-user-and-agent/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0009-use-mem0-as-the-first-memory-backend/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0009-use-mem0-as-the-first-memory-backend/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0009-use-mem0-as-the-first-memory-backend/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0010-aggregate-team-usage-into-one-run/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0010-aggregate-team-usage-into-one-run/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0010-aggregate-team-usage-into-one-run/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0011-isolate-worker-failures-and-propagate-team-stops/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0011-isolate-worker-failures-and-propagate-team-stops/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0011-isolate-worker-failures-and-propagate-team-stops/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0012-require-production-infrastructure-for-agentscope/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0012-require-production-infrastructure-for-agentscope/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0012-require-production-infrastructure-for-agentscope/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0013-clean-private-state-when-members-leave/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0013-clean-private-state-when-members-leave/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0013-clean-private-state-when-members-leave/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/adr/0014-integrate-without-forking-agentscope/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/adr/0014-integrate-without-forking-agentscope/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/adr/0014-integrate-without-forking-agentscope/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/agents/domain/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/agents/domain/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/agents/domain/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/agents/issue-tracker/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/agents/issue-tracker/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/agents/issue-tracker/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/agents/triage-labels/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/agents/triage-labels/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/agents/triage-labels/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/concepts/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/concepts/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/concepts/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/guides/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/guides/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/guides/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/guides/agentscope-release-gate/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/guides/agentscope-release-gate/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/guides/agentscope-release-gate/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/guides/configuration/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/guides/configuration/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/guides/configuration/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/guides/quick-start/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/guides/quick-start/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/guides/quick-start/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/guides/version-upgrade/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/guides/version-upgrade/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/guides/version-upgrade/"/>
+    </url>
+    <url>
+        <loc>https://vstorm-co.github.io/framework-agent-python/zh/includes/abbreviations/</loc>
+        <lastmod>2026-08-10</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="zh" href="https://vstorm-co.github.io/framework-agent-python/zh/includes/abbreviations/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://vstorm-co.github.io/framework-agent-python/includes/abbreviations/"/>
+    </url>
+</urlset>
