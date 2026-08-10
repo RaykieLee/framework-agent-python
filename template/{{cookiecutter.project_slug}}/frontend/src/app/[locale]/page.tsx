@@ -43,6 +43,7 @@ import { SmoothScroll } from "@/components/marketing/smooth-scroll";
 import { TestimonialGrid } from "@/components/marketing/testimonial-grid";
 import { JsonLd } from "@/components/seo/json-ld";
 import { APP_NAME, ROUTES } from "@/lib/constants";
+import { localizedPath } from "@/lib/locale-path";
 import { faqSchema, organizationSchema, websiteSchema } from "@/lib/schema-org";
 
 const LOGOS = [
@@ -179,8 +180,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
         brand={APP_NAME}
         links={navLinks}
         ctaLabel={tNav("nav.getStarted")}
-        ctaHref={ROUTES.REGISTER}
-        secondaryCta={{ label: tNav("nav.signIn"), href: ROUTES.LOGIN }}
+        ctaHref={localizedPath(locale, ROUTES.REGISTER)}
+        secondaryCta={{ label: tNav("nav.signIn"), href: localizedPath(locale, ROUTES.LOGIN) }}
       />
 
       <main id="main">
@@ -192,7 +193,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
             </>
           }
           description={t("hero.description")}
-          primaryCta={{ label: t("hero.ctaPrimary"), href: ROUTES.REGISTER }}
+          primaryCta={{ label: t("hero.ctaPrimary"), href: localizedPath(locale, ROUTES.REGISTER) }}
           secondaryCta={{ label: t("hero.ctaSecondary"), href: ROUTES.CONTACT }}
           ratingLabel={t("hero.ratingLabel")}
           trustNote={t("hero.trustNote")}
